@@ -1,0 +1,924 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head><meta name="generator" content="Hexo 3.8.0">
+    <meta charset="utf-8">
+    <meta name="keywords" content="JSP课程考试题, 意犹未尽">
+    <meta name="description" content="笔者本科期间JSP课程考试自己整理的题
+
+JSP中动态include与静态include的语法和区别是什么？  
+
+语法：动态include：&amp;lt;jsp:include page =””&amp;gt;静态include：&amp;lt;%@inclu">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>JSP课程考试题 | 意犹未尽</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+    <style type="text/css">
+        
+    </style>
+
+    <script src="/libs/jquery/jquery-2.2.0.min.js"></script>
+</head>
+
+
+<body>
+
+<header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">意犹未尽</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fa fa-navicon"></i></a>
+<ul class="right">
+    
+    <li class="hide-on-med-and-down">
+        <a href="/" class="waves-effect waves-light">
+            
+            <i class="fa fa-home"></i>
+            
+            <span>首页</span>
+        </a>
+    </li>
+    
+    <li class="hide-on-med-and-down">
+        <a href="/tags" class="waves-effect waves-light">
+            
+            <i class="fa fa-tags"></i>
+            
+            <span>标签</span>
+        </a>
+    </li>
+    
+    <li class="hide-on-med-and-down">
+        <a href="/categories" class="waves-effect waves-light">
+            
+            <i class="fa fa-bookmark"></i>
+            
+            <span>分类</span>
+        </a>
+    </li>
+    
+    <li class="hide-on-med-and-down">
+        <a href="/archives" class="waves-effect waves-light">
+            
+            <i class="fa fa-archive"></i>
+            
+            <span>归档</span>
+        </a>
+    </li>
+    
+    <li class="hide-on-med-and-down">
+        <a href="/about" class="waves-effect waves-light">
+            
+            <i class="fa fa-user-circle-o"></i>
+            
+            <span>关于</span>
+        </a>
+    </li>
+    
+    <li class="hide-on-med-and-down">
+        <a href="/friends" class="waves-effect waves-light">
+            
+            <i class="fa fa-address-book"></i>
+            
+            <span>友情链接</span>
+        </a>
+    </li>
+    
+    <li>
+        <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+            <i id="searchIcon" class="fa fa-search" title="搜索"></i>
+        </a>
+    </li>
+</ul>
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">意犹未尽</div>
+        <div class="logo-desc">
+            
+            --wangwei10061
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li>
+            <a href="/" class="waves-effect waves-light">
+                
+                <i class="fa fa-fw fa-home"></i>
+                
+                首页
+            </a>
+        </li>
+        
+        <li>
+            <a href="/tags" class="waves-effect waves-light">
+                
+                <i class="fa fa-fw fa-tags"></i>
+                
+                标签
+            </a>
+        </li>
+        
+        <li>
+            <a href="/categories" class="waves-effect waves-light">
+                
+                <i class="fa fa-fw fa-bookmark"></i>
+                
+                分类
+            </a>
+        </li>
+        
+        <li>
+            <a href="/archives" class="waves-effect waves-light">
+                
+                <i class="fa fa-fw fa-archive"></i>
+                
+                归档
+            </a>
+        </li>
+        
+        <li>
+            <a href="/about" class="waves-effect waves-light">
+                
+                <i class="fa fa-fw fa-user-circle-o"></i>
+                
+                关于
+            </a>
+        </li>
+        
+        <li>
+            <a href="/friends" class="waves-effect waves-light">
+                
+                <i class="fa fa-fw fa-address-book"></i>
+                
+                友情链接
+            </a>
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/blinkfox/hexo-theme-matery" class="waves-effect waves-light" target="_blank">
+                <i class="fa fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/blinkfox/hexo-theme-matery" class="github-corner tooltipped hide-on-med-and-down" target="_blank" data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewbox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/6.jpg')">
+    <div class="container">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <div class="description center-align post-title">
+                        JSP课程考试题
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        margin: 35px 0 15px 0;
+        padding-left: 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #toc-content .is-active-link::before {
+        background-color: #42b983;
+    }
+</style>
+<div class="row">
+    <div class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/jsp/" target="_blank">
+                                <span class="chip bg-color">jsp</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fa fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/web/" class="post-category" target="_blank">
+                                web
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                <div class="post-date info-break-policy">
+                    <i class="fa fa-calendar-minus-o fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2016-09-19
+                </div>
+
+                
+				
+				
+                    <div id="busuanzi_container_page_pv" class="info-break-policy">
+                        <i class="fa fa-eye fa-fw"></i>阅读次数:&nbsp;&nbsp;
+                        <span id="busuanzi_value_page_pv"></span>
+                    </div>
+				
+            </div>
+        </div>
+        <hr class="clearfix">
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <p>笔者本科期间JSP课程考试自己整理的题</p>
+<ol>
+<li><p>JSP中动态include与静态include的语法和区别是什么？  </p>
+<ul>
+<li>语法：<br>动态include：<code>&lt;jsp:include page =””&gt;</code><br>静态include：<code>&lt;%@include file = “”%&gt;</code>  </li>
+<li>区别：<br>静态包含是在JSP中包含一个静态的文件，同时解析这个文件中的JSP语句，相当于把该静态文件的内容复制到使用include指令的页面中，当被包含的文件发生变化时，使用include指令包含该文件的页面反应不出变化。<br>动态包含是将被包含文件编译后的结果包含入当前位置，它总是会检查所包含文件的变化，如果被包含资源有变化，那么该页面下一次被访问时将体现出变化后的内容。</li>
+</ul>
+</li>
+<li><p>两种跳转方式是什么？有什么区别？  </p>
+<ul>
+<li>两种跳转方式分别为：<br>forward跳转：<code>&lt;jsp:forward page=&quot;跳转页面地址&quot; /&gt;</code><br>response跳转：<code>response.sendRedirect(&quot;跳转页面地址&quot;)</code>  </li>
+<li>两种跳转的区别如下：<ul>
+<li>forward跳转：<br>a.服务器端跳转，地址栏不改变；<br>b.执行到跳转语句后马上无条件跳转，之后的代码不再执行(跳转之前一定要释放全部资源)；<br>c.request设置的属性在跳转后的页面仍可以使用；<br>d.使用<code>&lt;jsp:param name=&quot;参数名&quot; value=&quot;参数值&quot; /&gt;</code>传递参数。  </li>
+<li>response跳转：<br>a.客户端跳转,地址栏改变；<br>b.所有代码执行完毕后跳转；<br>c.跳转后的页面不能使用上一个页面的request属性；<br>d.使用地址重写传递参数(response.sendRedirect(“URL?参数名＝参数值”))。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>Tomcat服务器的默认端口是什么？怎么修改其默认端口？<br>Tomcat的默认端口为：8080<br>修改默认端口：<br>进到conf目录下修改server.xml：找到第一个Connector，修改port的值即可</p>
+</li>
+<li><p>在JSP中如何使用注释？</p>
+<ul>
+<li>JSP注释<br>&lt;%–这是JSP注释–%&gt;  </li>
+<li>JAVA注释<br><code>&lt;%
+/*JSP Scriplets代码片段中JAVA注释形式1*/
+int a = 1;   // JSP Scriplets代码片段中JAVA注释形式2
+%&gt;</code>  </li>
+<li>HTML注释<br><code>&lt;!—这是HTML注释 --&gt;</code></li>
+</ul>
+</li>
+<li><p>举例说明调用JavaBean的语法和各个属性的作用  </p>
+<ul>
+<li>语法：<br><code>&lt;jsp:useBean id =＂beanInstanceName＂ scope =＂page|request|session|application＂ class = ＂package.className＂/&gt;</code><br>或<br><code>&lt;jsp:useBean id =＂beanInstanceName＂ scope =＂page|request|session|application＂ class = ＂package.className＂&gt;
+&lt;/jsp:useBean&gt;</code>  </li>
+<li><p>例子：   </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;jsp:useBean id =＂bean1＂ scope =＂session＂ class = ＂com.nenu.haha.Bean1＂&gt;</span><br><span class="line">&lt;%=bean1.getName()%&gt;</span><br><span class="line">&lt;/jsp:useBean&gt;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>各属性的作用：<br>id: bean的实例名称，在后面的程序中使用该名称来区别不同的bean<br>scope: 指定bean的存在范围和变量名bean1的有效范围<br>class：bean的存放位置</p>
+</li>
+</ul>
+</li>
+<li><p>JSP收发邮件和上传文件的常用组件分别是什么？<br>上传文件：JspSmartUpload<br>收发邮件：JavaMail  </p>
+</li>
+<li><p>配置Tomcat虚拟目录时，需要修改哪个xml文件，在哪个位置加入什么语句？<br>修改Tomcat虚拟目录需要修改conf目录下的server.xml文件。<br>具体操作为：（假设工程根目录为：D:\myjsp）<br>找到<code>&lt;Host...&gt;</code>标签，下面增加一句：<br><code>&lt;Context path=＂/anyword＂ docBase=＂D:\myjsp＂reloadable=＂true＂/&gt;</code><br>path说明虚拟目录的名字，即访问路径为：localhost:8080/anyword<br>docBase为工程的物理路径</p>
+</li>
+<li><p>JSP的内置对象有哪些？作用分别是什么？  </p>
+<ul>
+<li>request:包含了客户端向服务器端请求的信息</li>
+<li>response：包含了服务器端向客户端返回的相应内容</li>
+<li>application：保存在application中的信息在整个应用中都有效，可存放全局变量</li>
+<li>session：表示当前用户的会话信息，在session中保存的内容在当前用户所连接到的所有页面中都是可以访问到的</li>
+<li>out:用于向客户端输出内容</li>
+<li>page：指向当前jsp页面本身</li>
+<li>exception：当JSP页面在执行页面过程中产生异常或是错误时，会自动产生一个exception对象</li>
+<li>config：是一个Servlet初始化时，JSP引擎向它传递信息用的</li>
+<li>pageContext：提供对JSP页面内所用对象及名字空间的访问</li>
+</ul>
+</li>
+<li><p>创建了结果集RS后，输出结果集中的所有记录，写出语句  </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">ResultSet rs = stmt.executeQuery();  <span class="comment">//得到结果集</span></span><br><span class="line">While(rs.next())</span><br><span class="line">&#123;</span><br><span class="line">     <span class="comment">//循环输出所有记录</span></span><br><span class="line">     <span class="keyword">int</span> id = rs.getInt(<span class="number">1</span>);</span><br><span class="line">     String name = rs.getString(<span class="number">2</span>);</span><br><span class="line">     out.println(＂id:＂+id+＂/t姓名:＂+name);</span><br><span class="line">&#125;</span><br><span class="line">rs.close();  <span class="comment">//关闭记录集</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>在SQL Server数据库中要做哪些设置才能够保证JSP顺利访问  </p>
+<ul>
+<li>启动sql server</li>
+<li>启用TCP/IP协议</li>
+<li>配置端口</li>
+<li>设置混合验证</li>
+<li>sa授权登录</li>
+<li>sa密码设置</li>
+<li>重启sql server  </li>
+</ul>
+</li>
+<li><p>关于中文乱码问题，有几种情况，如何解决？  </p>
+<ul>
+<li>JSP页面显示乱码<br>Page的第一行改成<code>&lt;%@page contentType=＂text/html;charset=utf-8＂%&gt;</code><br>Head里加<code>&lt;meta http-equiv=＂Content-Type＂ content=＂text/html;charset=utf-8＂&gt;</code><br>对包含文件作同样的修改  </li>
+<li>获取表单乱码——post提交  <ul>
+<li>方法一：在使用request.getParameter()之前设置编码：<br> request.setCharacterEncoding(＂utf-8＂);</li>
+<li>方法二：设置过滤器  </li>
+</ul>
+</li>
+<li><p>获取查询字符串乱码——get提交  </p>
+<ul>
+<li><p>方法一：  </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">     String pa = request.getParameter(＂haha＂);</span><br><span class="line">String pb = <span class="keyword">new</span> String(pa.getBytes(＂iso-<span class="number">8859</span>-<span class="number">1</span>＂),＂gb2312＂);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>方法二：<br>打开tomcat安装路径conf下的web.xml文件，在第一个Connector加入属性URIEncoding=＂utf-8＂</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>Tomcat如何允许目录浏览，如何修改默认启动页面  </p>
+<ul>
+<li>修改默认启动页面，打开conf/web.xml，修改<code>&lt;welcome-file-list&gt;</code>的值  </li>
+<li>允许目录浏览：设置<code>&lt;listings&gt;</code>的值为true</li>
+</ul>
+</li>
+<li><p>rs产生后，如何计算总记录数rs_total  </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">rs_last();</span><br><span class="line">rs_total = rs.getRow();</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<ol start="14">
+<li><p>详述JSP页面的执行过程，JSP页面第一次调用和第二次调用的区别  </p>
+<ul>
+<li>JSP页面执行过程：<br>当用户第一次请求JSP页面时，web容器将JSP页面转化成Servlet并通过Servlet引擎将其编译成class文件，将class文件加载入内存，执行完的结果通过HTML的形式返还给客户端  </li>
+<li>第一次调用的过程：JSP-&gt;Servlet-&gt;class  </li>
+<li>第二次调用，因为相应的class文件已经存在于JSP容器中，所以直接调用就行<br>所以第二次调用的速度要比第一次快</li>
+</ul>
+</li>
+<li><p>两种表单数据提交方式及区别  </p>
+<ul>
+<li>get方式参数的值会显示在地址栏，post不会</li>
+<li>post方式没有数据大小限制，get方式限制2k以内</li>
+<li>Servlet对于get的处理调用doGet()方法，对于post用doPost()处理</li>
+</ul>
+</li>
+</ol>
+
+            </div>
+            <hr>
+
+            
+            <style>
+    #reward {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    #reward .reward-link {
+        font-size: 1.88rem;
+    }
+
+    #reward .btn-floating:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #rewardModal {
+        width: 320px;
+        height: 350px;
+    }
+
+    #rewardModal .reward-title {
+        margin: 15px auto;
+        padding-bottom: 5px;
+    }
+
+    #rewardModal .modal-content {
+        padding: 10px;
+    }
+
+    #rewardModal .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.3rem;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    #rewardModal .close:hover {
+        color: #ef5350;
+        transform: scale(1.3);
+        -moz-transform:scale(1.3);
+        -webkit-transform:scale(1.3);
+        -o-transform:scale(1.3);
+    }
+
+    #rewardModal .reward-tabs {
+        margin: 0 auto;
+        width: 210px;
+    }
+
+    .reward-tabs .tabs {
+        height: 38px;
+        margin: 10px auto;
+        padding-left: 0;
+    }
+
+    .reward-content ul {
+        padding-left: 0 !important;
+    }
+
+    .reward-tabs .tabs .tab {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .reward-tabs .tab a {
+        color: #fff;
+        background-color: #ccc;
+    }
+
+    .reward-tabs .tab a:hover {
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .reward-tabs .wechat-tab .active {
+        color: #fff !important;
+        background-color: #22AB38 !important;
+    }
+
+    .reward-tabs .alipay-tab .active {
+        color: #fff !important;
+        background-color: #019FE8 !important;
+    }
+
+    .reward-tabs .reward-img {
+        width: 210px;
+        height: 210px;
+    }
+</style>
+
+<div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-large waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fa fa-close"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.png" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+            
+
+            <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+
+<div id="article-share">
+    
+    <div class="social-share" data-disabled="qzone" data-wechat-qrcode-helper="<p>微信里点“发现”->“扫一扫”二维码便可查看分享。</p>"></div>
+    
+</div>
+
+<script src="/libs/share/js/social-share.min.js"></script>
+
+            <div class="reprint">
+                <p>
+                    <span class="reprint-tip">
+                        <i class="fa fa-exclamation-circle"></i>&nbsp;&nbsp;转载请注明:
+                    </span>
+                    <a href="wangwei10061.github.io" class="b-link-green">意犹未尽</a>
+                    <i class="fa fa-angle-right fa-lg fa-fw text-color"></i>
+                    <a href="/2016/09/19/web/JSP课程考试题/" class="b-link-green">JSP课程考试题</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fa fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/2016/09/19/web/Ajax/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/16.jpg" class="responsive-img" alt="Ajax">
+                        
+                        <span class="card-title">Ajax</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary">
+Ajax是一门很叼的技术，它可以异步提交请求到服务端而不用刷新页面，这太有用了。设想一下，假如你在填写一个个人信息的页面，比如简历，各种信息填了好几十项，然后你上传了个头像，没有用异步上传的技术，头像上传完刷新回来，你填的其他信息全没了，</div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="fa fa-clock-o fa-fw icon-date"></i>2016-09-19
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fa fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/web/" class="post-category" target="_blank">
+                                    web
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/ajax/" target="_blank">
+                        <span class="chip bg-color">ajax</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fa fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2016/09/19/web/[转载]json/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/7.jpg" class="responsive-img" alt="[转载]json">
+                        
+                        <span class="card-title">[转载]json</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary">
+下面的内容是当时从网络上收藏到有道云笔记的，原作者已经不知道是谁，博客同时也是作为自己的笔记，无意侵权，如果您看到了这篇文章，并且您知道原出处，请您联系我，我将在博客中注明，或者如果您是原作者您介意我借用您的文章，请联系我，我将及时删除。</div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="fa fa-clock-o fa-fw icon-date"></i>2016-09-19
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fa fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/web/" class="post-category" target="_blank">
+                                    web
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/json/" target="_blank">
+                        <span class="chip bg-color">json</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+</div>
+
+
+    </div>
+    <div class="col l3 hide-on-med-and-down">
+        <div class="toc-widget">
+            <div class="toc-title"><i class="fa fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            // headingsOffset: -205,
+            headingSelector: 'h2, h3, h4'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+    });
+</script>
+    
+
+</main>
+
+
+<footer class="page-footer bg-color">
+    <div class="container row center-align">
+        <div class="col s12 m8 l8 copy-right">
+            本站由&copy;<a href="https://blinkfox.github.io/" target="_blank">Blinkfox</a>基于
+            <a href="https://hexo.io/" target="_blank">Hexo</a> 的
+            <a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">hexo-theme-matery</a>主题搭建.
+
+            
+
+            
+			
+                <br>
+                
+                <span id="busuanzi_container_site_pv">
+                    <i class="fa fa-heart-o"></i>
+                    本站总访问量 <span id="busuanzi_value_site_pv" class="white-color"></span>
+                </span>
+                
+                
+                <span id="busuanzi_container_site_uv">
+                    <i class="fa fa-users"></i>
+                    次,&nbsp;访客数 <span id="busuanzi_value_site_uv" class="white-color"></span> 人.
+                </span>
+                
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+
+
+    <a href="mailto:xxx@xx.xx" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fa fa-envelope-open"></i>
+    </a>
+
+
+
+    <a href="tencent://AddContact/?fromId=50&fromSubId=1&subcmd=all&uin=123123123" class="tooltipped" data-tooltip="QQ联系我: 123123123" data-position="top" data-delay="50">
+        <i class="fa fa-qq"></i>
+    </a>
+
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+<!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fa fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字" class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script src="/js/search.js"></script>
+<script type="text/javascript">
+$(function () {
+    searchFunc("/" + "search.xml", 'searchInput', 'searchResult');
+});
+</script>
+<!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fa fa-angle-up"></i>
+    </a>
+</div>
+
+
+<script src="/libs/materialize/materialize.min.js"></script>
+<script src="/libs/masonry/masonry.pkgd.min.js"></script>
+<script src="/libs/aos/aos.js"></script>
+<script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+<script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+<script src="/js/matery.js"></script>
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+
+    <script src="/libs/others/clicklove.js"></script>
+
+
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+
+
+</body>
+</html>
