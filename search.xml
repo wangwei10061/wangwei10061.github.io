@@ -860,31 +860,6 @@
     
     
     <entry>
-      <title>问题集：nextInt后nextLine读取空值</title>
-      <link href="/2016/09/18/java/wen-ti-ji-nextint-hou-nextline-du-qu-kong-zhi/"/>
-      <url>/2016/09/18/java/wen-ti-ji-nextint-hou-nextline-du-qu-kong-zhi/</url>
-      
-        <content type="html"><![CDATA[<p>在学习Scanner类的时候遇到一个问题，在使用nextInt()获取到一个整数之后，如果接着调用nextLine()方法，nextLine()方法将获取不到值？</p><pre class=" language-java"><code class="language-java"><span class="token keyword">import</span> java<span class="token punctuation">.</span>util<span class="token punctuation">.</span>*<span class="token punctuation">;</span><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">Test</span> <span class="token punctuation">{</span>    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">{</span>        Scanner sc <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Scanner</span><span class="token punctuation">(</span>System<span class="token punctuation">.</span>in<span class="token punctuation">)</span><span class="token punctuation">;</span>        <span class="token keyword">int</span> n <span class="token operator">=</span> sc<span class="token punctuation">.</span><span class="token function">nextInt</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>        String name <span class="token operator">=</span> sc<span class="token punctuation">.</span><span class="token function">nextLine</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>        String motto <span class="token operator">=</span> sc<span class="token punctuation">.</span><span class="token function">nextLine</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"----------------------"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>n<span class="token punctuation">)</span><span class="token punctuation">;</span>        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>name<span class="token punctuation">)</span><span class="token punctuation">;</span>        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>motto<span class="token punctuation">)</span><span class="token punctuation">;</span>        sc<span class="token punctuation">.</span><span class="token function">close</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>    <span class="token punctuation">}</span><span class="token punctuation">}</span></code></pre><p>当输入1和abc时，程序结束，name和motto的值分别被赋为空串和abc</p><pre><code>NPP_EXEC: &quot;java&quot;java  -cp &quot;C:\Users\frank\Desktop&quot; &quot;Test&quot;Process started &gt;&gt;&gt;1abc----------------------------1abc&lt;&lt;&lt; Process finished. (Exit code 0)================ READY ================</code></pre><p>吓得我赶紧查了一下API,API对于nextLine()方法给出的解释是这样的：</p><blockquote><p>此扫描器执行当前行，并返回跳过的输入信息。 此方法返回当前行的其余部分，不包括结尾处的行分隔符。当前位置移至下一行的行首。<br>因为此方法会继续在输入信息中查找行分隔符，所以如果没有行分隔符，它可能会缓冲所有输入信息，并查找要跳过的行。</p></blockquote><p>我们可以发现，对于上面的代码，当输入1 abc和def，name和motto的值分别被赋为 abc,def</p><pre><code>NPP_EXEC: &quot;java&quot;java  -cp &quot;C:\Users\frank\Desktop&quot; &quot;Test&quot;Process started &gt;&gt;&gt;1 abcdef----------------------------1 abcdef&lt;&lt;&lt; Process finished. (Exit code 0)================ READY ================</code></pre><p>那么问题出在哪呢？</p><p>我们知道平常在使用nextInt()的时候总是习惯于在输入完一个整数之后敲回车来结束这一次整数输入，殊不知在这一个整数输入之后就开始算做下一次输入了，也就是说你的这一个换行符被当作了下一个输入，也就是你nextLine()的输入，而根据官方API，nextLine会查找换行符之前的内容，而不会记录换行符作为信息，那么自然出现了nextInt()之后不能调用nextLine()获取一行字符的假象。</p><p>问题原因找到了，如何解决呢？</p><p>野蛮的办法，连续调用两次nextLine()，第一次调用就让它光荣地牺牲吧~</p>]]></content>
-      
-      
-      <categories>
-          
-          <category> JAVA </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> JAVA </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>问题集：两个String是否相等</title>
       <link href="/2016/09/18/java/wen-ti-ji-liang-ge-string-shi-fou-xiang-deng/"/>
       <url>/2016/09/18/java/wen-ti-ji-liang-ge-string-shi-fou-xiang-deng/</url>
@@ -977,6 +952,31 @@
         <tags>
             
             <tag> git </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>问题集：nextInt后nextLine读取空值</title>
+      <link href="/2016/09/18/java/wen-ti-ji-nextint-hou-nextline-du-qu-kong-zhi/"/>
+      <url>/2016/09/18/java/wen-ti-ji-nextint-hou-nextline-du-qu-kong-zhi/</url>
+      
+        <content type="html"><![CDATA[<p>在学习Scanner类的时候遇到一个问题，在使用nextInt()获取到一个整数之后，如果接着调用nextLine()方法，nextLine()方法将获取不到值？</p><pre class=" language-java"><code class="language-java"><span class="token keyword">import</span> java<span class="token punctuation">.</span>util<span class="token punctuation">.</span>*<span class="token punctuation">;</span><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">Test</span> <span class="token punctuation">{</span>    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">{</span>        Scanner sc <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Scanner</span><span class="token punctuation">(</span>System<span class="token punctuation">.</span>in<span class="token punctuation">)</span><span class="token punctuation">;</span>        <span class="token keyword">int</span> n <span class="token operator">=</span> sc<span class="token punctuation">.</span><span class="token function">nextInt</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>        String name <span class="token operator">=</span> sc<span class="token punctuation">.</span><span class="token function">nextLine</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>        String motto <span class="token operator">=</span> sc<span class="token punctuation">.</span><span class="token function">nextLine</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"----------------------"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>n<span class="token punctuation">)</span><span class="token punctuation">;</span>        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>name<span class="token punctuation">)</span><span class="token punctuation">;</span>        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>motto<span class="token punctuation">)</span><span class="token punctuation">;</span>        sc<span class="token punctuation">.</span><span class="token function">close</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>    <span class="token punctuation">}</span><span class="token punctuation">}</span></code></pre><p>当输入1和abc时，程序结束，name和motto的值分别被赋为空串和abc</p><pre><code>NPP_EXEC: &quot;java&quot;java  -cp &quot;C:\Users\frank\Desktop&quot; &quot;Test&quot;Process started &gt;&gt;&gt;1abc----------------------------1abc&lt;&lt;&lt; Process finished. (Exit code 0)================ READY ================</code></pre><p>吓得我赶紧查了一下API,API对于nextLine()方法给出的解释是这样的：</p><blockquote><p>此扫描器执行当前行，并返回跳过的输入信息。 此方法返回当前行的其余部分，不包括结尾处的行分隔符。当前位置移至下一行的行首。<br>因为此方法会继续在输入信息中查找行分隔符，所以如果没有行分隔符，它可能会缓冲所有输入信息，并查找要跳过的行。</p></blockquote><p>我们可以发现，对于上面的代码，当输入1 abc和def，name和motto的值分别被赋为 abc,def</p><pre><code>NPP_EXEC: &quot;java&quot;java  -cp &quot;C:\Users\frank\Desktop&quot; &quot;Test&quot;Process started &gt;&gt;&gt;1 abcdef----------------------------1 abcdef&lt;&lt;&lt; Process finished. (Exit code 0)================ READY ================</code></pre><p>那么问题出在哪呢？</p><p>我们知道平常在使用nextInt()的时候总是习惯于在输入完一个整数之后敲回车来结束这一次整数输入，殊不知在这一个整数输入之后就开始算做下一次输入了，也就是说你的这一个换行符被当作了下一个输入，也就是你nextLine()的输入，而根据官方API，nextLine会查找换行符之前的内容，而不会记录换行符作为信息，那么自然出现了nextInt()之后不能调用nextLine()获取一行字符的假象。</p><p>问题原因找到了，如何解决呢？</p><p>野蛮的办法，连续调用两次nextLine()，第一次调用就让它光荣地牺牲吧~</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> JAVA </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> JAVA </tag>
             
         </tags>
       
@@ -1114,31 +1114,6 @@
     
     
     <entry>
-      <title>HTTP协议</title>
-      <link href="/2016/09/18/web/http-xie-yi/"/>
-      <url>/2016/09/18/web/http-xie-yi/</url>
-      
-        <content type="html"><![CDATA[<p>HTTP（Hyper Text Transport Protocol）协议是我们生活中最常见的一种网络协议。它的全名叫做超文本传输协议。</p><ul><li>万维网工作原理（HTTP协议作用）</li><li>HTTP协议的分类</li><li>HTTP协议的内容</li></ul><ol><li><p><strong>万维网工作原理（HTTP协议作用）</strong><br>HTTP是面向事务的应用层的协议，它是万维网上能够可靠的交换文件的基础。万维网的工作过程如下图：<br><img src="http://i2.piimg.com/567571/0636f06a4d584f60.png" alt="image"><br>在这里有一个经典的面试题，这个题笔者在面试百度的时候曾经被问过，这个问题是“输入 <a href="http://www.baidu.com" target="_blank" rel="noopener">www.baidu.com</a> 回车之后发生了什么？”，这个问题简单的回答如下：</p><ol><li>浏览器向DNS请求解析<a href="http://www.baidu.com的IP地址。" target="_blank" rel="noopener">www.baidu.com的IP地址。</a></li><li>域名系统DNS解析出百度服务器的IP地址。</li><li>浏览器与服务器建立TCP连接。</li><li>浏览器发出取文件命令<br> GET /index.html</li><li>服务器给出响应，把文件index.html发送给浏览器。</li><li>TCP连接释放。</li><li>浏览器解析index.html，显示在页面中。</li></ol></li><li><p><strong>HTTP协议的分类</strong><br>目前HTTP协议只有两个版本：HTTP1.0 与 HTTP1.1。<br>自然1.1是比1.0高级的版本，那么1.1比1.0厉害在哪里呢？<br>其实它两者最大的差别如下：<br>HTTP1.0是无状态的，什么意思呢？这货在建立完TCP连接之后只为一次HTTP请求提供服务，也就是说可能某个页面有十张图片，需要向服务器发送十次HTTP请求，这个时候HTTP1.0的操作是重复地进行建立TCP连接，传送HTTP请求报文，传送HTTP响应报文，释放TCP连接 十次，很显然，这样做的效率是低下的。<br> HTTP1.1很好的改善了这一点，我们称它是持续连接的，它在发送完HTTP响应报文之后的一段时间内仍然会保持所建立的那条TCP连接，以便为下一次的HTTP请求服务。</p></li><li><p><strong>HTTP协议的内容</strong><br>HTTP的报文分为两种–请求报文与响应报文</p></li></ol><ul><li>请求报文<br>笔者用工具随手截取了一段HTTP请求报文如下：<br><code>`</code>HTML<br>GET /public/common/toolbar/css/index.css HTTP/1.1<br>Host: c.csdnimg.cn<br>Connection: keep-alive<br>Cache-Control: max-age=0<br>User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36<br>Accept: text/css,<em>/</em>;q=0.1<br>Referer: <a href="http://blog.csdn.net/forgotaboutgirl/article/details/6936982/" target="_blank" rel="noopener">http://blog.csdn.net/forgotaboutgirl/article/details/6936982/</a><br>Accept-Encoding: gzip, deflate, sdch<br>Accept-Language: zh-CN,zh;q=0.8<br>If-Modified-Since: Mon, 16 Nov 2015 10:38:49 GMT</li></ul><p>…</p><pre><code>对于它的解释如下：第一行叫做请求行：由请求的方法类型，请求的URL，协议版本和一个回车换行符构成。接下来的N行叫做首部行：包含一些参数，比如Host是请求的主机名，Accept是浏览器告诉服务器它所能接受解析的文档类型，Accept-Language是浏览器能解析的语言等。紧跟着是一个空行，标志着HTTP请求头已经结束，接下来的内容是请求体的内容。请求体的内容可以为空，也可以是表单的参数，形如：```HTMLusername=username&amp;password=pass</code></pre><ul><li>响应报文<br>同样截取一段响应报文如下：<br><code>`</code>HTML<br>HTTP/1.1 200 OK<br>Server: Apache-Coyote/1.1<br>Accept-Ranges: bytes<br>ETag: W/“105-1466676105602”<br>Last-Modified: Thu, 23 Jun 2016 10:01:45 GMT<br>Content-Type: text/html<br>Content-Length: 105<br>Date: Thu, 23 Jun 2016 10:04:32 GMT</li></ul><p>&lt;!DOCTYPE html&gt;</p><p><html lang="en"><br>    <head><meta name="generator" content="Hexo 3.8.0"><br>    <link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"><script src="/js/prism.js"></script></head></html></p><pre><code>&lt;body&gt;haha&lt;/body&gt;</code></pre><p><br><code>`</code><br>对于它的解释如下：<br>第一行叫做响应行：由HTTP版本号，响应码，响应码说明和一个回车换行符构成。<br>接下来的N行叫做首部行：包含一些参数，比如Server说明服务器类型。<br>紧跟着是一个空行，标志着HTTP请求头已经结束，接下来的内容是响应体的内容。<br>响应体的内容多为HTML代码，当然也可以是其他类型。</p>]]></content>
-      
-      
-      <categories>
-          
-          <category> web </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> HTTP </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>github pages + hexo 搭建个人博客</title>
       <link href="/2016/09/18/web/github-pages-hexo-da-jian-ge-ren-bo-ke/"/>
       <url>/2016/09/18/web/github-pages-hexo-da-jian-ge-ren-bo-ke/</url>
@@ -1156,6 +1131,31 @@
         <tags>
             
             <tag> github-pages </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>HTTP协议</title>
+      <link href="/2016/09/18/web/http-xie-yi/"/>
+      <url>/2016/09/18/web/http-xie-yi/</url>
+      
+        <content type="html"><![CDATA[<p>HTTP（Hyper Text Transport Protocol）协议是我们生活中最常见的一种网络协议。它的全名叫做超文本传输协议。</p><ul><li>万维网工作原理（HTTP协议作用）</li><li>HTTP协议的分类</li><li>HTTP协议的内容</li></ul><ol><li><p><strong>万维网工作原理（HTTP协议作用）</strong><br>HTTP是面向事务的应用层的协议，它是万维网上能够可靠的交换文件的基础。万维网的工作过程如下图：<br><img src="http://i2.piimg.com/567571/0636f06a4d584f60.png" alt="image"><br>在这里有一个经典的面试题，这个题笔者在面试百度的时候曾经被问过，这个问题是“输入 <a href="http://www.baidu.com" target="_blank" rel="noopener">www.baidu.com</a> 回车之后发生了什么？”，这个问题简单的回答如下：</p><ol><li>浏览器向DNS请求解析<a href="http://www.baidu.com的IP地址。" target="_blank" rel="noopener">www.baidu.com的IP地址。</a></li><li>域名系统DNS解析出百度服务器的IP地址。</li><li>浏览器与服务器建立TCP连接。</li><li>浏览器发出取文件命令<br> GET /index.html</li><li>服务器给出响应，把文件index.html发送给浏览器。</li><li>TCP连接释放。</li><li>浏览器解析index.html，显示在页面中。</li></ol></li><li><p><strong>HTTP协议的分类</strong><br>目前HTTP协议只有两个版本：HTTP1.0 与 HTTP1.1。<br>自然1.1是比1.0高级的版本，那么1.1比1.0厉害在哪里呢？<br>其实它两者最大的差别如下：<br>HTTP1.0是无状态的，什么意思呢？这货在建立完TCP连接之后只为一次HTTP请求提供服务，也就是说可能某个页面有十张图片，需要向服务器发送十次HTTP请求，这个时候HTTP1.0的操作是重复地进行建立TCP连接，传送HTTP请求报文，传送HTTP响应报文，释放TCP连接 十次，很显然，这样做的效率是低下的。<br> HTTP1.1很好的改善了这一点，我们称它是持续连接的，它在发送完HTTP响应报文之后的一段时间内仍然会保持所建立的那条TCP连接，以便为下一次的HTTP请求服务。</p></li><li><p><strong>HTTP协议的内容</strong><br>HTTP的报文分为两种–请求报文与响应报文</p></li></ol><ul><li>请求报文<br>笔者用工具随手截取了一段HTTP请求报文如下：<br><code>`</code>HTML<br>GET /public/common/toolbar/css/index.css HTTP/1.1<br>Host: c.csdnimg.cn<br>Connection: keep-alive<br>Cache-Control: max-age=0<br>User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36<br>Accept: text/css,<em>/</em>;q=0.1<br>Referer: <a href="http://blog.csdn.net/forgotaboutgirl/article/details/6936982/" target="_blank" rel="noopener">http://blog.csdn.net/forgotaboutgirl/article/details/6936982/</a><br>Accept-Encoding: gzip, deflate, sdch<br>Accept-Language: zh-CN,zh;q=0.8<br>If-Modified-Since: Mon, 16 Nov 2015 10:38:49 GMT</li></ul><p>…</p><pre><code>对于它的解释如下：第一行叫做请求行：由请求的方法类型，请求的URL，协议版本和一个回车换行符构成。接下来的N行叫做首部行：包含一些参数，比如Host是请求的主机名，Accept是浏览器告诉服务器它所能接受解析的文档类型，Accept-Language是浏览器能解析的语言等。紧跟着是一个空行，标志着HTTP请求头已经结束，接下来的内容是请求体的内容。请求体的内容可以为空，也可以是表单的参数，形如：```HTMLusername=username&amp;password=pass</code></pre><ul><li>响应报文<br>同样截取一段响应报文如下：<br><code>`</code>HTML<br>HTTP/1.1 200 OK<br>Server: Apache-Coyote/1.1<br>Accept-Ranges: bytes<br>ETag: W/“105-1466676105602”<br>Last-Modified: Thu, 23 Jun 2016 10:01:45 GMT<br>Content-Type: text/html<br>Content-Length: 105<br>Date: Thu, 23 Jun 2016 10:04:32 GMT</li></ul><p>&lt;!DOCTYPE html&gt;</p><p><html lang="en"><br>    <head><meta name="generator" content="Hexo 3.8.0"><br>    <link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head></html></p><pre><code>&lt;body&gt;haha&lt;/body&gt;</code></pre><p><br><code>`</code><br>对于它的解释如下：<br>第一行叫做响应行：由HTTP版本号，响应码，响应码说明和一个回车换行符构成。<br>接下来的N行叫做首部行：包含一些参数，比如Server说明服务器类型。<br>紧跟着是一个空行，标志着HTTP请求头已经结束，接下来的内容是响应体的内容。<br>响应体的内容多为HTML代码，当然也可以是其他类型。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> web </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> HTTP </tag>
             
         </tags>
       

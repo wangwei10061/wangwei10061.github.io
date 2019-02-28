@@ -930,19 +930,24 @@ apt-get install pyth
             <article class="cd-timeline-content" data-aos="fade-up">
                 <div class="article col s12 m6">
                     <div class="card">
-                        <a href="/2016/09/18/java/wen-ti-ji-nextint-hou-nextline-du-qu-kong-zhi/">
+                        <a href="/2016/09/18/java/wen-ti-ji-liang-ge-string-shi-fou-xiang-deng/">
                             <div class="card-image">
                                 
                                 
-                                <img src="/medias/featureimages/20.jpg" class="responsive-img" alt="问题集：nextInt后nextLine读取空值">
+                                <img src="/medias/featureimages/21.jpg" class="responsive-img" alt="问题集：两个String是否相等">
                                 
-                                <span class="card-title">问题集：nextInt后nextLine读取空值</span>
+                                <span class="card-title">问题集：两个String是否相等</span>
                             </div>
                         </a>
                         <div class="card-content article-content">
                             <div class="summary">
                                 
-                                    在学习Scanner类的时候遇到一个问题，在使用nextInt()获取到一个整数之后，如果接着调用nextLine()方法，nextLine()方法将获取不到值
+                                    
+我们知道String类私有的维护一个字符串池，在判断两个字符串对象是否==时，要考虑到这一点
+
+首先来看一段代码：  
+class StringDemo {
+
                                 
                             </div>
                             <div class="publish-info">
@@ -989,24 +994,25 @@ apt-get install pyth
             <article class="cd-timeline-content" data-aos="fade-up">
                 <div class="article col s12 m6">
                     <div class="card">
-                        <a href="/2016/09/18/java/wen-ti-ji-liang-ge-string-shi-fou-xiang-deng/">
+                        <a href="/2016/09/18/java/wen-ti-ji-tong-ming-bian-liang-wen-ti/">
                             <div class="card-image">
                                 
                                 
-                                <img src="/medias/featureimages/21.jpg" class="responsive-img" alt="问题集：两个String是否相等">
+                                <img src="/medias/featureimages/0.jpg" class="responsive-img" alt="问题集：同名变量问题">
                                 
-                                <span class="card-title">问题集：两个String是否相等</span>
+                                <span class="card-title">问题集：同名变量问题</span>
                             </div>
                         </a>
                         <div class="card-content article-content">
                             <div class="summary">
                                 
                                     
-我们知道String类私有的维护一个字符串池，在判断两个字符串对象是否==时，要考虑到这一点
+本文介绍什么情况下在同一个类中同名变量可以共存
 
-首先来看一段代码：  
-class StringDemo {
-
+相关代码如下：
+class Test{
+ static int x = 1;
+ public static 
                                 
                             </div>
                             <div class="publish-info">
