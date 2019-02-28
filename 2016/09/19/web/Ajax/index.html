@@ -29,7 +29,7 @@ Ajax是一门很叼的技术，它可以异步提交请求到服务端而不用�
     </style>
 
     <script src="/libs/jquery/jquery-2.2.0.min.js"></script>
-</head>
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
 
 
 <body>
@@ -92,15 +92,6 @@ Ajax是一门很叼的技术，它可以异步提交请求到服务端而不用�
             <i class="fa fa-user-circle-o"></i>
             
             <span>关于</span>
-        </a>
-    </li>
-    
-    <li class="hide-on-med-and-down">
-        <a href="/friends" class="waves-effect waves-light">
-            
-            <i class="fa fa-address-book"></i>
-            
-            <span>友情链接</span>
         </a>
     </li>
     
@@ -171,15 +162,6 @@ Ajax是一门很叼的技术，它可以异步提交请求到服务端而不用�
                 <i class="fa fa-fw fa-user-circle-o"></i>
                 
                 关于
-            </a>
-        </li>
-        
-        <li>
-            <a href="/friends" class="waves-effect waves-light">
-                
-                <i class="fa fa-fw fa-address-book"></i>
-                
-                友情链接
             </a>
         </li>
         
@@ -353,64 +335,64 @@ Ajax是一门很叼的技术，它可以异步提交请求到服务端而不用�
 <p>Ajax是一门很叼的技术，它可以异步提交请求到服务端而不用刷新页面，这太有用了。设想一下，假如你在填写一个个人信息的页面，比如简历，各种信息填了好几十项，然后你上传了个头像，没有用异步上传的技术，头像上传完刷新回来，你填的其他信息全没了，那你是不是会摔电脑？现在你明白Ajax到底有多重要，但是它重要并不代表它难，笔者当时学习Ajax的时候是在慕课网学的，一个多小时的课程，让你明白什么是Ajax，如何用Ajax，精辟！</p>
 <hr>
 <p>下面是Ajax的一段示例代码  </p>
-<pre><code class="js">&lt;Script&gt;
-  &lt;!-- Ajax 发送get异步请求 --&gt;
-  document.getElementById(&quot;search&quot;).onclick = function()
-  {
-    var request = new XMLHttpRequest();
-    request.open(&quot;GET&quot;,&quot;/staff1.do?staffNum=&quot;+document.getElementById(&quot;keyword&quot;).value);
-    request.send();
-    request.onreadystatechange = function()
-    {
-      if(request.readyState===4)
-      {
-        if(request.status===200)
-        {
-          document.getElementById(&quot;searchResult&quot;).innerHTML = request.responseText;
-        }
-        else
-          alert(&quot;发生错误&quot;+request.status);
-      }
-    }
-  }
+<pre class=" language-js"><code class="language-js"><span class="token operator">&lt;</span>Script<span class="token operator">></span>
+  <span class="token operator">&lt;</span><span class="token operator">!</span><span class="token operator">--</span> Ajax 发送<span class="token keyword">get</span>异步请求 <span class="token operator">--</span><span class="token operator">></span>
+  document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">"search"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>onclick <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+  <span class="token punctuation">{</span>
+    <span class="token keyword">var</span> request <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">XMLHttpRequest</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    request<span class="token punctuation">.</span><span class="token function">open</span><span class="token punctuation">(</span><span class="token string">"GET"</span><span class="token punctuation">,</span><span class="token string">"/staff1.do?staffNum="</span><span class="token operator">+</span>document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">"keyword"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>value<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    request<span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    request<span class="token punctuation">.</span>onreadystatechange <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+      <span class="token keyword">if</span><span class="token punctuation">(</span>request<span class="token punctuation">.</span>readyState<span class="token operator">===</span><span class="token number">4</span><span class="token punctuation">)</span>
+      <span class="token punctuation">{</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span>request<span class="token punctuation">.</span>status<span class="token operator">===</span><span class="token number">200</span><span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+          document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">"searchResult"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>innerHTML <span class="token operator">=</span> request<span class="token punctuation">.</span>responseText<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">else</span>
+          <span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">"发生错误"</span><span class="token operator">+</span>request<span class="token punctuation">.</span>status<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
 
-  &lt;!-- Ajax 发送post异步请求 --&gt;
-  document.getElementById(&quot;create&quot;).onclick = function()
-  {
-    var request = new XMLHttpRequest();
-    request.open(&quot;POST&quot;,&quot;/staff.do&quot;);
-    var data = &quot;staffNum=&quot;+document.getElementById(&quot;staffNum&quot;).value
-          +&quot;&amp;staffName=&quot;+document.getElementById(&quot;staffName&quot;).value+
-            &quot;&amp;staffSex=&quot;+document.getElementById(&quot;staffSex&quot;).value+
-            &quot;&amp;staffAge=&quot;+document.getElementById(&quot;staffAge&quot;).value;
-    request.setRequestHeader(&quot;Content-Type&quot;,&quot;application/x-www-form-urlencoded&quot;);
-    request.send(data);
-    request.onreadystatechange = function()
-    {
-      if(request.readyState===4)
-      {
-        if(request.status===200)
-        {
-          document.getElementById(&quot;createResult&quot;).innerHTML = request.responseText;
-        }
-        else
-          alert(&quot;发生错误&quot;+request.status);
-      }
-    }
-  }
-&lt;/Script&gt;
+  <span class="token operator">&lt;</span><span class="token operator">!</span><span class="token operator">--</span> Ajax 发送post异步请求 <span class="token operator">--</span><span class="token operator">></span>
+  document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">"create"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>onclick <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+  <span class="token punctuation">{</span>
+    <span class="token keyword">var</span> request <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">XMLHttpRequest</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    request<span class="token punctuation">.</span><span class="token function">open</span><span class="token punctuation">(</span><span class="token string">"POST"</span><span class="token punctuation">,</span><span class="token string">"/staff.do"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">var</span> data <span class="token operator">=</span> <span class="token string">"staffNum="</span><span class="token operator">+</span>document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">"staffNum"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>value
+          <span class="token operator">+</span><span class="token string">"&amp;staffName="</span><span class="token operator">+</span>document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">"staffName"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>value<span class="token operator">+</span>
+            <span class="token string">"&amp;staffSex="</span><span class="token operator">+</span>document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">"staffSex"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>value<span class="token operator">+</span>
+            <span class="token string">"&amp;staffAge="</span><span class="token operator">+</span>document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">"staffAge"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>value<span class="token punctuation">;</span>
+    request<span class="token punctuation">.</span><span class="token function">setRequestHeader</span><span class="token punctuation">(</span><span class="token string">"Content-Type"</span><span class="token punctuation">,</span><span class="token string">"application/x-www-form-urlencoded"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    request<span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    request<span class="token punctuation">.</span>onreadystatechange <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+      <span class="token keyword">if</span><span class="token punctuation">(</span>request<span class="token punctuation">.</span>readyState<span class="token operator">===</span><span class="token number">4</span><span class="token punctuation">)</span>
+      <span class="token punctuation">{</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span>request<span class="token punctuation">.</span>status<span class="token operator">===</span><span class="token number">200</span><span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+          document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">"createResult"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>innerHTML <span class="token operator">=</span> request<span class="token punctuation">.</span>responseText<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">else</span>
+          <span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">"发生错误"</span><span class="token operator">+</span>request<span class="token punctuation">.</span>status<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token operator">&lt;</span><span class="token operator">/</span>Script<span class="token operator">></span>
 </code></pre>
 <p>从代码中可以看到，使用Ajax的步骤分为这么几步：  </p>
 <ol>
-<li>创建XMLHttpRequest对象  <pre><code class="js">var xmlhttp;
-if (window.XMLHttpRequest)
-{// code for IE7+, Firefox, Chrome, Opera, Safari
-xmlhttp=new XMLHttpRequest();
-}
-else
-{// code for IE6, IE5
-xmlhttp=new ActiveXObject(&quot;Microsoft.XMLHTTP&quot;);
-}
+<li>创建XMLHttpRequest对象  <pre class=" language-js"><code class="language-js"><span class="token keyword">var</span> xmlhttp<span class="token punctuation">;</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span>window<span class="token punctuation">.</span>XMLHttpRequest<span class="token punctuation">)</span>
+<span class="token punctuation">{</span><span class="token comment" spellcheck="true">// code for IE7+, Firefox, Chrome, Opera, Safari</span>
+xmlhttp<span class="token operator">=</span><span class="token keyword">new</span> <span class="token class-name">XMLHttpRequest</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">else</span>
+<span class="token punctuation">{</span><span class="token comment" spellcheck="true">// code for IE6, IE5</span>
+xmlhttp<span class="token operator">=</span><span class="token keyword">new</span> <span class="token class-name">ActiveXObject</span><span class="token punctuation">(</span><span class="token string">"Microsoft.XMLHTTP"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 </code></pre>
 </li>
 <li>打开一个连接 open(method, url, asynch)<br>参数的含义如下：<br>method：请求类型<br>url：请求路径<br>asynch：是否要异步传输，默认值为true(异步)</li>

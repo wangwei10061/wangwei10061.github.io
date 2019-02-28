@@ -29,7 +29,7 @@
     </style>
 
     <script src="/libs/jquery/jquery-2.2.0.min.js"></script>
-</head>
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
 
 
 <body>
@@ -92,15 +92,6 @@
             <i class="fa fa-user-circle-o"></i>
             
             <span>关于</span>
-        </a>
-    </li>
-    
-    <li class="hide-on-med-and-down">
-        <a href="/friends" class="waves-effect waves-light">
-            
-            <i class="fa fa-address-book"></i>
-            
-            <span>友情链接</span>
         </a>
     </li>
     
@@ -171,15 +162,6 @@
                 <i class="fa fa-fw fa-user-circle-o"></i>
                 
                 关于
-            </a>
-        </li>
-        
-        <li>
-            <a href="/friends" class="waves-effect waves-light">
-                
-                <i class="fa fa-fw fa-address-book"></i>
-                
-                友情链接
             </a>
         </li>
         
@@ -373,14 +355,14 @@
 <li>条件运算符：&amp;&amp;，||（注意与&amp;，|的区别：&amp;和|可以用于位运算，而&amp;&amp;和||具有短路的功能）<br>谈及运算符，Math类中的一些函数和常量也非常常用，比如Math.PI，Math.abs(n)等，这些还需要我们在平常多积累。</li>
 </ul>
 <h2 id="字符串"><a href="#字符串" class="headerlink" title="字符串"></a>字符串</h2><p>Java中，字符串是存放在字符串池当中的，一经创建不能被改变，或许你可能不服了，怎么就不能被改变了？举个栗子：</p>
-<pre><code class="Java">String a =&quot;haha&quot;;
-a =&quot;bb&quot;;
+<pre class=" language-Java"><code class="language-Java">String a ="haha";
+a ="bb";
 </code></pre>
 <p>这里字符串a不是改成”bb”了么？<br>请注意，字符串不是基本类型，它是引用类型，a不过是一个引用，它指向字符串池中的”haha”变量，现在我将它赋值为”bb”，不过是把它指向了”bb”这个字符串对象了而已，”haha”依然在那，没有任何改变。<br>如果想要创建可变的字符串，可以使用StringBuilder或StringBuffer这两个类，它们的功能完全一样，区别仅在于StringBuilder是线程安全的，而StringBuffer不是。<br>编程中，字符串API是使用最多的，我们需要熟练的掌握，具体请自行查阅API文档。</p>
 <h2 id="大数值"><a href="#大数值" class="headerlink" title="大数值"></a>大数值</h2><p>做ACM的同学应该都知道，在Java里边有一个很厉害的东西，它可以实现任意精度的计算，不会溢出。这个神奇的东西就是BigInteger和BigDecimal类，它的神奇之处已经介绍了可以实现任意精度的计算。但是不支持+，-，*，/这些运算符号，所有的运算符号都被用函数来代替了。<br>具体的函数还是请查阅API，它的底层使用数组实现的，有兴趣的同学可以自行查阅它的源码，由于比较高能，本文不予讨论。</p>
 <h2 id="数组"><a href="#数组" class="headerlink" title="数组"></a>数组</h2><ul>
-<li>定义和初始化：<br>主要注意对象数组的定义和初始化方式：<pre><code class="JAVA">Person[] p =newPerson[5];
-for(int i =0; i &lt; p.length; i++)
+<li>定义和初始化：<br>主要注意对象数组的定义和初始化方式：<pre class=" language-JAVA"><code class="language-JAVA">Person[] p =newPerson[5];
+for(int i =0; i < p.length; i++)
 {
   p[i]=newPerson();
 }
@@ -388,7 +370,7 @@ for(int i =0; i &lt; p.length; i++)
 </li>
 <li>匿名数组：<br>在方法中时常要传递匿名数组 ：<pre><code>printArray(newint[]{1,2,3});
 </code></pre></li>
-<li>foreach循环:<br>Java5中新增的循环书写方式，用于对数组或集合对象进行遍历，格式为：<br>foreach(var : collection)    statements   ,如：<pre><code class="JAVA">foreach(p :Person per)
+<li>foreach循环:<br>Java5中新增的循环书写方式，用于对数组或集合对象进行遍历，格式为：<br>foreach(var : collection)    statements   ,如：<pre class=" language-JAVA"><code class="language-JAVA">foreach(p :Person per)
 {
   per =newPerson();
 }
@@ -591,24 +573,20 @@ for(int i =0; i &lt; p.length; i++)
             <div class="article-badge left-badge text-color">
                 <i class="fa fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2016/09/18/java/wen-ti-ji-zi-ding-yi-java.lang.object-lei/">
+                <a href="/2016/09/18/git/git-zong-jie/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/21.jpg" class="responsive-img" alt="问题集：自定义java.lang.Object类">
+                        <img src="/medias/featureimages/10.jpg" class="responsive-img" alt="Git总结">
                         
-                        <span class="card-title">问题集：自定义java.lang.Object类</span>
+                        <span class="card-title">Git总结</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary">
-同学去阿里面试的时候被问到的问题：可否自定义一个String类，放在一个名为java.lang的包中？与此问题有异曲同工之妙。
+git作为一种分布式的版本控制工具，相对svn的优势是很明显的，曾被阿里的面试官问到git与svn的区别，在这里对git做一个简要的介绍。
 
-相关代码如下：
-package java.lang;
-
-public class Object {
-    </div>
+why git?我本人用svn有三年的时间了，你要是不嫌弃的话其实svn也没有那么烂，我感觉会用</div>
                     <div class="publish-info">
                         <span class="publish-date">
                             <i class="fa fa-clock-o fa-fw icon-date"></i>2016-09-18
@@ -617,8 +595,8 @@ public class Object {
                             
                             <i class="fa fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/JAVA/" class="post-category" target="_blank">
-                                    JAVA
+                            <a href="/categories/git/" class="post-category" target="_blank">
+                                    git
                                 </a>
                             
                             
@@ -628,8 +606,8 @@ public class Object {
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/JAVA/" target="_blank">
-                        <span class="chip bg-color">JAVA</span>
+                    <a href="/tags/git/" target="_blank">
+                        <span class="chip bg-color">git</span>
                     </a>
                     
                 </div>

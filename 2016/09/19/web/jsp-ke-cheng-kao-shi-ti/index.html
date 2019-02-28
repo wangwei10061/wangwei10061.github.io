@@ -32,7 +32,7 @@ JSP中动态include与静态include的语法和区别是什么？
     </style>
 
     <script src="/libs/jquery/jquery-2.2.0.min.js"></script>
-</head>
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
 
 
 <body>
@@ -95,15 +95,6 @@ JSP中动态include与静态include的语法和区别是什么？
             <i class="fa fa-user-circle-o"></i>
             
             <span>关于</span>
-        </a>
-    </li>
-    
-    <li class="hide-on-med-and-down">
-        <a href="/friends" class="waves-effect waves-light">
-            
-            <i class="fa fa-address-book"></i>
-            
-            <span>友情链接</span>
         </a>
     </li>
     
@@ -174,15 +165,6 @@ JSP中动态include与静态include的语法和区别是什么？
                 <i class="fa fa-fw fa-user-circle-o"></i>
                 
                 关于
-            </a>
-        </li>
-        
-        <li>
-            <a href="/friends" class="waves-effect waves-light">
-                
-                <i class="fa fa-fw fa-address-book"></i>
-                
-                友情链接
             </a>
         </li>
         
@@ -411,7 +393,7 @@ int a = 1;   // JSP Scriplets代码片段中JAVA注释形式2
 </ul>
 </li>
 <li><p>创建了结果集RS后，输出结果集中的所有记录，写出语句  </p>
-<pre><code class="JAVA">ResultSet rs = stmt.executeQuery();  //得到结果集
+<pre class=" language-JAVA"><code class="language-JAVA">ResultSet rs = stmt.executeQuery();  //得到结果集
 While(rs.next())
 {
  //循环输出所有记录
@@ -442,7 +424,7 @@ rs.close();  //关闭记录集
 </ul>
 </li>
 <li>获取查询字符串乱码——get提交  <ul>
-<li>方法一：  <pre><code class="JAVA">String pa = request.getParameter(＂haha＂);
+<li>方法一：  <pre class=" language-JAVA"><code class="language-JAVA">String pa = request.getParameter(＂haha＂);
 String pb = new String(pa.getBytes(＂iso-8859-1＂),＂gb2312＂);
 </code></pre>
 </li>
@@ -458,7 +440,7 @@ String pb = new String(pa.getBytes(＂iso-8859-1＂),＂gb2312＂);
 </ul>
 </li>
 <li><p>rs产生后，如何计算总记录数rs_total  </p>
-<pre><code class="JAVA">rs_last();
+<pre class=" language-JAVA"><code class="language-JAVA">rs_last();
 rs_total = rs.getRow();
 </code></pre>
 </li>

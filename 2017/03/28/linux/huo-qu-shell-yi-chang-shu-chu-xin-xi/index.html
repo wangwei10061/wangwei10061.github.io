@@ -31,7 +31,7 @@
     </style>
 
     <script src="/libs/jquery/jquery-2.2.0.min.js"></script>
-</head>
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
 
 
 <body>
@@ -94,15 +94,6 @@
             <i class="fa fa-user-circle-o"></i>
             
             <span>关于</span>
-        </a>
-    </li>
-    
-    <li class="hide-on-med-and-down">
-        <a href="/friends" class="waves-effect waves-light">
-            
-            <i class="fa fa-address-book"></i>
-            
-            <span>友情链接</span>
         </a>
     </li>
     
@@ -173,15 +164,6 @@
                 <i class="fa fa-fw fa-user-circle-o"></i>
                 
                 关于
-            </a>
-        </li>
-        
-        <li>
-            <a href="/friends" class="waves-effect waves-light">
-                
-                <i class="fa fa-fw fa-address-book"></i>
-                
-                友情链接
             </a>
         </li>
         
@@ -355,28 +337,28 @@
 <p>好一段时间不写博客了，今天实在是忍不住。一个shell命令的问题调了两天，一句代码，shell这个东西，不会真是急人</p>
 <hr>
 <p>现在在做的系统使用了jenkins的pipeline插件，需求需要在pipeline中做一些功能性的操作，比如运行一个JAVA类啊，读取一个文件啊之类的，现在考虑编译并运行一个JAVA类Hello.java，代码如下：  </p>
-<pre><code class="java">public class Hello {
-  public static void main(String[] args) {
-    System.out.println(&quot;Hello&quot;);
-  }
-}
+<pre class=" language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">Hello</span> <span class="token punctuation">{</span>
+  <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"Hello"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <p>既然是编译运行，那理所当然要能够返回的结果对吧。以编译为例，在pipeline中使用以下语句可以编译并运行Hello.java。<br><code>sh &#39;javac Hello.java &amp;&amp; java Hello&#39;</code><br>这不是很简单嘛，有何难的？但是你会发现，编译是被执行了，但你根本得不到编译执行的结果，我尝试用一个变量去接收它，<code>var javacResult = sh &#39;javac Hello.java &amp;&amp; java Hello&#39;</code>，人家给我返回的结果是null。顿时觉得这个设计好傻逼，怎么办呢，改变不了这个世界就改变自己吧。对于shell的理解，命令的执行结果是可以重定向到文件的，于是我把我的代码改成了下边这样：  </p>
-<pre><code class="shell">sh &#39;javac Hello.java &gt; temp.txt &amp;&amp; java Hello &gt; temp.txt&#39;
-var javacResult = readFile &#39;temp.txt&#39;
+<pre class=" language-shell"><code class="language-shell">sh 'javac Hello.java > temp.txt && java Hello > temp.txt'
+var javacResult = readFile 'temp.txt'
 </code></pre>
 <p>情况有所改观，javac编译通过，那么java Hello的运行结果理所当然是Hello，查看temp.txt的内容果然是Hello，似乎用一种愚蠢笨拙的方式解决了这个问题。<br>后来经意间在stackoverflow上看到了这么一种优雅的写法：  </p>
 <pre><code>javacSourceResult = sh script: &#39;javac &#39; + className + &#39;.java&#39;, returnStdout: true
 </code></pre><p>这是官方提供的获取shell命令输出结果的方式，果然还是官方的方法好用。好用归好用，它还是没能解决我的需求。我是要调用shell命令去编译运行Java程序，期待它在编译运行出错之后也能够给我以反馈。但是令我失望的是官方提供的这种方式并没有做到这一点，读者可以自己尝试，当编译出错时，javacSourceResult的结果是类似于exit 1的信息，之所以是exit 1，是因为shell执行失败了，人家给它的错误码1给返回了。<br>更改Hello.java文件如下，</p>
-<pre><code class="java">public class Hello {
-  public static void main(String[] args) {
-    .out.println(&quot;Hello&quot;);
-  }
-}
+<pre class=" language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">Hello</span> <span class="token punctuation">{</span>
+  <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"Hello"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <p>这是jenkins的执行结果：<br><img src="/images/2017/03/jenkins-err.png" alt="jenkins_err"><br>可以看到jenkins成功地执行了javac进行编译，并且成功的将错误信息打印在了控制台，我不知道为什么我用变量接收的时候不给我设计成接收shell命令的错误信息，万般不得解。<br>没办法，现在水平还不够，不能去改他的源码，再找找其他路子吧，pipeline支持groovy的语法，考虑了用groovy去调用shell，但是得到的效果也不理想，结果依然是null。<br>最终在google上泡了一天，综合了SO上好几位高人的回答，还是把之前那个笨拙的方法做了一下改进：  </p>
-<pre><code class="shell">node() {
-    sh script: &#39;echo &quot;$(javac Hello.java 2&gt;&amp;1)&quot; &gt; temp.txt&#39;
+<pre class=" language-shell"><code class="language-shell">node() {
+    sh script: 'echo "$(javac Hello.java 2>&1)" > temp.txt'
 }
 </code></pre>
 <p>对上面这句命令进行一下解释，2&gt;&amp;1的意思是将错误流的内容合并到输出流，具体解释如下：<br><img src="/images/2017/03/2-1.png" alt="2&gt;&amp;1"><br>运行效果：<br><img src="/images/2017/03/效果.png" alt="效果"><br>尽管不怎么欣赏使用临时文件这种方式，但是至少解决了问题，暂时先用着，在用的过程中看能不能找到更好的方法。</p>

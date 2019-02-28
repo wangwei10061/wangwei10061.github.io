@@ -9,7 +9,7 @@
 今天接到一个外包的需求，一个表中的字段含有大写也含小写，要全部转换为小写，批量转换。
 
 表结构相关的信息肯定是从information_schema中搞，sql语句如下：
-SELECT CONCAT(&amp;#39;ALTER TABLE `&amp;">
+SELECT CONCAT(&#39;ALTER TABLE `&#39;, ta">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -32,7 +32,7 @@ SELECT CONCAT(&amp;#39;ALTER TABLE `&amp;">
     </style>
 
     <script src="/libs/jquery/jquery-2.2.0.min.js"></script>
-</head>
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
 
 
 <body>
@@ -95,15 +95,6 @@ SELECT CONCAT(&amp;#39;ALTER TABLE `&amp;">
             <i class="fa fa-user-circle-o"></i>
             
             <span>关于</span>
-        </a>
-    </li>
-    
-    <li class="hide-on-med-and-down">
-        <a href="/friends" class="waves-effect waves-light">
-            
-            <i class="fa fa-address-book"></i>
-            
-            <span>友情链接</span>
         </a>
     </li>
     
@@ -174,15 +165,6 @@ SELECT CONCAT(&amp;#39;ALTER TABLE `&amp;">
                 <i class="fa fa-fw fa-user-circle-o"></i>
                 
                 关于
-            </a>
-        </li>
-        
-        <li>
-            <a href="/friends" class="waves-effect waves-light">
-                
-                <i class="fa fa-fw fa-address-book"></i>
-                
-                友情链接
             </a>
         </li>
         
@@ -356,26 +338,26 @@ SELECT CONCAT(&amp;#39;ALTER TABLE `&amp;">
 <p>今天接到一个外包的需求，一个表中的字段含有大写也含小写，要全部转换为小写，批量转换。</p>
 <hr>
 <p>表结构相关的信息肯定是从information_schema中搞，sql语句如下：</p>
-<pre><code class="sql">SELECT CONCAT(&#39;ALTER TABLE `&#39;, table_schema, &#39;`.`&#39;, table_name, 
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">SELECT</span> CONCAT<span class="token punctuation">(</span><span class="token string">'ALTER TABLE `'</span><span class="token punctuation">,</span> table_schema<span class="token punctuation">,</span> <span class="token string">'`.`'</span><span class="token punctuation">,</span> table_name<span class="token punctuation">,</span> 
 
-              &#39;` CHANGE `&#39;, column_name, &#39;` `&#39;, LOWER(column_name), &#39;` &#39;, column_type,
+              <span class="token string">'` CHANGE `'</span><span class="token punctuation">,</span> column_name<span class="token punctuation">,</span> <span class="token string">'` `'</span><span class="token punctuation">,</span> LOWER<span class="token punctuation">(</span>column_name<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">'` '</span><span class="token punctuation">,</span> column_type<span class="token punctuation">,</span>
 
-              IF(IS_NULLABLE=&#39;NO&#39;,&#39; NOT NULL&#39;,&#39;&#39;),
+              <span class="token keyword">IF</span><span class="token punctuation">(</span>IS_NULLABLE<span class="token operator">=</span><span class="token string">'NO'</span><span class="token punctuation">,</span><span class="token string">' NOT NULL'</span><span class="token punctuation">,</span><span class="token string">''</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
 
-              IF(column_default &lt;&gt; &#39;&#39;, CONCAT(&#39; DEFAULT &#39;, column_default), &#39;&#39;), 
+              <span class="token keyword">IF</span><span class="token punctuation">(</span>column_default <span class="token operator">&lt;></span> <span class="token string">''</span><span class="token punctuation">,</span> CONCAT<span class="token punctuation">(</span><span class="token string">' DEFAULT '</span><span class="token punctuation">,</span> column_default<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">''</span><span class="token punctuation">)</span><span class="token punctuation">,</span> 
 
-               &#39; &#39;, extra )
+               <span class="token string">' '</span><span class="token punctuation">,</span> extra <span class="token punctuation">)</span>
 
-  FROM information_schema.columns
+  <span class="token keyword">FROM</span> information_schema<span class="token punctuation">.</span><span class="token keyword">columns</span>
 
-  WHERE column_name REGEXP &#39;^[A-Z]&#39; COLLATE utf8_bin
+  <span class="token keyword">WHERE</span> column_name <span class="token operator">REGEXP</span> <span class="token string">'^[A-Z]'</span> <span class="token keyword">COLLATE</span> utf8_bin
 
-    AND table_schema &lt;&gt; &#39;information_schema&#39;;
+    <span class="token operator">AND</span> table_schema <span class="token operator">&lt;></span> <span class="token string">'information_schema'</span><span class="token punctuation">;</span>
 </code></pre>
 <p>原理是从information_schema动态拼出修改的sql语句,demo得到的结果如下：</p>
-<pre><code class="sql">ALTER TABLE `test`.`haha` CHANGE `AAA` `aaa` int(255) unsigned zerofill NOT NULL auto_increment
-ALTER TABLE `test`.`haha` CHANGE `BBB` `bbb` int(11) 
-ALTER TABLE `test`.`haha` CHANGE `CCC` `ccc` int(11) 
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">ALTER</span> <span class="token keyword">TABLE</span> <span class="token punctuation">`</span>test<span class="token punctuation">`</span><span class="token punctuation">.</span><span class="token punctuation">`</span>haha<span class="token punctuation">`</span> CHANGE <span class="token punctuation">`</span>AAA<span class="token punctuation">`</span> <span class="token punctuation">`</span><span class="token number">aaa</span><span class="token punctuation">`</span> <span class="token keyword">int</span><span class="token punctuation">(</span><span class="token number">255</span><span class="token punctuation">)</span> unsigned zerofill <span class="token operator">NOT</span> <span class="token boolean">NULL</span> <span class="token keyword">auto_increment</span>
+<span class="token keyword">ALTER</span> <span class="token keyword">TABLE</span> <span class="token punctuation">`</span>test<span class="token punctuation">`</span><span class="token punctuation">.</span><span class="token punctuation">`</span>haha<span class="token punctuation">`</span> CHANGE <span class="token punctuation">`</span>BBB<span class="token punctuation">`</span> <span class="token punctuation">`</span><span class="token number">bbb</span><span class="token punctuation">`</span> <span class="token keyword">int</span><span class="token punctuation">(</span><span class="token number">11</span><span class="token punctuation">)</span> 
+<span class="token keyword">ALTER</span> <span class="token keyword">TABLE</span> <span class="token punctuation">`</span>test<span class="token punctuation">`</span><span class="token punctuation">.</span><span class="token punctuation">`</span>haha<span class="token punctuation">`</span> CHANGE <span class="token punctuation">`</span>CCC<span class="token punctuation">`</span> <span class="token punctuation">`</span><span class="token number">ccc</span><span class="token punctuation">`</span> <span class="token keyword">int</span><span class="token punctuation">(</span><span class="token number">11</span><span class="token punctuation">)</span> 
 </code></pre>
 <p>sql有了，拷贝出来批量执行一下就行了，settled~~</p>
 

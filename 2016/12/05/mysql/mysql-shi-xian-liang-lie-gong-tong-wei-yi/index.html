@@ -31,7 +31,7 @@
     </style>
 
     <script src="/libs/jquery/jquery-2.2.0.min.js"></script>
-</head>
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
 
 
 <body>
@@ -94,15 +94,6 @@
             <i class="fa fa-user-circle-o"></i>
             
             <span>关于</span>
-        </a>
-    </li>
-    
-    <li class="hide-on-med-and-down">
-        <a href="/friends" class="waves-effect waves-light">
-            
-            <i class="fa fa-address-book"></i>
-            
-            <span>友情链接</span>
         </a>
     </li>
     
@@ -173,15 +164,6 @@
                 <i class="fa fa-fw fa-user-circle-o"></i>
                 
                 关于
-            </a>
-        </li>
-        
-        <li>
-            <a href="/friends" class="waves-effect waves-light">
-                
-                <i class="fa fa-fw fa-address-book"></i>
-                
-                友情链接
             </a>
         </li>
         
@@ -355,25 +337,25 @@
 <p>通过数据库的操作保证两个列的数据共同唯一，也就是说A列中的元素唯一，B列中的元素唯一，并且A中的元素不能出现在B中</p>
 <hr>
 <p>第一想法是通过check约束来实现，但是尝试了一下发现check约束局限于对单独的列进行操作。<br>后来几经周折采用了触发器：<br>测试表的信息：  </p>
-<pre><code class="sql">    CREATE TABLE `test` (
-      `A` varchar(255) DEFAULT NULL,
-      `B` varchar(255) DEFAULT NULL
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8
+<pre class=" language-sql"><code class="language-sql">    <span class="token keyword">CREATE</span> <span class="token keyword">TABLE</span> <span class="token punctuation">`</span>test<span class="token punctuation">`</span> <span class="token punctuation">(</span>
+      <span class="token punctuation">`</span>A<span class="token punctuation">`</span> <span class="token keyword">varchar</span><span class="token punctuation">(</span><span class="token number">255</span><span class="token punctuation">)</span> <span class="token keyword">DEFAULT</span> <span class="token boolean">NULL</span><span class="token punctuation">,</span>
+      <span class="token punctuation">`</span>B<span class="token punctuation">`</span> <span class="token keyword">varchar</span><span class="token punctuation">(</span><span class="token number">255</span><span class="token punctuation">)</span> <span class="token keyword">DEFAULT</span> <span class="token boolean">NULL</span>
+    <span class="token punctuation">)</span> <span class="token keyword">ENGINE</span><span class="token operator">=</span><span class="token keyword">InnoDB</span> <span class="token keyword">DEFAULT</span> <span class="token keyword">CHARSET</span><span class="token operator">=</span>utf8
 </code></pre>
 <p>创建触发器的语句：</p>
-<pre><code class="sql">    delimiter |
-    CREATE TRIGGER unique_AB BEFORE INSERT ON test
-      FOR EACH ROW
-      BEGIN
-             DECLARE msg varchar(200);  
-         DECLARE flag int;
-         set flag = (select count(*) from test where A = new.A or B = new.A or A = new.B or B = new.B);
-         IF flag &gt; 0 THEN
-            set msg = &quot;column duplicate!!!&quot;;  
-                SIGNAL SQLSTATE &#39;45000&#39; SET MESSAGE_TEXT = msg;  
-         END IF;
-      END;
-    |
+<pre class=" language-sql"><code class="language-sql">    <span class="token keyword">delimiter</span> <span class="token operator">|</span>
+    <span class="token keyword">CREATE</span> <span class="token keyword">TRIGGER</span> unique_AB BEFORE <span class="token keyword">INSERT</span> <span class="token keyword">ON</span> test
+      <span class="token keyword">FOR EACH ROW</span>
+      <span class="token keyword">BEGIN</span>
+             <span class="token keyword">DECLARE</span> msg <span class="token keyword">varchar</span><span class="token punctuation">(</span><span class="token number">200</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  
+         <span class="token keyword">DECLARE</span> flag <span class="token keyword">int</span><span class="token punctuation">;</span>
+         <span class="token keyword">set</span> flag <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">select</span> <span class="token function">count</span><span class="token punctuation">(</span><span class="token operator">*</span><span class="token punctuation">)</span> <span class="token keyword">from</span> test <span class="token keyword">where</span> A <span class="token operator">=</span> new<span class="token punctuation">.</span>A <span class="token operator">or</span> B <span class="token operator">=</span> new<span class="token punctuation">.</span>A <span class="token operator">or</span> A <span class="token operator">=</span> new<span class="token punctuation">.</span>B <span class="token operator">or</span> B <span class="token operator">=</span> new<span class="token punctuation">.</span>B<span class="token punctuation">)</span><span class="token punctuation">;</span>
+         <span class="token keyword">IF</span> flag <span class="token operator">></span> <span class="token number">0</span> <span class="token keyword">THEN</span>
+            <span class="token keyword">set</span> msg <span class="token operator">=</span> <span class="token string">"column duplicate!!!"</span><span class="token punctuation">;</span>  
+                SIGNAL SQLSTATE <span class="token string">'45000'</span> <span class="token keyword">SET</span> MESSAGE_TEXT <span class="token operator">=</span> msg<span class="token punctuation">;</span>  
+         <span class="token keyword">END</span> <span class="token keyword">IF</span><span class="token punctuation">;</span>
+      <span class="token keyword">END</span><span class="token punctuation">;</span>
+    <span class="token operator">|</span>
 </code></pre>
 <p>解释：<br>创建了一个before insert 触发器，<code>select count(*) from test where A = new.A or B = new.A or A = new.B or B = new.B</code>这条语句从数据库中查找当前的A或B是否曾经出现，<code>SIGNAL SQLSTATE &#39;45000&#39; SET MESSAGE_TEXT = msg;</code>这条语句创建了一个“unhandled user-defined exception.”，所以当当前A或B曾经出现在表中时，新的插入会报一个column duplicate!!!的错误。关于sql中如何抛出一个异常参考：<a href="https://dev.mysql.com/doc/refman/5.5/en/signal.html#signal-effects" target="_blank" rel="noopener">mysql官方文档</a><br>运行结果：<br><img src="/images/2016/11/insert.png" alt="insert"></p>
 <p>说这个问题的应用场景在哪呢？<br>我当时是公司在看一个培训视频的时候，有这么一个设计，我们讨论到了这个问题：<br><img src="/images/2016/11/登录名编码唯一.png" alt="登录名编码唯一"><br>这里的登录名是用户自己指定的，编码是系统指定的，但是他们都可以在用户登录的时候作为用户名使用，所以要求共同唯一。</p>

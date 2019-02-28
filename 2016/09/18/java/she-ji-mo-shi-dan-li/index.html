@@ -36,7 +36,7 @@
     </style>
 
     <script src="/libs/jquery/jquery-2.2.0.min.js"></script>
-</head>
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
 
 
 <body>
@@ -99,15 +99,6 @@
             <i class="fa fa-user-circle-o"></i>
             
             <span>关于</span>
-        </a>
-    </li>
-    
-    <li class="hide-on-med-and-down">
-        <a href="/friends" class="waves-effect waves-light">
-            
-            <i class="fa fa-address-book"></i>
-            
-            <span>友情链接</span>
         </a>
     </li>
     
@@ -178,15 +169,6 @@
                 <i class="fa fa-fw fa-user-circle-o"></i>
                 
                 关于
-            </a>
-        </li>
-        
-        <li>
-            <a href="/friends" class="waves-effect waves-light">
-                
-                <i class="fa fa-fw fa-address-book"></i>
-                
-                友情链接
             </a>
         </li>
         
@@ -374,115 +356,115 @@
 <ul>
 <li>饿汉式<br>所谓饿汉式，顾名思义，它很饥饿，于是它在类加载的时候就迫不及待的创建对象。  </li>
 </ul>
-<pre><code class="java">class Singleton {
+<pre class=" language-java"><code class="language-java"><span class="token keyword">class</span> <span class="token class-name">Singleton</span> <span class="token punctuation">{</span>
 
-    // 私有化构造方法：
-    private Singleton() {
-    }
+    <span class="token comment" spellcheck="true">// 私有化构造方法：</span>
+    <span class="token keyword">private</span> <span class="token function">Singleton</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">}</span>
 
-    // 建立该方法的对象：
-    private static Singleton s = new Singleton();
+    <span class="token comment" spellcheck="true">// 建立该方法的对象：</span>
+    <span class="token keyword">private</span> <span class="token keyword">static</span> Singleton s <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Singleton</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    // 提供外界访问该对象的方法：
-    public static Singleton getInstance() {
-        return s;
-    }
+    <span class="token comment" spellcheck="true">// 提供外界访问该对象的方法：</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> Singleton <span class="token function">getInstance</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> s<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    // 其余方法及属性的定义同普通类：
-    private static int age;
-    private static String name;
+    <span class="token comment" spellcheck="true">// 其余方法及属性的定义同普通类：</span>
+    <span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">int</span> age<span class="token punctuation">;</span>
+    <span class="token keyword">private</span> <span class="token keyword">static</span> String name<span class="token punctuation">;</span>
 
-    public void setAge(int age) {
-        this.age = age;
-    }
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">setAge</span><span class="token punctuation">(</span><span class="token keyword">int</span> age<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>age <span class="token operator">=</span> age<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    public int getAge() {
-        return age;
-    }
+    <span class="token keyword">public</span> <span class="token keyword">int</span> <span class="token function">getAge</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> age<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">setName</span><span class="token punctuation">(</span>String name<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>name <span class="token operator">=</span> name<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    public String getName() {
-        return name;
-    }
+    <span class="token keyword">public</span> String <span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> name<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-}
+<span class="token punctuation">}</span>
 
-class SingletonDemo {
-    // 测试：
-    public static void main(String[] args) {
-        Singleton s1 = Singleton.getInstance();
-        Singleton s2 = Singleton.getInstance();
+<span class="token keyword">class</span> <span class="token class-name">SingletonDemo</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">// 测试：</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        Singleton s1 <span class="token operator">=</span> Singleton<span class="token punctuation">.</span><span class="token function">getInstance</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Singleton s2 <span class="token operator">=</span> Singleton<span class="token punctuation">.</span><span class="token function">getInstance</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-        s1.setName(&quot; zhangsan!!!!!! &quot;);
-        System.out.println(s2.getName());
+        s1<span class="token punctuation">.</span><span class="token function">setName</span><span class="token punctuation">(</span><span class="token string">" zhangsan!!!!!! "</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>s2<span class="token punctuation">.</span><span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    }
-}
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 
 </code></pre>
 <ul>
 <li>懒汉式<br>所谓懒汉式，它很懒，不到迫不得已，它不创建对象，所以只有当使用时它才开始创建对象。  </li>
 </ul>
-<pre><code class="java">
-class Singleton {
+<pre class=" language-java"><code class="language-java">
+<span class="token keyword">class</span> <span class="token class-name">Singleton</span> <span class="token punctuation">{</span>
 
-    // 私有化构造方法：
-    private Singleton() {
-    }
+    <span class="token comment" spellcheck="true">// 私有化构造方法：</span>
+    <span class="token keyword">private</span> <span class="token function">Singleton</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">}</span>
 
-    // 建立该方法的对象：
-    private static Singleton s = null;
+    <span class="token comment" spellcheck="true">// 建立该方法的对象：</span>
+    <span class="token keyword">private</span> <span class="token keyword">static</span> Singleton s <span class="token operator">=</span> null<span class="token punctuation">;</span>
 
-    // 提供外界访问该对象的方法：
-    public static Singleton getInstance() {
-        // 此处增加了对安全隐患的处理
-        if (s == null) {
+    <span class="token comment" spellcheck="true">// 提供外界访问该对象的方法：</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> Singleton <span class="token function">getInstance</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// 此处增加了对安全隐患的处理</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>s <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
 
-            synchronized (Singleton.class) {
-                if (s == null)
+            <span class="token keyword">synchronized</span> <span class="token punctuation">(</span>Singleton<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>s <span class="token operator">==</span> null<span class="token punctuation">)</span>
 
-                    s = new Singleton();
-            }
-        }
-        return s;
-    }
+                    s <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Singleton</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">return</span> s<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    // 其余方法及属性的定义同普通类：
-    private static int age;
-    private static String name;
+    <span class="token comment" spellcheck="true">// 其余方法及属性的定义同普通类：</span>
+    <span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">int</span> age<span class="token punctuation">;</span>
+    <span class="token keyword">private</span> <span class="token keyword">static</span> String name<span class="token punctuation">;</span>
 
-    public void setAge(int age) {
-        this.age = age;
-    }
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">setAge</span><span class="token punctuation">(</span><span class="token keyword">int</span> age<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>age <span class="token operator">=</span> age<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    public int getAge() {
-        return age;
-    }
+    <span class="token keyword">public</span> <span class="token keyword">int</span> <span class="token function">getAge</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> age<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">setName</span><span class="token punctuation">(</span>String name<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>name <span class="token operator">=</span> name<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    public String getName() {
-        return name;
-    }
+    <span class="token keyword">public</span> String <span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> name<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-}
+<span class="token punctuation">}</span>
 
-class SingletonDemo {
-    // 测试：
-    public static void main(String[] args) {
-        Singleton s1 = Singleton.getInstance();
-        Singleton s2 = Singleton.getInstance();
+<span class="token keyword">class</span> <span class="token class-name">SingletonDemo</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">// 测试：</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        Singleton s1 <span class="token operator">=</span> Singleton<span class="token punctuation">.</span><span class="token function">getInstance</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Singleton s2 <span class="token operator">=</span> Singleton<span class="token punctuation">.</span><span class="token function">getInstance</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-        s1.setName(&quot; zhangsan!!!!!! &quot;);
-        System.out.println(s2.getName());
+        s1<span class="token punctuation">.</span><span class="token function">setName</span><span class="token punctuation">(</span><span class="token string">" zhangsan!!!!!! "</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>s2<span class="token punctuation">.</span><span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    }
-}
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <p>懒汉式设计的内容比较广，在面试中经常会被问及，但开发中一般使用饿汉式，简便快捷，无安全隐患</p>
 
@@ -680,21 +662,17 @@ class SingletonDemo {
             <div class="article-badge left-badge text-color">
                 <i class="fa fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2016/09/18/java/she-ji-mo-shi-mo-ban-she-ji-mo-shi/">
+                <a href="/2016/09/18/java/huan-jing-bian-liang/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/8.jpg" class="responsive-img" alt="设计模式：模板设计模式">
+                        <img src="/medias/featureimages/19.jpg" class="responsive-img" alt="语法：环境变量">
                         
-                        <span class="card-title">设计模式：模板设计模式</span>
+                        <span class="card-title">语法：环境变量</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
-                    <div class="summary">
-模板方法设计模式：在定义功能时，功能的一部分是确定的，而另一部分是不确定的，又确定的部分调用不确定的部分，这时把不确定的部分封装起来，暴露出去，让它的子类去具体实现。这也是抽象类的一种应用方式。
-
-通过一个小程序体现如下：
-class T</div>
+                    <div class="summary">Java环境变量的配置java_home: 指向jdk根目录，被许多IDE和容器所需要path：指定java.exe和javac.exe等运行java程序必不可少的工具所在的目录        值为：%java_home%/binclass</div>
                     <div class="publish-info">
                         <span class="publish-date">
                             <i class="fa fa-clock-o fa-fw icon-date"></i>2016-09-18
@@ -718,10 +696,6 @@ class T</div>
                         <span class="chip bg-color">JAVA</span>
                     </a>
                     
-                    <a href="/tags/设计模式/" target="_blank">
-                        <span class="chip bg-color">设计模式</span>
-                    </a>
-                    
                 </div>
                 
             </div>
@@ -733,22 +707,21 @@ class T</div>
                 下一篇&nbsp;<i class="fa fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2016/09/18/java/jing-tai-static/">
+                <a href="/2016/09/18/java/she-ji-mo-shi-mo-ban-she-ji-mo-shi/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/16.jpg" class="responsive-img" alt="语法：静态--static">
+                        <img src="/medias/featureimages/8.jpg" class="responsive-img" alt="设计模式：模板设计模式">
                         
-                        <span class="card-title">语法：静态--static</span>
+                        <span class="card-title">设计模式：模板设计模式</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary">
-Java中有一个特殊的关键字，叫static关键字，一个变量或方法是否被static修饰会导致它的性质和应用范围有很大的不同。本文主要讨论Java中静态与非静态的区别。  
+模板方法设计模式：在定义功能时，功能的一部分是确定的，而另一部分是不确定的，又确定的部分调用不确定的部分，这时把不确定的部分封装起来，暴露出去，让它的子类去具体实现。这也是抽象类的一种应用方式。
 
-老毕的视频教程中讲到：  
-
-static是一个修饰符，用以修</div>
+通过一个小程序体现如下：
+class T</div>
                     <div class="publish-info">
                             <span class="publish-date">
                                 <i class="fa fa-clock-o fa-fw icon-date"></i>2016-09-18
@@ -770,6 +743,10 @@ static是一个修饰符，用以修</div>
                     
                     <a href="/tags/JAVA/" target="_blank">
                         <span class="chip bg-color">JAVA</span>
+                    </a>
+                    
+                    <a href="/tags/设计模式/" target="_blank">
+                        <span class="chip bg-color">设计模式</span>
                     </a>
                     
                 </div>

@@ -29,7 +29,7 @@
     </style>
 
     <script src="/libs/jquery/jquery-2.2.0.min.js"></script>
-</head>
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
 
 
 <body>
@@ -92,15 +92,6 @@
             <i class="fa fa-user-circle-o"></i>
             
             <span>关于</span>
-        </a>
-    </li>
-    
-    <li class="hide-on-med-and-down">
-        <a href="/friends" class="waves-effect waves-light">
-            
-            <i class="fa fa-address-book"></i>
-            
-            <span>友情链接</span>
         </a>
     </li>
     
@@ -171,15 +162,6 @@
                 <i class="fa fa-fw fa-user-circle-o"></i>
                 
                 关于
-            </a>
-        </li>
-        
-        <li>
-            <a href="/friends" class="waves-effect waves-light">
-                
-                <i class="fa fa-fw fa-address-book"></i>
-                
-                友情链接
             </a>
         </li>
         
@@ -354,25 +336,25 @@
 <hr>
 <p>介绍了maven中仓库的概念，以及远程仓库，镜像仓库，本地仓库三者的关系</p>
 <p>简单点来说，repository就是个仓库。maven里有两种仓库，本地仓库和远程仓库。<br>远程仓库相当于公共的仓库，大家都能看到。本地仓库是你本地的一个山寨版，只有你看的到，主要起缓存作用。当你向仓库请求插件或依赖的时候，会先检查本地仓库里是否有。如果有则直接返回，否则会向远程仓库请求，并做缓存。你也可以把你做的东西上传到本地仓库给你本地自己用，或上传到远程仓库，供大家使用。<br>远程仓库可以在工程的pom.xml文件里指定。如果没指定，默认就会把下面这地方做远程仓库，即默认会到<a href="http://repo1.maven.org/maven2" target="_blank" rel="noopener">http://repo1.maven.org/maven2</a> 这个地方去请求插件和依赖包。</p>
-<pre><code class="xml">&lt;repository&gt;
-    &lt;snapshots&gt;
-        &lt;enabled&gt;false&lt;/enabled&gt;
-    &lt;/snapshots&gt;
-    &lt;id&gt;central&lt;/id&gt;
-    &lt;name&gt;Maven Repository Switchboard&lt;/name&gt;
-    &lt;url&gt;http://repo1.maven.org/maven2&lt;/url&gt;
-&lt;/repository&gt;
+<pre class=" language-xml"><code class="language-xml"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>repository</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>snapshots</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>enabled</span><span class="token punctuation">></span></span>false<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>enabled</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>snapshots</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>id</span><span class="token punctuation">></span></span>central<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>id</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>name</span><span class="token punctuation">></span></span>Maven Repository Switchboard<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>name</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>url</span><span class="token punctuation">></span></span>http://repo1.maven.org/maven2<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>url</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>repository</span><span class="token punctuation">></span></span>
 </code></pre>
 <p>本地仓库默认在你本地的用户目录下的.m2/repository目录下。 </p>
 <p>mirror就是镜像，主要提供一个方便地切换远程仓库地址的途径。比如，上班的时候在公司，用电信的网络，连的是电信的仓库。回到家后，是网通的网络，我想连网通的仓库，就可以通过mirror配置，统一把我工程里的仓库地址都改成联通的，而不用到具体工程配置文件里一个一个地改地址。<br>mirror的配置在.m2/settings.xml里。如： </p>
-<pre><code class="xml">&lt;mirrors&gt;
-    &lt;mirror&gt;
-        &lt;id&gt;UK&lt;/id&gt;
-        &lt;name&gt;UK Central&lt;/name&gt;
-        &lt;url&gt;http://uk.maven.org/maven2&lt;/url&gt;
-        &lt;mirrorOf&gt;central&lt;/mirrorOf&gt;
-    &lt;/mirror&gt;
-&lt;/mirrors&gt;
+<pre class=" language-xml"><code class="language-xml"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>mirrors</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>mirror</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>id</span><span class="token punctuation">></span></span>UK<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>id</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>name</span><span class="token punctuation">></span></span>UK Central<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>name</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>url</span><span class="token punctuation">></span></span>http://uk.maven.org/maven2<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>url</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>mirrorOf</span><span class="token punctuation">></span></span>central<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>mirrorOf</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>mirror</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>mirrors</span><span class="token punctuation">></span></span>
 </code></pre>
 <p>这样的话，就会给上面id为central的远程仓库做了个镜像。以后向central这个仓库发的请求都会发到<a href="http://uk.maven.org/maven2" target="_blank" rel="noopener">http://uk.maven.org/maven2</a> 而不是<a href="http://repo1.maven.org/maven2" target="_blank" rel="noopener">http://repo1.maven.org/maven2</a> 了。<br>central 里是要替代的仓库的id。如果填*，就会替代所有仓库。 </p>
 <p>参考资料：<br><a href="http://maven.apache.org/guides/introduction/introduction-to-repositories.html" target="_blank" rel="noopener">http://maven.apache.org/guides/introduction/introduction-to-repositories.html</a><br><a href="http://maven.apache.org/guides/mini/guide-mirror-settings.html" target="_blank" rel="noopener">http://maven.apache.org/guides/mini/guide-mirror-settings.html</a></p>
@@ -582,10 +564,10 @@
                 </a>
                 <div class="card-content article-content">
                     <div class="summary">POM常用标签如下
-&lt;!--pom项目根标签，指定一些项目的约束--&gt;
-&lt;project&gt;  
-    &lt;!--pom的版本，固定值4.0.0--&gt;
-    &lt;modelVersion&gt;4.0</div>
+&lt;!--pom项目根标签，指定一些项目的约束-->
+&lt;project>  
+    &lt;!--pom的版本，固定值4.0.0-->
+    &lt;modelVersion>4.0.0&lt;/model</div>
                     <div class="publish-info">
                         <span class="publish-date">
                             <i class="fa fa-clock-o fa-fw icon-date"></i>2016-09-19

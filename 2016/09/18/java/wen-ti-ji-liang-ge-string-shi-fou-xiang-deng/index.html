@@ -33,7 +33,7 @@ class StringDemo {
     </style>
 
     <script src="/libs/jquery/jquery-2.2.0.min.js"></script>
-</head>
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
 
 
 <body>
@@ -96,15 +96,6 @@ class StringDemo {
             <i class="fa fa-user-circle-o"></i>
             
             <span>关于</span>
-        </a>
-    </li>
-    
-    <li class="hide-on-med-and-down">
-        <a href="/friends" class="waves-effect waves-light">
-            
-            <i class="fa fa-address-book"></i>
-            
-            <span>友情链接</span>
         </a>
     </li>
     
@@ -175,15 +166,6 @@ class StringDemo {
                 <i class="fa fa-fw fa-user-circle-o"></i>
                 
                 关于
-            </a>
-        </li>
-        
-        <li>
-            <a href="/friends" class="waves-effect waves-light">
-                
-                <i class="fa fa-fw fa-address-book"></i>
-                
-                友情链接
             </a>
         </li>
         
@@ -357,20 +339,20 @@ class StringDemo {
 <p>我们知道String类私有的维护一个字符串池，在判断两个字符串对象是否==时，要考虑到这一点</p>
 <hr>
 <p>首先来看一段代码：  </p>
-<pre><code class="java">class StringDemo {
- public static void main(String[] args) {
-  String s1 = &quot;Welcome&quot;;
-  String s2 = new String(&quot;Welcome&quot;);
-  String s3 = &quot;Welcome&quot;;
-  String s4 = new String(&quot;Welcome&quot;).intern();
+<pre class=" language-java"><code class="language-java"><span class="token keyword">class</span> <span class="token class-name">StringDemo</span> <span class="token punctuation">{</span>
+ <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  String s1 <span class="token operator">=</span> <span class="token string">"Welcome"</span><span class="token punctuation">;</span>
+  String s2 <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">String</span><span class="token punctuation">(</span><span class="token string">"Welcome"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  String s3 <span class="token operator">=</span> <span class="token string">"Welcome"</span><span class="token punctuation">;</span>
+  String s4 <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">String</span><span class="token punctuation">(</span><span class="token string">"Welcome"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">intern</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-  //对相同字符串直接量使用同一个实例
-  System.out.println(s1 == s2);    //false
-  System.out.println(s1 == s3);    //true
-  System.out.println(s3 == s4);    //true
-  System.out.println(s2 == s4);    //false
-    }
-}
+  <span class="token comment" spellcheck="true">//对相同字符串直接量使用同一个实例</span>
+  System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>s1 <span class="token operator">==</span> s2<span class="token punctuation">)</span><span class="token punctuation">;</span>    <span class="token comment" spellcheck="true">//false</span>
+  System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>s1 <span class="token operator">==</span> s3<span class="token punctuation">)</span><span class="token punctuation">;</span>    <span class="token comment" spellcheck="true">//true</span>
+  System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>s3 <span class="token operator">==</span> s4<span class="token punctuation">)</span><span class="token punctuation">;</span>    <span class="token comment" spellcheck="true">//true</span>
+  System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>s2 <span class="token operator">==</span> s4<span class="token punctuation">)</span><span class="token punctuation">;</span>    <span class="token comment" spellcheck="true">//false</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <p>简单解释如下：<br>s1 == s2 为false，原因是s1存在于字符串池中，而s2不是从字符串池中取的”Welcome”对象<br>s1 == s3 为true，因为s1和s3指向字符串池中的同一”Welcome”对象<br>s3 == s4 为true，s2 == s4 为false，官方API给出的解释如下：  </p>
 <blockquote>
@@ -573,25 +555,20 @@ class StringDemo {
             <div class="article-badge left-badge text-color">
                 <i class="fa fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2016/09/18/java/wen-ti-ji-tong-ming-bian-liang-wen-ti/">
+                <a href="/2016/09/18/java/wen-ti-ji-nextint-hou-nextline-du-qu-kong-zhi/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/0.jpg" class="responsive-img" alt="问题集：同名变量问题">
+                        <img src="/medias/featureimages/20.jpg" class="responsive-img" alt="问题集：nextInt后nextLine读取空值">
                         
-                        <span class="card-title">问题集：同名变量问题</span>
+                        <span class="card-title">问题集：nextInt后nextLine读取空值</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
-                    <div class="summary">
-本文介绍什么情况下在同一个类中同名变量可以共存
+                    <div class="summary">在学习Scanner类的时候遇到一个问题，在使用nextInt()获取到一个整数之后，如果接着调用nextLine()方法，nextLine()方法将获取不到值？
+import java.util.*;
 
-相关代码如下：
-class Test{
- static int x = 1;
- public static void main(String[] args){
-  int x=2;
-  S</div>
+public class Test</div>
                     <div class="publish-info">
                         <span class="publish-date">
                             <i class="fa fa-clock-o fa-fw icon-date"></i>2016-09-18
@@ -626,20 +603,25 @@ class Test{
                 下一篇&nbsp;<i class="fa fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2016/09/18/java/wen-ti-ji-nextint-hou-nextline-du-qu-kong-zhi/">
+                <a href="/2016/09/18/java/wen-ti-ji-tong-ming-bian-liang-wen-ti/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/20.jpg" class="responsive-img" alt="问题集：nextInt后nextLine读取空值">
+                        <img src="/medias/featureimages/0.jpg" class="responsive-img" alt="问题集：同名变量问题">
                         
-                        <span class="card-title">问题集：nextInt后nextLine读取空值</span>
+                        <span class="card-title">问题集：同名变量问题</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
-                    <div class="summary">在学习Scanner类的时候遇到一个问题，在使用nextInt()获取到一个整数之后，如果接着调用nextLine()方法，nextLine()方法将获取不到值？
-import java.util.*;
+                    <div class="summary">
+本文介绍什么情况下在同一个类中同名变量可以共存
 
-public class Test</div>
+相关代码如下：
+class Test{
+ static int x = 1;
+ public static void main(String[] args){
+  int x=2;
+  S</div>
                     <div class="publish-info">
                             <span class="publish-date">
                                 <i class="fa fa-clock-o fa-fw icon-date"></i>2016-09-18

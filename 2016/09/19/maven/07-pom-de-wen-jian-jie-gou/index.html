@@ -6,10 +6,10 @@
     <meta charset="utf-8">
     <meta name="keywords" content="07--pom的文件结构, 顽逗">
     <meta name="description" content="POM常用标签如下
-&amp;lt;!--pom项目根标签，指定一些项目的约束--&amp;gt;
-&amp;lt;project&amp;gt;  
-    &amp;lt;!--pom的版本，固定值4.0.0--&amp;gt;
-    &amp;lt;modelVersion&amp;gt;4.0">
+&amp;lt;!--pom项目根标签，指定一些项目的约束--&gt;
+&amp;lt;project&gt;  
+    &amp;lt;!--pom的版本，固定值4.0.0--&gt;
+    &amp;lt;modelVersion&gt;4.0.0&amp;lt;/model">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -32,7 +32,7 @@
     </style>
 
     <script src="/libs/jquery/jquery-2.2.0.min.js"></script>
-</head>
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
 
 
 <body>
@@ -95,15 +95,6 @@
             <i class="fa fa-user-circle-o"></i>
             
             <span>关于</span>
-        </a>
-    </li>
-    
-    <li class="hide-on-med-and-down">
-        <a href="/friends" class="waves-effect waves-light">
-            
-            <i class="fa fa-address-book"></i>
-            
-            <span>友情链接</span>
         </a>
     </li>
     
@@ -174,15 +165,6 @@
                 <i class="fa fa-fw fa-user-circle-o"></i>
                 
                 关于
-            </a>
-        </li>
-        
-        <li>
-            <a href="/friends" class="waves-effect waves-light">
-                
-                <i class="fa fa-fw fa-address-book"></i>
-                
-                友情链接
             </a>
         </li>
         
@@ -353,89 +335,89 @@
         <div class="card-content article-card-content">
             <div id="articleContent">
                 <p>POM常用标签如下</p>
-<pre><code class="xml">&lt;!--pom项目根标签，指定一些项目的约束--&gt;
-&lt;project&gt;  
-    &lt;!--pom的版本，固定值4.0.0--&gt;
-    &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;  
+<pre class=" language-xml"><code class="language-xml"><span class="token comment" spellcheck="true">&lt;!--pom项目根标签，指定一些项目的约束--></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>project</span><span class="token punctuation">></span></span>  
+    <span class="token comment" spellcheck="true">&lt;!--pom的版本，固定值4.0.0--></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>modelVersion</span><span class="token punctuation">></span></span>4.0.0<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>modelVersion</span><span class="token punctuation">></span></span>  
 
-    &lt;!--当前maven工程坐标--&gt;
-    &lt;!--组织名--&gt;
-    &lt;groupId&gt;com.nenu.test&lt;/groupId&gt;
-    &lt;!--模块名--&gt;
-    &lt;artifactId&gt;&lt;/artifactId&gt;
-    &lt;!--版本--&gt;
-    &lt;version&gt;&lt;/version&gt;
-    &lt;!--打包方式，可选值jar,war,pom等--&gt;
-    &lt;packaging&gt;&lt;/packaging&gt;
+    <span class="token comment" spellcheck="true">&lt;!--当前maven工程坐标--></span>
+    <span class="token comment" spellcheck="true">&lt;!--组织名--></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>groupId</span><span class="token punctuation">></span></span>com.nenu.test<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>groupId</span><span class="token punctuation">></span></span>
+    <span class="token comment" spellcheck="true">&lt;!--模块名--></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>artifactId</span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>artifactId</span><span class="token punctuation">></span></span>
+    <span class="token comment" spellcheck="true">&lt;!--版本--></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>version</span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>version</span><span class="token punctuation">></span></span>
+    <span class="token comment" spellcheck="true">&lt;!--打包方式，可选值jar,war,pom等--></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>packaging</span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>packaging</span><span class="token punctuation">></span></span>
 
-    &lt;!--描述信息--&gt;
-    &lt;!--唯一标示--&gt;
-    &lt;id&gt;&lt;/id&gt;
-    &lt;!--工程名字描述--&gt;
-    &lt;name&gt;&lt;/name&gt;
-    &lt;!--工程简介--&gt;
-    &lt;description&gt;&lt;/description&gt;
+    <span class="token comment" spellcheck="true">&lt;!--描述信息--></span>
+    <span class="token comment" spellcheck="true">&lt;!--唯一标示--></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>id</span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>id</span><span class="token punctuation">></span></span>
+    <span class="token comment" spellcheck="true">&lt;!--工程名字描述--></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>name</span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>name</span><span class="token punctuation">></span></span>
+    <span class="token comment" spellcheck="true">&lt;!--工程简介--></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>description</span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>description</span><span class="token punctuation">></span></span>
 
-    &lt;!--依赖--&gt;
-    &lt;dependencies&gt;
-        &lt;dependency&gt;
-            &lt;!--这里首先是依赖的库的坐标--&gt;
-            &lt;!--作用域：可选值：compile，provided，test，system，runtime--&gt;
-            &lt;scope&gt;&lt;scope&gt;
-            &lt;!--排除依赖--&gt;
-            &lt;exclusions&gt;
-                &lt;exclusion&gt;
-                    &lt;!--坐标不需要版本号--&gt;
-                &lt;/exclusion&gt;
-            &lt;/exclusions&gt;
-        &lt;/dependency&gt;
-    &lt;/dependencies&gt;
+    <span class="token comment" spellcheck="true">&lt;!--依赖--></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependencies</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependency</span><span class="token punctuation">></span></span>
+            <span class="token comment" spellcheck="true">&lt;!--这里首先是依赖的库的坐标--></span>
+            <span class="token comment" spellcheck="true">&lt;!--作用域：可选值：compile，provided，test，system，runtime--></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>scope</span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>scope</span><span class="token punctuation">></span></span>
+            <span class="token comment" spellcheck="true">&lt;!--排除依赖--></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>exclusions</span><span class="token punctuation">></span></span>
+                <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>exclusion</span><span class="token punctuation">></span></span>
+                    <span class="token comment" spellcheck="true">&lt;!--坐标不需要版本号--></span>
+                <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>exclusion</span><span class="token punctuation">></span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>exclusions</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>dependency</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>dependencies</span><span class="token punctuation">></span></span>
 
-    &lt;!--只用于父类中--&gt;
-    &lt;dependencyManagement&gt;
-        &lt;dependencies&gt;
-            &lt;dependency&gt;
-                &lt;!--这里首先是依赖的库的坐标--&gt;
-                &lt;!--作用域：可选值：compile，provided，test，system，runtime，import--&gt;
-                &lt;scope&gt;&lt;scope&gt;
-            &lt;/dependency&gt;
-        &lt;/dependencies&gt;
-    &lt;/dependencyManagement&gt;
+    <span class="token comment" spellcheck="true">&lt;!--只用于父类中--></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependencyManagement</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependencies</span><span class="token punctuation">></span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependency</span><span class="token punctuation">></span></span>
+                <span class="token comment" spellcheck="true">&lt;!--这里首先是依赖的库的坐标--></span>
+                <span class="token comment" spellcheck="true">&lt;!--作用域：可选值：compile，provided，test，system，runtime，import--></span>
+                <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>scope</span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>scope</span><span class="token punctuation">></span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>dependency</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>dependencies</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>dependencyManagement</span><span class="token punctuation">></span></span>
 
-    &lt;!--构建时候的一些配置--&gt;
-    &lt;build&gt;
-        &lt;!--插件--&gt;
-        &lt;plugins&gt;
-            &lt;plugin&gt;
-                &lt;!--也是需要一个坐标信息--&gt;
+    <span class="token comment" spellcheck="true">&lt;!--构建时候的一些配置--></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>build</span><span class="token punctuation">></span></span>
+        <span class="token comment" spellcheck="true">&lt;!--插件--></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>plugins</span><span class="token punctuation">></span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>plugin</span><span class="token punctuation">></span></span>
+                <span class="token comment" spellcheck="true">&lt;!--也是需要一个坐标信息--></span>
 
-                &lt;!--执行信息--&gt;
-                &lt;executions&gt;
-                    &lt;execution&gt;
-                        &lt;!--作用阶段--&gt;
-                        &lt;phase&gt;&lt;/phase&gt;
-                        &lt;!--目标--&gt;
-                        &lt;goals&gt;
-                                &lt;goal&gt;&lt;/goal&gt;
-                            &lt;/goals&gt;
-                    &lt;/execution&gt;
-                &lt;/executions&gt;
-            &lt;/plugin&gt;
-        &lt;/plugins&gt;
-    &lt;/build&gt;
+                <span class="token comment" spellcheck="true">&lt;!--执行信息--></span>
+                <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>executions</span><span class="token punctuation">></span></span>
+                    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>execution</span><span class="token punctuation">></span></span>
+                        <span class="token comment" spellcheck="true">&lt;!--作用阶段--></span>
+                        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>phase</span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>phase</span><span class="token punctuation">></span></span>
+                        <span class="token comment" spellcheck="true">&lt;!--目标--></span>
+                        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>goals</span><span class="token punctuation">></span></span>
+                                <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>goal</span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>goal</span><span class="token punctuation">></span></span>
+                            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>goals</span><span class="token punctuation">></span></span>
+                    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>execution</span><span class="token punctuation">></span></span>
+                <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>executions</span><span class="token punctuation">></span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>plugin</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>plugins</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>build</span><span class="token punctuation">></span></span>
 
-    &lt;!--父模块--&gt;
-    &lt;parent&gt;
-        &lt;!--坐标信息--&gt;
-    &lt;/parent&gt;
+    <span class="token comment" spellcheck="true">&lt;!--父模块--></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>parent</span><span class="token punctuation">></span></span>
+        <span class="token comment" spellcheck="true">&lt;!--坐标信息--></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>parent</span><span class="token punctuation">></span></span>
 
-    &lt;!--用于聚合某些模块--&gt;
-    &lt;modules&gt;
-        &lt;module&gt;
-            &lt;!--坐标信息--&gt;
-        &lt;/module&gt;
-    &lt;/modules&gt;
-&lt;/project&gt;
+    <span class="token comment" spellcheck="true">&lt;!--用于聚合某些模块--></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>modules</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>module</span><span class="token punctuation">></span></span>
+            <span class="token comment" spellcheck="true">&lt;!--坐标信息--></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>module</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>modules</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>project</span><span class="token punctuation">></span></span>
 </code></pre>
 
             </div>

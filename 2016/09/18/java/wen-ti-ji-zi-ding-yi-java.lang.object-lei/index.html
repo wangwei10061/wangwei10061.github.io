@@ -35,7 +35,7 @@ public class Object {
     </style>
 
     <script src="/libs/jquery/jquery-2.2.0.min.js"></script>
-</head>
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
 
 
 <body>
@@ -98,15 +98,6 @@ public class Object {
             <i class="fa fa-user-circle-o"></i>
             
             <span>关于</span>
-        </a>
-    </li>
-    
-    <li class="hide-on-med-and-down">
-        <a href="/friends" class="waves-effect waves-light">
-            
-            <i class="fa fa-address-book"></i>
-            
-            <span>友情链接</span>
         </a>
     </li>
     
@@ -177,15 +168,6 @@ public class Object {
                 <i class="fa fa-fw fa-user-circle-o"></i>
                 
                 关于
-            </a>
-        </li>
-        
-        <li>
-            <a href="/friends" class="waves-effect waves-light">
-                
-                <i class="fa fa-fw fa-address-book"></i>
-                
-                友情链接
             </a>
         </li>
         
@@ -359,13 +341,13 @@ public class Object {
 <p>同学去阿里面试的时候被问到的问题：可否自定义一个String类，放在一个名为java.lang的包中？与此问题有异曲同工之妙。</p>
 <hr>
 <p>相关代码如下：</p>
-<pre><code class="java">package java.lang;
+<pre class=" language-java"><code class="language-java"><span class="token keyword">package</span> java<span class="token punctuation">.</span>lang<span class="token punctuation">;</span>
 
-public class Object {
-    public static void main(String[] args) {
-        System.out.println(&quot;Hello World!&quot;);
-    }
-}
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">Object</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"Hello World!"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <p>运行结果如下：<br><img src="/images/2016/10/vmresult.png" alt><br>为什么呢，明明我定义了main方法？它偏偏说找不到？<br>我们注意到这个类的特殊性，java.lang.Object，太特殊了，这不是万物的祖先嘛。<br>待续》》》因为虚拟机的类加载机制</p>
 
@@ -563,20 +545,25 @@ public class Object {
             <div class="article-badge left-badge text-color">
                 <i class="fa fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2016/09/18/java/wen-ti-ji-nextint-hou-nextline-du-qu-kong-zhi/">
+                <a href="/2016/09/18/java/wen-ti-ji-tong-ming-bian-liang-wen-ti/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/20.jpg" class="responsive-img" alt="问题集：nextInt后nextLine读取空值">
+                        <img src="/medias/featureimages/0.jpg" class="responsive-img" alt="问题集：同名变量问题">
                         
-                        <span class="card-title">问题集：nextInt后nextLine读取空值</span>
+                        <span class="card-title">问题集：同名变量问题</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
-                    <div class="summary">在学习Scanner类的时候遇到一个问题，在使用nextInt()获取到一个整数之后，如果接着调用nextLine()方法，nextLine()方法将获取不到值？
-import java.util.*;
+                    <div class="summary">
+本文介绍什么情况下在同一个类中同名变量可以共存
 
-public class Test</div>
+相关代码如下：
+class Test{
+ static int x = 1;
+ public static void main(String[] args){
+  int x=2;
+  S</div>
                     <div class="publish-info">
                         <span class="publish-date">
                             <i class="fa fa-clock-o fa-fw icon-date"></i>2016-09-18
@@ -611,18 +598,20 @@ public class Test</div>
                 下一篇&nbsp;<i class="fa fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2016/09/18/java/java-ji-ben-de-cheng-xu-she-ji-jie-gou/">
+                <a href="/2016/09/18/git/git-zong-jie/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/10.jpg" class="responsive-img" alt="语法：JAVA基本的程序设计结构">
+                        <img src="/medias/featureimages/10.jpg" class="responsive-img" alt="Git总结">
                         
-                        <span class="card-title">语法：JAVA基本的程序设计结构</span>
+                        <span class="card-title">Git总结</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary">
-高级语言的基本程序设计结构都是大同小异的，笔者大学期间学习的第一门高级语言是C语言，在学习Java语言中不涉及到面向对象的部分时，都还是感觉非常得心应手的，毕竟高级语言的组成都比较相近，大体包括：标识符，变量，常量，关键字，分隔符，表达式</div>
+git作为一种分布式的版本控制工具，相对svn的优势是很明显的，曾被阿里的面试官问到git与svn的区别，在这里对git做一个简要的介绍。
+
+why git?我本人用svn有三年的时间了，你要是不嫌弃的话其实svn也没有那么烂，我感觉会用</div>
                     <div class="publish-info">
                             <span class="publish-date">
                                 <i class="fa fa-clock-o fa-fw icon-date"></i>2016-09-18
@@ -631,8 +620,8 @@ public class Test</div>
                             
                             <i class="fa fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/JAVA/" class="post-category" target="_blank">
-                                    JAVA
+                            <a href="/categories/git/" class="post-category" target="_blank">
+                                    git
                                 </a>
                             
                             
@@ -642,8 +631,8 @@ public class Test</div>
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/JAVA/" target="_blank">
-                        <span class="chip bg-color">JAVA</span>
+                    <a href="/tags/git/" target="_blank">
+                        <span class="chip bg-color">git</span>
                     </a>
                     
                 </div>

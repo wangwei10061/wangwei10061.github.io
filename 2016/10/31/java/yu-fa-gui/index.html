@@ -40,7 +40,7 @@ JAVA GUI应用得不多了，从笔记中翻到了，也搬运过来罢。
     </style>
 
     <script src="/libs/jquery/jquery-2.2.0.min.js"></script>
-</head>
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
 
 
 <body>
@@ -103,15 +103,6 @@ JAVA GUI应用得不多了，从笔记中翻到了，也搬运过来罢。
             <i class="fa fa-user-circle-o"></i>
             
             <span>关于</span>
-        </a>
-    </li>
-    
-    <li class="hide-on-med-and-down">
-        <a href="/friends" class="waves-effect waves-light">
-            
-            <i class="fa fa-address-book"></i>
-            
-            <span>友情链接</span>
         </a>
     </li>
     
@@ -182,15 +173,6 @@ JAVA GUI应用得不多了，从笔记中翻到了，也搬运过来罢。
                 <i class="fa fa-fw fa-user-circle-o"></i>
                 
                 关于
-            </a>
-        </li>
-        
-        <li>
-            <a href="/friends" class="waves-effect waves-light">
-                
-                <i class="fa fa-fw fa-address-book"></i>
-                
-                友情链接
             </a>
         </li>
         
@@ -387,195 +369,195 @@ JAVA GUI应用得不多了，从笔记中翻到了，也搬运过来罢。
 <li><p>例程</p>
 </li>
 </ul>
-<pre><code class="java">import java.awt.*;
-import java.awt.event.*;
+<pre class=" language-java"><code class="language-java"><span class="token keyword">import</span> java<span class="token punctuation">.</span>awt<span class="token punctuation">.</span>*<span class="token punctuation">;</span>
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>awt<span class="token punctuation">.</span>event<span class="token punctuation">.</span>*<span class="token punctuation">;</span>
 
-//将图形用户界面和事件的处理分离开来
-public class SeparatedAwtListener {
+<span class="token comment" spellcheck="true">//将图形用户界面和事件的处理分离开来</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">SeparatedAwtListener</span> <span class="token punctuation">{</span>
 
-    // 建立引用
-    private Frame f;
-    private Button b;
-    private TextField tf;
+    <span class="token comment" spellcheck="true">// 建立引用</span>
+    <span class="token keyword">private</span> Frame f<span class="token punctuation">;</span>
+    <span class="token keyword">private</span> Button b<span class="token punctuation">;</span>
+    <span class="token keyword">private</span> TextField tf<span class="token punctuation">;</span>
 
-    SeparatedAwtListener() {
-        init();
-    }
+    <span class="token function">SeparatedAwtListener</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    // 初始化：
-    public void init() {
-        // 界面
-        f = new Frame(&quot;my frame&quot;);
+    <span class="token comment" spellcheck="true">// 初始化：</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">init</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// 界面</span>
+        f <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Frame</span><span class="token punctuation">(</span><span class="token string">"my frame"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-        f.setBounds(200, 300, 500, 400);
+        f<span class="token punctuation">.</span><span class="token function">setBounds</span><span class="token punctuation">(</span><span class="token number">200</span><span class="token punctuation">,</span> <span class="token number">300</span><span class="token punctuation">,</span> <span class="token number">500</span><span class="token punctuation">,</span> <span class="token number">400</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-        b = new Button(&quot;退出&quot;);
-        f.add(b);
-        tf = new TextField(20);
-        f.add(tf);
+        b <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Button</span><span class="token punctuation">(</span><span class="token string">"退出"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        f<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>b<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        tf <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">TextField</span><span class="token punctuation">(</span><span class="token number">20</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        f<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>tf<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-        f.setLayout(new FlowLayout());
-        f.setVisible(true);
+        f<span class="token punctuation">.</span><span class="token function">setLayout</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">FlowLayout</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        f<span class="token punctuation">.</span><span class="token function">setVisible</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-        myEvent();
-    }
+        <span class="token function">myEvent</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    // 事件监听
-    public void myEvent() {
-        // 窗口事件
-        f.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                System.exit(0);
-            }
-        });
-        // 动作事件
-        b.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.out.println(&quot;Action&quot;);
-            }
-        });
-        // 鼠标事件
-        b.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                System.out.println(&quot;点击&quot;);
-            }
-        });
-        // 键盘事件
-        b.addKeyListener(new KeyAdapter() {
-            public void keyPressed(KeyEvent e) {
-                if (e.isControlDown() &amp;&amp; e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    System.exit(0);
-                }
-            }
-        });
+    <span class="token comment" spellcheck="true">// 事件监听</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">myEvent</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// 窗口事件</span>
+        f<span class="token punctuation">.</span><span class="token function">addWindowListener</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">WindowAdapter</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token annotation punctuation">@Override</span>
+            <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">windowClosing</span><span class="token punctuation">(</span>WindowEvent e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                System<span class="token punctuation">.</span><span class="token function">exit</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">// 动作事件</span>
+        b<span class="token punctuation">.</span><span class="token function">addActionListener</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">ActionListener</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token annotation punctuation">@Override</span>
+            <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">actionPerformed</span><span class="token punctuation">(</span>ActionEvent e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"Action"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">// 鼠标事件</span>
+        b<span class="token punctuation">.</span><span class="token function">addMouseListener</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">MouseAdapter</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token annotation punctuation">@Override</span>
+            <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">mouseClicked</span><span class="token punctuation">(</span>MouseEvent e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"点击"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">// 键盘事件</span>
+        b<span class="token punctuation">.</span><span class="token function">addKeyListener</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">KeyAdapter</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">keyPressed</span><span class="token punctuation">(</span>KeyEvent e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>e<span class="token punctuation">.</span><span class="token function">isControlDown</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> e<span class="token punctuation">.</span><span class="token function">getKeyCode</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">==</span> KeyEvent<span class="token punctuation">.</span>VK_ENTER<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    System<span class="token punctuation">.</span><span class="token function">exit</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-        tf.addKeyListener(new KeyAdapter() {
-            public void keyPressed(KeyEvent e) {
-                if (!(e.getKeyCode() &gt;= KeyEvent.VK_0 &amp;&amp; e.getKeyCode() &lt;= KeyEvent.VK_9))
-                    e.consume();
-            }
-        });
+        tf<span class="token punctuation">.</span><span class="token function">addKeyListener</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">KeyAdapter</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">keyPressed</span><span class="token punctuation">(</span>KeyEvent e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token punctuation">(</span>e<span class="token punctuation">.</span><span class="token function">getKeyCode</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">>=</span> KeyEvent<span class="token punctuation">.</span>VK_0 <span class="token operator">&amp;&amp;</span> e<span class="token punctuation">.</span><span class="token function">getKeyCode</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&lt;=</span> KeyEvent<span class="token punctuation">.</span>VK_9<span class="token punctuation">)</span><span class="token punctuation">)</span>
+                    e<span class="token punctuation">.</span><span class="token function">consume</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    }
+    <span class="token punctuation">}</span>
 
-    public static void main(String[] args) {
-        new SeparatedAwtListener();
-    }
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">new</span> <span class="token class-name">SeparatedAwtListener</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-}
+<span class="token punctuation">}</span>
 
 
 
-// Dialog的使用，自制资源管理器
+<span class="token comment" spellcheck="true">// Dialog的使用，自制资源管理器</span>
 
-import java.awt.*;
-import java.awt.event.*;
-import java.io.File;
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>awt<span class="token punctuation">.</span>*<span class="token punctuation">;</span>
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>awt<span class="token punctuation">.</span>event<span class="token punctuation">.</span>*<span class="token punctuation">;</span>
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>io<span class="token punctuation">.</span>File<span class="token punctuation">;</span>
 
-public class ImitateFileExplorer {
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">ImitateFileExplorer</span> <span class="token punctuation">{</span>
 
-    private Frame f;
-    private TextField tf;
-    private TextArea ta;
-    private Button but;
-    private Panel p;
-    private Dialog dlg;
-    private Button but_dlg;
+    <span class="token keyword">private</span> Frame f<span class="token punctuation">;</span>
+    <span class="token keyword">private</span> TextField tf<span class="token punctuation">;</span>
+    <span class="token keyword">private</span> TextArea ta<span class="token punctuation">;</span>
+    <span class="token keyword">private</span> Button but<span class="token punctuation">;</span>
+    <span class="token keyword">private</span> Panel p<span class="token punctuation">;</span>
+    <span class="token keyword">private</span> Dialog dlg<span class="token punctuation">;</span>
+    <span class="token keyword">private</span> Button but_dlg<span class="token punctuation">;</span>
 
-    ImitateFileExplorer() {
-        init();
-    }
+    <span class="token function">ImitateFileExplorer</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    private void init() {
-        f = new Frame(&quot;模拟文件管理器 &quot;);
-        tf = new TextField(50);
-        but = new Button(&quot;显示文件名&quot;);
-        ta = new TextArea();
-        p = new Panel();
+    <span class="token keyword">private</span> <span class="token keyword">void</span> <span class="token function">init</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        f <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Frame</span><span class="token punctuation">(</span><span class="token string">"模拟文件管理器 "</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        tf <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">TextField</span><span class="token punctuation">(</span><span class="token number">50</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        but <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Button</span><span class="token punctuation">(</span><span class="token string">"显示文件名"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        ta <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">TextArea</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        p <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Panel</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-        f.setBounds(200, 100, 800, 700);
-        f.setLayout(new BorderLayout());
+        f<span class="token punctuation">.</span><span class="token function">setBounds</span><span class="token punctuation">(</span><span class="token number">200</span><span class="token punctuation">,</span> <span class="token number">100</span><span class="token punctuation">,</span> <span class="token number">800</span><span class="token punctuation">,</span> <span class="token number">700</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        f<span class="token punctuation">.</span><span class="token function">setLayout</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">BorderLayout</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-        p.add(tf);
-        p.add(but);
+        p<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>tf<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        p<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>but<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-        f.add(p, BorderLayout.NORTH);
-        f.add(ta, BorderLayout.CENTER);
+        f<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>p<span class="token punctuation">,</span> BorderLayout<span class="token punctuation">.</span>NORTH<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        f<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>ta<span class="token punctuation">,</span> BorderLayout<span class="token punctuation">.</span>CENTER<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-        f.setVisible(true);
+        f<span class="token punctuation">.</span><span class="token function">setVisible</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-        eventDo();
-    }
+        <span class="token function">eventDo</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    public void eventDo() {
-        // 关闭窗口
-        f.addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                System.exit(0);
-            }
-        });
-        // 实现按钮点击对应的功能
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">eventDo</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// 关闭窗口</span>
+        f<span class="token punctuation">.</span><span class="token function">addWindowListener</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">WindowAdapter</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">windowClosing</span><span class="token punctuation">(</span>WindowEvent e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                System<span class="token punctuation">.</span><span class="token function">exit</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">// 实现按钮点击对应的功能</span>
 
-        but.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                String path = tf.getText();
+        but<span class="token punctuation">.</span><span class="token function">addActionListener</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">ActionListener</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">actionPerformed</span><span class="token punctuation">(</span>ActionEvent e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                String path <span class="token operator">=</span> tf<span class="token punctuation">.</span><span class="token function">getText</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-                File file = new File(path);
+                File file <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">File</span><span class="token punctuation">(</span>path<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-                if (file.exists()) {
-                    if (file.isDirectory()) {
-                        ta.setText(&quot;&quot;);
-                        String[] fileNameList = file.list();
-                        int i = fileNameList.length - 1;
-                        System.out.println(i);
-                        while (i &gt; 0) {
-                            ta.append(fileNameList[i--] + &#39;\n&#39;);
-                        }
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>file<span class="token punctuation">.</span><span class="token function">exists</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    <span class="token keyword">if</span> <span class="token punctuation">(</span>file<span class="token punctuation">.</span><span class="token function">isDirectory</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                        ta<span class="token punctuation">.</span><span class="token function">setText</span><span class="token punctuation">(</span><span class="token string">""</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                        String<span class="token punctuation">[</span><span class="token punctuation">]</span> fileNameList <span class="token operator">=</span> file<span class="token punctuation">.</span><span class="token function">list</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                        <span class="token keyword">int</span> i <span class="token operator">=</span> fileNameList<span class="token punctuation">.</span>length <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">;</span>
+                        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>i<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                        <span class="token keyword">while</span> <span class="token punctuation">(</span>i <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                            ta<span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span>fileNameList<span class="token punctuation">[</span>i<span class="token operator">--</span><span class="token punctuation">]</span> <span class="token operator">+</span> <span class="token string">'\n'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                        <span class="token punctuation">}</span>
 
-                    } else
-                        ta.setText(file.getName());
-                } else {
-                    // 创建一个对话框提示输入有误
-                    dlg = new Dialog(f);
-                    dlg.setTitle(&quot;出错了&quot;);
-                    dlg.setBounds(400, 300, 200, 100);
+                    <span class="token punctuation">}</span> <span class="token keyword">else</span>
+                        ta<span class="token punctuation">.</span><span class="token function">setText</span><span class="token punctuation">(</span>file<span class="token punctuation">.</span><span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                    <span class="token comment" spellcheck="true">// 创建一个对话框提示输入有误</span>
+                    dlg <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Dialog</span><span class="token punctuation">(</span>f<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    dlg<span class="token punctuation">.</span><span class="token function">setTitle</span><span class="token punctuation">(</span><span class="token string">"出错了"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    dlg<span class="token punctuation">.</span><span class="token function">setBounds</span><span class="token punctuation">(</span><span class="token number">400</span><span class="token punctuation">,</span> <span class="token number">300</span><span class="token punctuation">,</span> <span class="token number">200</span><span class="token punctuation">,</span> <span class="token number">100</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-                    dlg.add(new TextField(tf.getText() + &quot;未找到!!!!&quot;));
-                    but_dlg = new Button(&quot;确定&quot;);
-                    dlg.add(but_dlg);
+                    dlg<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">TextField</span><span class="token punctuation">(</span>tf<span class="token punctuation">.</span><span class="token function">getText</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">"未找到!!!!"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    but_dlg <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Button</span><span class="token punctuation">(</span><span class="token string">"确定"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    dlg<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>but_dlg<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-                    dlg.setLayout(new FlowLayout());
-                    dlg.setVisible(true);
+                    dlg<span class="token punctuation">.</span><span class="token function">setLayout</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">FlowLayout</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    dlg<span class="token punctuation">.</span><span class="token function">setVisible</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-                    doDialogEvent();
-                }
+                    <span class="token function">doDialogEvent</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
 
-            }
-        });
-    }
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    // 对对话框进行事件处理
-    public void doDialogEvent() {
-        dlg.addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                dlg.setVisible(false);
-            }
-        });
-        but_dlg.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                dlg.setVisible(false);
-            }
-        });
-    }
+    <span class="token comment" spellcheck="true">// 对对话框进行事件处理</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">doDialogEvent</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        dlg<span class="token punctuation">.</span><span class="token function">addWindowListener</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">WindowAdapter</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">windowClosing</span><span class="token punctuation">(</span>WindowEvent e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                dlg<span class="token punctuation">.</span><span class="token function">setVisible</span><span class="token punctuation">(</span><span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        but_dlg<span class="token punctuation">.</span><span class="token function">addActionListener</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">ActionListener</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">actionPerformed</span><span class="token punctuation">(</span>ActionEvent e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                dlg<span class="token punctuation">.</span><span class="token function">setVisible</span><span class="token punctuation">(</span><span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    public static void main(String[] args) {
-        new ImitateFileExplorer();
-    }
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">new</span> <span class="token class-name">ImitateFileExplorer</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-}
+<span class="token punctuation">}</span>
 </code></pre>
 
             </div>

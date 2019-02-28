@@ -31,7 +31,7 @@ public class Test {">
     </style>
 
     <script src="/libs/jquery/jquery-2.2.0.min.js"></script>
-</head>
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
 
 
 <body>
@@ -94,15 +94,6 @@ public class Test {">
             <i class="fa fa-user-circle-o"></i>
             
             <span>关于</span>
-        </a>
-    </li>
-    
-    <li class="hide-on-med-and-down">
-        <a href="/friends" class="waves-effect waves-light">
-            
-            <i class="fa fa-address-book"></i>
-            
-            <span>友情链接</span>
         </a>
     </li>
     
@@ -173,15 +164,6 @@ public class Test {">
                 <i class="fa fa-fw fa-user-circle-o"></i>
                 
                 关于
-            </a>
-        </li>
-        
-        <li>
-            <a href="/friends" class="waves-effect waves-light">
-                
-                <i class="fa fa-fw fa-address-book"></i>
-                
-                友情链接
             </a>
         </li>
         
@@ -354,17 +336,17 @@ public class Test {">
                 <p>在Oracle Java程序设计大赛模拟题中见到了这么一道题：</p>
 <p><img src="/images/2016/09/oracle题.png" alt="oracle题"></p>
 <p>当时就懵逼了，这不是全错了么，还有这么个用法？心中当然知道出题者的意图是考察对于数字数据类型的掌握程度，赶忙写了个demo测试了一下。</p>
-<pre><code class="java">public class Test {
-    public static void main(String[] args) {
-        long n1 = 12_3_45___789;
-    //    long n2 = __123_45_678_9;
-    //    int n3 = 0xFc_aB_C3_353;
-        double n4 = 0b11001_001_0_0_11;
-    //    float n5 = 1.4_142_13;
-        float n6 = 0_1_2_3;
-        System.out.println(n1 + &quot; &quot; + n4 + &quot; &quot; + n6);
-    }
-}
+<pre class=" language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">Test</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">long</span> n1 <span class="token operator">=</span> 12_3_45___789<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//    long n2 = __123_45_678_9;</span>
+    <span class="token comment" spellcheck="true">//    int n3 = 0xFc_aB_C3_353;</span>
+        <span class="token keyword">double</span> n4 <span class="token operator">=</span> 0b11001_001_0_0_11<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//    float n5 = 1.4_142_13;</span>
+        <span class="token keyword">float</span> n6 <span class="token operator">=</span> 0_1_2_3<span class="token punctuation">;</span>
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>n1 <span class="token operator">+</span> <span class="token string">" "</span> <span class="token operator">+</span> n4 <span class="token operator">+</span> <span class="token string">" "</span> <span class="token operator">+</span> n6<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <p>结果没啥好说的，请自行测试，百度了一下说法。然后就发现是自己孤陋寡闻了，Java7就支持了数字之间加下划线的特性。（希望不要被吐槽，google访问不上，如有高人求指点）度娘告知的答案如下：</p>
 <p>JDK1.7的发布介绍了一些有用的特征，尽管大部分都是一些语法糖，但仍然极大地提高了代码的可读性和质量。其中的一个特征是介绍字面常量数字的下划线。</p>
@@ -377,30 +359,30 @@ public class Test {">
 <li>该数值型字面值是字符串类型的时候</li>
 </ul>
 <p>这里有一些例子，来表现哪些地方加给数字加下划线有效，哪些地方给数字加下划线无效</p>
-<pre><code class="java">float pi1 = 3_.1415F; // 无效的; 不能在小数点之前有下划线
-float pi2 = 3._1415F; // 无效的; 不能在小数点之后有下划线
-long socialSecurityNumber1 = 999_99_9999_L; //无效的，不能在L下标之前加下划线
-int a1 = _52; // 这是一个下划线开头的标识符，不是个数字
-int a2 = 5_2; // 有效
-int a3 = 52_; // 无效的，不能以下划线结尾
-int a4 = 5_______2; // 有效的
-int a5 = 0_x52; // 无效，不能在0x之间有下划线
-int a6 = 0x_52; // 无效的，不能在数字开头有下划线
-int a7 = 0x5_2; // 有效的 (16进制数字)
-int a8 = 0x52_; // 无效的，不能以下划线结尾
-int a9 = 0_52; // 有效的（8进制数）
-int a10 = 05_2; // 有效的（8进制数）
-int a11 = 052_; // 无效的，不能以下划线结尾
+<pre class=" language-java"><code class="language-java"><span class="token keyword">float</span> pi1 <span class="token operator">=</span> 3_<span class="token number">.1415F</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// 无效的; 不能在小数点之前有下划线</span>
+<span class="token keyword">float</span> pi2 <span class="token operator">=</span> <span class="token number">3</span><span class="token punctuation">.</span>_1415F<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// 无效的; 不能在小数点之后有下划线</span>
+<span class="token keyword">long</span> socialSecurityNumber1 <span class="token operator">=</span> 999_99_9999_L<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">//无效的，不能在L下标之前加下划线</span>
+<span class="token keyword">int</span> a1 <span class="token operator">=</span> _52<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// 这是一个下划线开头的标识符，不是个数字</span>
+<span class="token keyword">int</span> a2 <span class="token operator">=</span> 5_2<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// 有效</span>
+<span class="token keyword">int</span> a3 <span class="token operator">=</span> 52_<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// 无效的，不能以下划线结尾</span>
+<span class="token keyword">int</span> a4 <span class="token operator">=</span> 5_______2<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// 有效的</span>
+<span class="token keyword">int</span> a5 <span class="token operator">=</span> 0_x52<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// 无效，不能在0x之间有下划线</span>
+<span class="token keyword">int</span> a6 <span class="token operator">=</span> 0x_52<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// 无效的，不能在数字开头有下划线</span>
+<span class="token keyword">int</span> a7 <span class="token operator">=</span> 0x5_2<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// 有效的 (16进制数字)</span>
+<span class="token keyword">int</span> a8 <span class="token operator">=</span> 0x52_<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// 无效的，不能以下划线结尾</span>
+<span class="token keyword">int</span> a9 <span class="token operator">=</span> 0_52<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// 有效的（8进制数）</span>
+<span class="token keyword">int</span> a10 <span class="token operator">=</span> 05_2<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// 有效的（8进制数）</span>
+<span class="token keyword">int</span> a11 <span class="token operator">=</span> 052_<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// 无效的，不能以下划线结尾</span>
 </code></pre>
 <p>下面是一些在数字中用下划线的其它示例：</p>
-<pre><code class="java">long creditCardNumber = 6684_5678_9012_3456L; // 在编码的时候，最好永远不要这么做
-long socialSecurityNumber = 333_99_9999L; // 在编码的时候，最好永远不要这么做
-float pi = 3.14_15F;
-long hexBytes = 0xFF_EC_DE_5E;
-long hexWords = 0xCAFE_BABE;
-long maxLong = 0x7fff_ffff_ffff_ffffL;
-byte nybbles = 0b0010_0101;
-long bytes = 0b11010010_01101001_10010100_10010010;
+<pre class=" language-java"><code class="language-java"><span class="token keyword">long</span> creditCardNumber <span class="token operator">=</span> 6684_5678_9012_3456L<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// 在编码的时候，最好永远不要这么做</span>
+<span class="token keyword">long</span> socialSecurityNumber <span class="token operator">=</span> 333_99_9999L<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// 在编码的时候，最好永远不要这么做</span>
+<span class="token keyword">float</span> pi <span class="token operator">=</span> <span class="token number">3</span><span class="token punctuation">.</span>14_15F<span class="token punctuation">;</span>
+<span class="token keyword">long</span> hexBytes <span class="token operator">=</span> 0xFF_EC_DE_5E<span class="token punctuation">;</span>
+<span class="token keyword">long</span> hexWords <span class="token operator">=</span> 0xCAFE_BABE<span class="token punctuation">;</span>
+<span class="token keyword">long</span> maxLong <span class="token operator">=</span> 0x7fff_ffff_ffff_ffffL<span class="token punctuation">;</span>
+<span class="token keyword">byte</span> nybbles <span class="token operator">=</span> 0b0010_0101<span class="token punctuation">;</span>
+<span class="token keyword">long</span> bytes <span class="token operator">=</span> 0b11010010_01101001_10010100_10010010<span class="token punctuation">;</span>
 </code></pre>
 <p>综上，数字型常量加下划线可以很好地提高代码可读性，可合理使用。</p>
 
@@ -647,20 +629,24 @@ pip install shado</div>
                 下一篇&nbsp;<i class="fa fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2016/09/18/git/git-zong-jie/">
+                <a href="/2016/09/18/java/wen-ti-ji-2-2-5/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/10.jpg" class="responsive-img" alt="Git总结">
+                        <img src="/medias/featureimages/11.jpg" class="responsive-img" alt="问题集：2 + 2 = 5">
                         
-                        <span class="card-title">Git总结</span>
+                        <span class="card-title">问题集：2 + 2 = 5</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary">
-git作为一种分布式的版本控制工具，相对svn的优势是很明显的，曾被阿里的面试官问到git与svn的区别，在这里对git做一个简要的介绍。
+一个有趣的实验：2 + 2 = 5
 
-why git?我本人用svn有三年的时间了，你要是不嫌弃的话其实svn也没有那么烂，我感觉会用</div>
+相关代码如下：
+import java.lang.reflect.*;
+
+public class Test {
+    public static void main(String[] args) </div>
                     <div class="publish-info">
                             <span class="publish-date">
                                 <i class="fa fa-clock-o fa-fw icon-date"></i>2016-09-18
@@ -669,8 +655,8 @@ why git?我本人用svn有三年的时间了，你要是不嫌弃的话其实svn
                             
                             <i class="fa fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/git/" class="post-category" target="_blank">
-                                    git
+                            <a href="/categories/JAVA/" class="post-category" target="_blank">
+                                    JAVA
                                 </a>
                             
                             
@@ -680,8 +666,8 @@ why git?我本人用svn有三年的时间了，你要是不嫌弃的话其实svn
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/git/" target="_blank">
-                        <span class="chip bg-color">git</span>
+                    <a href="/tags/JAVA/" target="_blank">
+                        <span class="chip bg-color">JAVA</span>
                     </a>
                     
                 </div>

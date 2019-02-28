@@ -32,7 +32,7 @@ class T">
     </style>
 
     <script src="/libs/jquery/jquery-2.2.0.min.js"></script>
-</head>
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
 
 
 <body>
@@ -95,15 +95,6 @@ class T">
             <i class="fa fa-user-circle-o"></i>
             
             <span>关于</span>
-        </a>
-    </li>
-    
-    <li class="hide-on-med-and-down">
-        <a href="/friends" class="waves-effect waves-light">
-            
-            <i class="fa fa-address-book"></i>
-            
-            <span>友情链接</span>
         </a>
     </li>
     
@@ -174,15 +165,6 @@ class T">
                 <i class="fa fa-fw fa-user-circle-o"></i>
                 
                 关于
-            </a>
-        </li>
-        
-        <li>
-            <a href="/friends" class="waves-effect waves-light">
-                
-                <i class="fa fa-fw fa-address-book"></i>
-                
-                友情链接
             </a>
         </li>
         
@@ -360,44 +342,44 @@ class T">
 <p>模板方法设计模式：在定义功能时，功能的一部分是确定的，而另一部分是不确定的，又确定的部分调用不确定的部分，<br>这时把不确定的部分封装起来，暴露出去，让它的子类去具体实现。<br>这也是抽象类的一种应用方式。</p>
 <hr>
 <p>通过一个小程序体现如下：</p>
-<pre><code class="java">class TemplateDemo {
-    public static void main(String[] args) {
-        A a = new A();
-        a.getTime();
-    }
-}
+<pre class=" language-java"><code class="language-java"><span class="token keyword">class</span> <span class="token class-name">TemplateDemo</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        A a <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">A</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        a<span class="token punctuation">.</span><span class="token function">getTime</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 
-/*
+<span class="token comment" spellcheck="true">/*
  * 需求：获取一个程序的运行时间；
  * 
  * 实现方法：调用System类中的currentTimeMillis获取开始及结束时间 相减可得
  *
- */
+ */</span>
 
-abstract class GetTime {
+<span class="token keyword">abstract</span> <span class="token keyword">class</span> <span class="token class-name">GetTime</span> <span class="token punctuation">{</span>
 
-    public final void getTime() {
+    <span class="token keyword">public</span> <span class="token keyword">final</span> <span class="token keyword">void</span> <span class="token function">getTime</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
 
-        long startTime = System.currentTimeMillis();
+        <span class="token keyword">long</span> startTime <span class="token operator">=</span> System<span class="token punctuation">.</span><span class="token function">currentTimeMillis</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-        runProgram();
+        <span class="token function">runProgram</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-        long endTime = System.currentTimeMillis();
+        <span class="token keyword">long</span> endTime <span class="token operator">=</span> System<span class="token punctuation">.</span><span class="token function">currentTimeMillis</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-        System.out.println(&quot;运行时间：&quot; + (endTime - startTime));
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"运行时间："</span> <span class="token operator">+</span> <span class="token punctuation">(</span>endTime <span class="token operator">-</span> startTime<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    }
+    <span class="token punctuation">}</span>
 
-    public abstract void runProgram();
+    <span class="token keyword">public</span> <span class="token keyword">abstract</span> <span class="token keyword">void</span> <span class="token function">runProgram</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-}
+<span class="token punctuation">}</span>
 
-class A extends GetTime {
-    public void runProgram() {
-        for (int i = 0; i &lt; 4000; i += 100)
-            System.out.print(i + &quot; &quot;);
-    }
-}
+<span class="token keyword">class</span> <span class="token class-name">A</span> <span class="token keyword">extends</span> <span class="token class-name">GetTime</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">runProgram</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token number">4000</span><span class="token punctuation">;</span> i <span class="token operator">+=</span> <span class="token number">100</span><span class="token punctuation">)</span>
+            System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">print</span><span class="token punctuation">(</span>i <span class="token operator">+</span> <span class="token string">" "</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 </code></pre>
 
             </div>
@@ -594,17 +576,25 @@ class A extends GetTime {
             <div class="article-badge left-badge text-color">
                 <i class="fa fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2016/09/18/java/huan-jing-bian-liang/">
+                <a href="/2016/09/18/java/she-ji-mo-shi-dan-li/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/19.jpg" class="responsive-img" alt="语法：环境变量">
+                        <img src="/medias/featureimages/17.jpg" class="responsive-img" alt="设计模式：单例">
                         
-                        <span class="card-title">语法：环境变量</span>
+                        <span class="card-title">设计模式：单例</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
-                    <div class="summary">Java环境变量的配置java_home: 指向jdk根目录，被许多IDE和容器所需要path：指定java.exe和javac.exe等运行java程序必不可少的工具所在的目录        值为：%java_home%/binclass</div>
+                    <div class="summary">
+单例设计模式是应用非常广泛的一种设计模式，分为饿汉式和懒汉式。本文将分别予以介绍。
+
+单例设计模式：对于一个特定的类只允许其建立唯一的一个对象
+单例模式的三步曲：
+
+禁止在该类外建立该类的对象  
+在该类内建立一个对象    
+对外提供一</div>
                     <div class="publish-info">
                         <span class="publish-date">
                             <i class="fa fa-clock-o fa-fw icon-date"></i>2016-09-18
@@ -628,6 +618,10 @@ class A extends GetTime {
                         <span class="chip bg-color">JAVA</span>
                     </a>
                     
+                    <a href="/tags/设计模式/" target="_blank">
+                        <span class="chip bg-color">设计模式</span>
+                    </a>
+                    
                 </div>
                 
             </div>
@@ -639,25 +633,22 @@ class A extends GetTime {
                 下一篇&nbsp;<i class="fa fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2016/09/18/java/she-ji-mo-shi-dan-li/">
+                <a href="/2016/09/18/java/jing-tai-static/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/17.jpg" class="responsive-img" alt="设计模式：单例">
+                        <img src="/medias/featureimages/16.jpg" class="responsive-img" alt="语法：静态--static">
                         
-                        <span class="card-title">设计模式：单例</span>
+                        <span class="card-title">语法：静态--static</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary">
-单例设计模式是应用非常广泛的一种设计模式，分为饿汉式和懒汉式。本文将分别予以介绍。
+Java中有一个特殊的关键字，叫static关键字，一个变量或方法是否被static修饰会导致它的性质和应用范围有很大的不同。本文主要讨论Java中静态与非静态的区别。  
 
-单例设计模式：对于一个特定的类只允许其建立唯一的一个对象
-单例模式的三步曲：
+老毕的视频教程中讲到：  
 
-禁止在该类外建立该类的对象  
-在该类内建立一个对象    
-对外提供一</div>
+static是一个修饰符，用以修</div>
                     <div class="publish-info">
                             <span class="publish-date">
                                 <i class="fa fa-clock-o fa-fw icon-date"></i>2016-09-18
@@ -679,10 +670,6 @@ class A extends GetTime {
                     
                     <a href="/tags/JAVA/" target="_blank">
                         <span class="chip bg-color">JAVA</span>
-                    </a>
-                    
-                    <a href="/tags/设计模式/" target="_blank">
-                        <span class="chip bg-color">设计模式</span>
                     </a>
                     
                 </div>

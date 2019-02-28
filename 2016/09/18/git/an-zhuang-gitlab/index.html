@@ -32,7 +32,7 @@ pip install shado">
     </style>
 
     <script src="/libs/jquery/jquery-2.2.0.min.js"></script>
-</head>
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
 
 
 <body>
@@ -95,15 +95,6 @@ pip install shado">
             <i class="fa fa-user-circle-o"></i>
             
             <span>关于</span>
-        </a>
-    </li>
-    
-    <li class="hide-on-med-and-down">
-        <a href="/friends" class="waves-effect waves-light">
-            
-            <i class="fa fa-address-book"></i>
-            
-            <span>友情链接</span>
         </a>
     </li>
     
@@ -174,15 +165,6 @@ pip install shado">
                 <i class="fa fa-fw fa-user-circle-o"></i>
                 
                 关于
-            </a>
-        </li>
-        
-        <li>
-            <a href="/friends" class="waves-effect waves-light">
-                
-                <i class="fa fa-fw fa-address-book"></i>
-                
-                友情链接
             </a>
         </li>
         
@@ -353,38 +335,38 @@ pip install shado">
         <div class="card-content article-card-content">
             <div id="articleContent">
                 <h3 id="翻墙"><a href="#翻墙" class="headerlink" title="翻墙"></a>翻墙</h3><ol>
-<li>下载shadowsocks  <pre><code class="shell">apt-get update
+<li>下载shadowsocks  <pre class=" language-shell"><code class="language-shell">apt-get update
 apt-get install python-pip
 apt-get install python-setuptools m2crypto
 pip install shadowsocks
 </code></pre>
 </li>
-<li>设置配置文件<pre><code class="json">{
-&quot;server&quot;:&quot;XX.XX.XX.XX&quot;,
-&quot;server_port&quot;:XX,
-&quot;local_port&quot;:1080,
-&quot;password&quot;:&quot;your password&quot;,
-&quot;timeout&quot;:600,
-&quot;method&quot;:&quot;aes-256-cfb&quot;
-}
+<li>设置配置文件<pre class=" language-json"><code class="language-json"><span class="token punctuation">{</span>
+<span class="token property">"server"</span><span class="token operator">:</span><span class="token string">"XX.XX.XX.XX"</span><span class="token punctuation">,</span>
+<span class="token property">"server_port"</span><span class="token operator">:</span>XX<span class="token punctuation">,</span>
+<span class="token property">"local_port"</span><span class="token operator">:</span><span class="token number">1080</span><span class="token punctuation">,</span>
+<span class="token property">"password"</span><span class="token operator">:</span><span class="token string">"your password"</span><span class="token punctuation">,</span>
+<span class="token property">"timeout"</span><span class="token operator">:</span><span class="token number">600</span><span class="token punctuation">,</span>
+<span class="token property">"method"</span><span class="token operator">:</span><span class="token string">"aes-256-cfb"</span>
+<span class="token punctuation">}</span>
 </code></pre>
 </li>
-<li>启动shadowsocks  <pre><code class="shell">sslocal -c /your/path/shadowsocks.json
+<li>启动shadowsocks  <pre class=" language-shell"><code class="language-shell">sslocal -c /your/path/shadowsocks.json
 </code></pre>
 </li>
-<li>由于需要给终端翻墙，还需要安装并配置polipo<pre><code class="shell">apt-get install polipo
+<li>由于需要给终端翻墙，还需要安装并配置polipo<pre class=" language-shell"><code class="language-shell">apt-get install polipo
 </code></pre>
-修改配置  <pre><code class="shell">vim /etc/polipo/config
+修改配置  <pre class=" language-shell"><code class="language-shell">vim /etc/polipo/config
 </code></pre>
-添加三行<pre><code class="shell">socksParentProxy = &quot;localhost:1080&quot;
+添加三行<pre class=" language-shell"><code class="language-shell">socksParentProxy = "localhost:1080"
 socksProxyType = socks5
 logLevel=4
 </code></pre>
-关闭和启动polipo<pre><code class="shell">service polipo stop
+关闭和启动polipo<pre class=" language-shell"><code class="language-shell">service polipo stop
 service polipo start
 </code></pre>
 </li>
-<li>验证和使用<pre><code class="shell">http_proxy=http://localhost:8123 curl ip.gs
+<li>验证和使用<pre class=" language-shell"><code class="language-shell">http_proxy=http://localhost:8123 curl ip.gs
 </code></pre>
 语句得到的ip地址已经不是中国的了：“City / 城市: New York City New York<br>Country / 国家: United States<br>”，说明安装成功。<br>上面实验说明了想要为某个命令加上代理，就在前面使用：http_proxy=<a href="http://localhost:8123" target="_blank" rel="noopener">http://localhost:8123</a><br>ps：8123是polipo的默认端口，如有需要，可以修改成其他有效端口。</li>
 </ol>

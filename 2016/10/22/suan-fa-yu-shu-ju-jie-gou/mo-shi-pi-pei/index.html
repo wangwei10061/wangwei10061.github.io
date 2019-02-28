@@ -35,7 +35,7 @@ jdk String源码i">
     </style>
 
     <script src="/libs/jquery/jquery-2.2.0.min.js"></script>
-</head>
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
 
 
 <body>
@@ -98,15 +98,6 @@ jdk String源码i">
             <i class="fa fa-user-circle-o"></i>
             
             <span>关于</span>
-        </a>
-    </li>
-    
-    <li class="hide-on-med-and-down">
-        <a href="/friends" class="waves-effect waves-light">
-            
-            <i class="fa fa-address-book"></i>
-            
-            <span>友情链接</span>
         </a>
     </li>
     
@@ -177,15 +168,6 @@ jdk String源码i">
                 <i class="fa fa-fw fa-user-circle-o"></i>
                 
                 关于
-            </a>
-        </li>
-        
-        <li>
-            <a href="/friends" class="waves-effect waves-light">
-                
-                <i class="fa fa-fw fa-address-book"></i>
-                
-                友情链接
             </a>
         </li>
         
@@ -372,108 +354,108 @@ jdk String源码i">
 <li>next数组<br>但是如胖子所说，这篇博文忽略了一个问题，KMP算法的核心问题：next数组的计算。<br>什么是next数组？在上面提到的博文中，你应该接触到一个部分匹配表的概念，那就是next数组。也就是说在模式串中，从开始位置到每一个位置的子串的最大公共前后缀长度。比如“cad”，next[1]代表c的最大公共前后缀长度，next[3]代表cad的最大公共前后缀长度。  </li>
 <li>next数组的计算及代码<br>上面的博文介绍了它的实质，这里我们介绍一下，如何计算得出这个next数组。<br>注意一点，我们约定next数组的下标从1开始，为什么这么约定，我想是因为我们现在是从算法的层面来考虑这个问题吧，毕竟只有程序猿才认为万物从0开始。其实你非要从0开始也没毛病，不影响分析的过程。<br>下面这一段内容不大好理解，请沉下心来看。<br>next数组的计算采用递推的方式来进行。假设我们现在已经求得next[1]、next[2]、……next[i]，分别表示长度为1到i的字符串的最大公共前后缀长度，现在要求next[i+1]。从next[i]求next[i+1]，只是添加了一个元素第i+1位（注意前面提到的下标从1开始），那么存在如图所示的关系。<br><img src="/images/2016/10/nexti.png" alt="nexti"><br>下面开始next[i+1]的计算：<br><img src="/images/2016/10/next数组.png" alt="next数组"><br>如果位置i和位置next[i]+1处的两个字符相同，则next[i+1]等于next[i]加1；<br>如果两个位置的字符不相同，我们可以将长度为next[i]的字符串继续分割（如图，对A的分割，得到公共前后缀为A1，A2），获得其最大公共长度next[next[i]]，然后将next[next[i]]+1处的字符和位置i的字符比较，如果位置next[next[i]]+1和位置i的字符相同，则next[i+1]就等于next[next[i]]加1。如果不相等，就可以继续分割长度为next[next[i]]的字符串，直到公共前缀长度为0为止。<br>为什么这样计算？如果位置i和位置next[i]+1处的两个字符不相同，那么对于长度为i+1的子串，最大公共前后缀中的前缀只能出现在A内部，且是A的前缀，这比较容易理解，那么这个前缀是多长？上面的做法每一步都在取最长的可能长度，否则的话，假设取该前缀为C=[A1 + 后续的几个元素]，那么在A中不存在与C相等的后缀，那意味着在B中也不存在与C相等的后缀，自然[C + C后的第一位元素]不会等于[B的某后缀 + 第(i+1)的元素]。<br>分析完了，上代码：  </li>
 </ul>
-<pre><code class="java">public static int[] getNextArray(String s) {
-        // 因为我们分析时下标从1开始，所以多分配一位
-        int[] next = new int[s.length() + 1];
+<pre class=" language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">int</span><span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token function">getNextArray</span><span class="token punctuation">(</span>String s<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// 因为我们分析时下标从1开始，所以多分配一位</span>
+        <span class="token keyword">int</span><span class="token punctuation">[</span><span class="token punctuation">]</span> next <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">int</span><span class="token punctuation">[</span>s<span class="token punctuation">.</span><span class="token function">length</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
 
-        // next[0]约定为0，反正没用 
-        next[0] = next[1] = 0;
-        int j = 0;
+        <span class="token comment" spellcheck="true">// next[0]约定为0，反正没用 </span>
+        next<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">=</span> next<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+        <span class="token keyword">int</span> j <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
 
-        // 注意在算法中的next[i]+1位置在程序中表示为next[i]，因为数组元素从0开始
-        for(int i = 1; i &lt; s.length(); i++) {
-            while(j &gt; 0 &amp;&amp; s.charAt(i) != s.charAt(j)) {
-                j = next[j];
-            }
-            if(s.charAt(i) == s.charAt(j)) {
-                j++;
-            }
-            next[i + 1] = j;
-        }
-        return next;
-    }
+        <span class="token comment" spellcheck="true">// 注意在算法中的next[i]+1位置在程序中表示为next[i]，因为数组元素从0开始</span>
+        <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> s<span class="token punctuation">.</span><span class="token function">length</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">while</span><span class="token punctuation">(</span>j <span class="token operator">></span> <span class="token number">0</span> <span class="token operator">&amp;&amp;</span> s<span class="token punctuation">.</span><span class="token function">charAt</span><span class="token punctuation">(</span>i<span class="token punctuation">)</span> <span class="token operator">!=</span> s<span class="token punctuation">.</span><span class="token function">charAt</span><span class="token punctuation">(</span>j<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                j <span class="token operator">=</span> next<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+            <span class="token keyword">if</span><span class="token punctuation">(</span>s<span class="token punctuation">.</span><span class="token function">charAt</span><span class="token punctuation">(</span>i<span class="token punctuation">)</span> <span class="token operator">==</span> s<span class="token punctuation">.</span><span class="token function">charAt</span><span class="token punctuation">(</span>j<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                j<span class="token operator">++</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+            next<span class="token punctuation">[</span>i <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">=</span> j<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">return</span> next<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 </code></pre>
 <ul>
 <li>kmp的实现<br>有了next数组，当每次比较到两个字符串的字符不同时，我们就可以根据next数组将模式串向前移动(已匹配长度-next[i])位，接着继续比较下一个位置。算法实现如下：  </li>
 </ul>
-<pre><code class="java">public static int findFirstSubStrInString(String source, String pattern) {
-        int[] next = getNextArray(pattern);
+<pre class=" language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">int</span> <span class="token function">findFirstSubStrInString</span><span class="token punctuation">(</span>String source<span class="token punctuation">,</span> String pattern<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">int</span><span class="token punctuation">[</span><span class="token punctuation">]</span> next <span class="token operator">=</span> <span class="token function">getNextArray</span><span class="token punctuation">(</span>pattern<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-        int i = 0;
-        int j = 1;
+        <span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+        <span class="token keyword">int</span> j <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
 
-        while(i &lt; source.length() &amp;&amp; j &lt;= pattern.length()) {
-            // 如果当前比较位置相等，判断是否得到结果，如果是，返回位置
-            if(source.charAt(i) == pattern.charAt(j - 1)) {
-                if(j == pattern.length()) {
-                    return i - j + 1;
-                }
-                i++;
-                j++;
-            } else if(j == 1) { // 如果不相等，并且j没有开始移动
-                i++;
-            } else { // 如果不相等，且j已经开始移动
-                i -= next[j]; // i = i - compared + (compared - next[j]);
-                j = 1;
-            }
-        }
+        <span class="token keyword">while</span><span class="token punctuation">(</span>i <span class="token operator">&lt;</span> source<span class="token punctuation">.</span><span class="token function">length</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> j <span class="token operator">&lt;=</span> pattern<span class="token punctuation">.</span><span class="token function">length</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">// 如果当前比较位置相等，判断是否得到结果，如果是，返回位置</span>
+            <span class="token keyword">if</span><span class="token punctuation">(</span>source<span class="token punctuation">.</span><span class="token function">charAt</span><span class="token punctuation">(</span>i<span class="token punctuation">)</span> <span class="token operator">==</span> pattern<span class="token punctuation">.</span><span class="token function">charAt</span><span class="token punctuation">(</span>j <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">if</span><span class="token punctuation">(</span>j <span class="token operator">==</span> pattern<span class="token punctuation">.</span><span class="token function">length</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    <span class="token keyword">return</span> i <span class="token operator">-</span> j <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+                i<span class="token operator">++</span><span class="token punctuation">;</span>
+                j<span class="token operator">++</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span><span class="token punctuation">(</span>j <span class="token operator">==</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token comment" spellcheck="true">// 如果不相等，并且j没有开始移动</span>
+                i<span class="token operator">++</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span> <span class="token comment" spellcheck="true">// 如果不相等，且j已经开始移动</span>
+                i <span class="token operator">-=</span> next<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// i = i - compared + (compared - next[j]);</span>
+                j <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
 
-        return -1;
-}
+        <span class="token keyword">return</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <p>至此kmp算法介绍完毕。  </p>
 <h5 id="jdk-String源码indexOf-String-str-的实现"><a href="#jdk-String源码indexOf-String-str-的实现" class="headerlink" title="jdk String源码indexOf(String str)的实现"></a>jdk String源码indexOf(String str)的实现</h5><p>理解了KMP算法之后，不自觉地想到String的indexOf(String str)方法是不是也用KMP实现的呢？赶紧看了一下源码。其实现如下： </p>
-<pre><code class="java">public int indexOf(String str) {
-        return indexOf(str, 0);
-}
+<pre class=" language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">int</span> <span class="token function">indexOf</span><span class="token punctuation">(</span>String str<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token function">indexOf</span><span class="token punctuation">(</span>str<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-public int indexOf(String str, int fromIndex) {
-    return indexOf(value, 0, value.length,
-            str.value, 0, str.value.length, fromIndex);
-}
+<span class="token keyword">public</span> <span class="token keyword">int</span> <span class="token function">indexOf</span><span class="token punctuation">(</span>String str<span class="token punctuation">,</span> <span class="token keyword">int</span> fromIndex<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token function">indexOf</span><span class="token punctuation">(</span>value<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> value<span class="token punctuation">.</span>length<span class="token punctuation">,</span>
+            str<span class="token punctuation">.</span>value<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> str<span class="token punctuation">.</span>value<span class="token punctuation">.</span>length<span class="token punctuation">,</span> fromIndex<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-static int indexOf(char[] source, int sourceOffset, int sourceCount,
-        char[] target, int targetOffset, int targetCount,
-        int fromIndex) {
-    if (fromIndex &gt;= sourceCount) {
-        return (targetCount == 0 ? sourceCount : -1);
-    }
-    if (fromIndex &lt; 0) {
-        fromIndex = 0;
-    }
-    if (targetCount == 0) {
-        return fromIndex;
-    }
+<span class="token keyword">static</span> <span class="token keyword">int</span> <span class="token function">indexOf</span><span class="token punctuation">(</span><span class="token keyword">char</span><span class="token punctuation">[</span><span class="token punctuation">]</span> source<span class="token punctuation">,</span> <span class="token keyword">int</span> sourceOffset<span class="token punctuation">,</span> <span class="token keyword">int</span> sourceCount<span class="token punctuation">,</span>
+        <span class="token keyword">char</span><span class="token punctuation">[</span><span class="token punctuation">]</span> target<span class="token punctuation">,</span> <span class="token keyword">int</span> targetOffset<span class="token punctuation">,</span> <span class="token keyword">int</span> targetCount<span class="token punctuation">,</span>
+        <span class="token keyword">int</span> fromIndex<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>fromIndex <span class="token operator">>=</span> sourceCount<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token punctuation">(</span>targetCount <span class="token operator">==</span> <span class="token number">0</span> <span class="token operator">?</span> sourceCount <span class="token operator">:</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>fromIndex <span class="token operator">&lt;</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        fromIndex <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>targetCount <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> fromIndex<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    char first = target[targetOffset];
-    int max = sourceOffset + (sourceCount - targetCount);
+    <span class="token keyword">char</span> first <span class="token operator">=</span> target<span class="token punctuation">[</span>targetOffset<span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token keyword">int</span> max <span class="token operator">=</span> sourceOffset <span class="token operator">+</span> <span class="token punctuation">(</span>sourceCount <span class="token operator">-</span> targetCount<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    for (int i = sourceOffset + fromIndex; i &lt;= max; i++) {
-        /* Look for first character. */
-        if (source[i] != first) {
-            while (++i &lt;= max &amp;&amp; source[i] != first);
-        }
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> sourceOffset <span class="token operator">+</span> fromIndex<span class="token punctuation">;</span> i <span class="token operator">&lt;=</span> max<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">/* Look for first character. */</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>source<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">!=</span> first<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token operator">++</span>i <span class="token operator">&lt;=</span> max <span class="token operator">&amp;&amp;</span> source<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">!=</span> first<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
 
-        /* Found first character, now look at the rest of v2 */
-        if (i &lt;= max) {
-            int j = i + 1;
-            int end = j + targetCount - 1;
-            for (int k = targetOffset + 1; j &lt; end &amp;&amp; source[j]
-                    == target[k]; j++, k++);
+        <span class="token comment" spellcheck="true">/* Found first character, now look at the rest of v2 */</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>i <span class="token operator">&lt;=</span> max<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">int</span> j <span class="token operator">=</span> i <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">;</span>
+            <span class="token keyword">int</span> end <span class="token operator">=</span> j <span class="token operator">+</span> targetCount <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">;</span>
+            <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> k <span class="token operator">=</span> targetOffset <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">;</span> j <span class="token operator">&lt;</span> end <span class="token operator">&amp;&amp;</span> source<span class="token punctuation">[</span>j<span class="token punctuation">]</span>
+                    <span class="token operator">==</span> target<span class="token punctuation">[</span>k<span class="token punctuation">]</span><span class="token punctuation">;</span> j<span class="token operator">++</span><span class="token punctuation">,</span> k<span class="token operator">++</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-            if (j == end) {
-                /* Found whole string. */
-                return i - sourceOffset;
-            }
-        }
-    }
-    return -1;
-}
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>j <span class="token operator">==</span> end<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token comment" spellcheck="true">/* Found whole string. */</span>
+                <span class="token keyword">return</span> i <span class="token operator">-</span> sourceOffset<span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <p>可以看到jdk源码中的indexOf方法采用的是最朴素的模式匹配算法也就是BF算法来实现的，jdk实现时为什么不采用kmp呢？答案暂时还未知，但是KMP算法对这个例子运行不出结果：  </p>
-<pre><code class="java">findFirstSubStrInString(&quot;aaaaaaaaaaaaaaaaaaaaaa&quot; + 
-            &quot;aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&quot;
-            + &quot;aaaaaaaaaaaaaaaaaaaaaaaaaaaaab&quot;, &quot;aaab&quot;);
+<pre class=" language-java"><code class="language-java"><span class="token function">findFirstSubStrInString</span><span class="token punctuation">(</span><span class="token string">"aaaaaaaaaaaaaaaaaaaaaa"</span> <span class="token operator">+</span> 
+            <span class="token string">"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"</span>
+            <span class="token operator">+</span> <span class="token string">"aaaaaaaaaaaaaaaaaaaaaaaaaaaaab"</span><span class="token punctuation">,</span> <span class="token string">"aaab"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 </code></pre>
 <p>感觉这不是正宗的KMP算法，但是按照那哥们那篇博客确实是这样的，苦笑，进一步探究原因中。</p>
 
@@ -738,7 +720,7 @@ static int indexOf(char[] source, int sourceOffset, int sourceCount,
 今天接到一个外包的需求，一个表中的字段含有大写也含小写，要全部转换为小写，批量转换。
 
 表结构相关的信息肯定是从information_schema中搞，sql语句如下：
-SELECT CONCAT(&#39;ALTER TABLE `&</div>
+SELECT CONCAT('ALTER TABLE `', ta</div>
                     <div class="publish-info">
                             <span class="publish-date">
                                 <i class="fa fa-clock-o fa-fw icon-date"></i>2016-10-21

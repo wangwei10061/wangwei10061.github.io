@@ -38,7 +38,7 @@ JDK注解所谓JDK注解是指：jdk使">
     </style>
 
     <script src="/libs/jquery/jquery-2.2.0.min.js"></script>
-</head>
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
 
 
 <body>
@@ -101,15 +101,6 @@ JDK注解所谓JDK注解是指：jdk使">
             <i class="fa fa-user-circle-o"></i>
             
             <span>关于</span>
-        </a>
-    </li>
-    
-    <li class="hide-on-med-and-down">
-        <a href="/friends" class="waves-effect waves-light">
-            
-            <i class="fa fa-address-book"></i>
-            
-            <span>友情链接</span>
         </a>
     </li>
     
@@ -180,15 +171,6 @@ JDK注解所谓JDK注解是指：jdk使">
                 <i class="fa fa-fw fa-user-circle-o"></i>
                 
                 关于
-            </a>
-        </li>
-        
-        <li>
-            <a href="/friends" class="waves-effect waves-light">
-                
-                <i class="fa fa-fw fa-address-book"></i>
-                
-                友情链接
             </a>
         </li>
         
@@ -383,17 +365,17 @@ JDK注解所谓JDK注解是指：jdk使">
 <li>@Documented&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;指定注解在JavaDoc中出现</li>
 </ul>
 <h5 id="自定义注解"><a href="#自定义注解" class="headerlink" title="自定义注解"></a>自定义注解</h5><p>自定义注解指代用户自己定义的注解。<br>自定义注解的格式：</p>
-<pre><code class="java">元注解
-public @interface 注解名 {
-    元素类型 元素名();
-}
+<pre class=" language-java"><code class="language-java">元注解
+<span class="token keyword">public</span> @<span class="token keyword">interface</span> 注解名 <span class="token punctuation">{</span>
+    元素类型 元素名<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <p>如：  </p>
-<pre><code class="java">@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Table {
-    String value();
-}
+<pre class=" language-java"><code class="language-java"><span class="token annotation punctuation">@Target</span><span class="token punctuation">(</span>ElementType<span class="token punctuation">.</span>TYPE<span class="token punctuation">)</span>
+<span class="token annotation punctuation">@Retention</span><span class="token punctuation">(</span>RetentionPolicy<span class="token punctuation">.</span>RUNTIME<span class="token punctuation">)</span>
+<span class="token keyword">public</span> @<span class="token keyword">interface</span> <span class="token class-name">Table</span> <span class="token punctuation">{</span>
+    String <span class="token function">value</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <p>当自定义注解只有一个元素时，元素名通常命名为value，这样在使用注解时可以省略元素名和“=”号。<br>使用注解的一般格式为：<code>@注解名(元素名1=&quot;值1&quot;,元素名2=&quot;值2&quot;)</code></p>
 <h5 id="注解的解析：（通过反射机制解析）"><a href="#注解的解析：（通过反射机制解析）" class="headerlink" title="注解的解析：（通过反射机制解析）"></a>注解的解析：（通过反射机制解析）</h5><p>三个方法：  </p>
@@ -403,193 +385,193 @@ public @interface Table {
 <li>注解名.元素名()&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//解析注解中对应的元素</li>
 </ul>
 <p>示例程序（示例程序来源于慕课网）：  </p>
-<pre><code class="java">/**
+<pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">/**
 *    需求:根据输入条件自动拼接出对应的sql查询语句
 *    实现思路：自定义注解@Table，@column
-*/
+*/</span>
 
-// Table.java
+<span class="token comment" spellcheck="true">// Table.java</span>
 
-package annotation;
+<span class="token keyword">package</span> annotation<span class="token punctuation">;</span>
 
-import java.lang.annotation.*;
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>lang<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span>*<span class="token punctuation">;</span>
 
-/**
+<span class="token comment" spellcheck="true">/**
  * Created by wangw on 2016/1/28.
- */
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-@Inherited
-@Documented
-public @interface Table {
-    String value();
-}
+ */</span>
+<span class="token annotation punctuation">@Target</span><span class="token punctuation">(</span>ElementType<span class="token punctuation">.</span>TYPE<span class="token punctuation">)</span>
+<span class="token annotation punctuation">@Retention</span><span class="token punctuation">(</span>RetentionPolicy<span class="token punctuation">.</span>RUNTIME<span class="token punctuation">)</span>
+<span class="token annotation punctuation">@Inherited</span>
+<span class="token annotation punctuation">@Documented</span>
+<span class="token keyword">public</span> @<span class="token keyword">interface</span> <span class="token class-name">Table</span> <span class="token punctuation">{</span>
+    String <span class="token function">value</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
 
-// Column.java
+<span class="token comment" spellcheck="true">// Column.java</span>
 
-package annotation;
+<span class="token keyword">package</span> annotation<span class="token punctuation">;</span>
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>lang<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span>ElementType<span class="token punctuation">;</span>
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>lang<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span>Retention<span class="token punctuation">;</span>
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>lang<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span>RetentionPolicy<span class="token punctuation">;</span>
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>lang<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span>Target<span class="token punctuation">;</span>
 
-/**
+<span class="token comment" spellcheck="true">/**
  * Created by wangw on 2016/1/28.
- */
-@Target(ElementType.FIELD)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Column {
-    String value();
-}
+ */</span>
+<span class="token annotation punctuation">@Target</span><span class="token punctuation">(</span>ElementType<span class="token punctuation">.</span>FIELD<span class="token punctuation">)</span>
+<span class="token annotation punctuation">@Retention</span><span class="token punctuation">(</span>RetentionPolicy<span class="token punctuation">.</span>RUNTIME<span class="token punctuation">)</span>
+<span class="token keyword">public</span> @<span class="token keyword">interface</span> <span class="token class-name">Column</span> <span class="token punctuation">{</span>
+    String <span class="token function">value</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-// User.java 使用自定义注解定义的pojo
+<span class="token comment" spellcheck="true">// User.java 使用自定义注解定义的pojo</span>
 
-package annotation;
+<span class="token keyword">package</span> annotation<span class="token punctuation">;</span>
 
-/**
+<span class="token comment" spellcheck="true">/**
  * Created by wangw on 2016/1/28.
- */
-@Table(&quot;user&quot;)
-public class User {
-    @Column(&quot;name&quot;)
-    private String name;
-    @Column(&quot;age&quot;)
-    private int age;
-    @Column(&quot;stuId&quot;)
-    private String stuId;
-    @Column(&quot;phone&quot;)
-    private String phone;
-    @Column(&quot;sex&quot;)
-    private int sex; // 0代表男，1代表女
+ */</span>
+<span class="token annotation punctuation">@Table</span><span class="token punctuation">(</span><span class="token string">"user"</span><span class="token punctuation">)</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">User</span> <span class="token punctuation">{</span>
+    <span class="token annotation punctuation">@Column</span><span class="token punctuation">(</span><span class="token string">"name"</span><span class="token punctuation">)</span>
+    <span class="token keyword">private</span> String name<span class="token punctuation">;</span>
+    <span class="token annotation punctuation">@Column</span><span class="token punctuation">(</span><span class="token string">"age"</span><span class="token punctuation">)</span>
+    <span class="token keyword">private</span> <span class="token keyword">int</span> age<span class="token punctuation">;</span>
+    <span class="token annotation punctuation">@Column</span><span class="token punctuation">(</span><span class="token string">"stuId"</span><span class="token punctuation">)</span>
+    <span class="token keyword">private</span> String stuId<span class="token punctuation">;</span>
+    <span class="token annotation punctuation">@Column</span><span class="token punctuation">(</span><span class="token string">"phone"</span><span class="token punctuation">)</span>
+    <span class="token keyword">private</span> String phone<span class="token punctuation">;</span>
+    <span class="token annotation punctuation">@Column</span><span class="token punctuation">(</span><span class="token string">"sex"</span><span class="token punctuation">)</span>
+    <span class="token keyword">private</span> <span class="token keyword">int</span> sex<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// 0代表男，1代表女</span>
 
-    public String getName() {
-        return name;
-    }
+    <span class="token keyword">public</span> String <span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> name<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">setName</span><span class="token punctuation">(</span>String name<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>name <span class="token operator">=</span> name<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    public int getAge() {
-        return age;
-    }
+    <span class="token keyword">public</span> <span class="token keyword">int</span> <span class="token function">getAge</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> age<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    public void setAge(int age) {
-        this.age = age;
-    }
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">setAge</span><span class="token punctuation">(</span><span class="token keyword">int</span> age<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>age <span class="token operator">=</span> age<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    public String getStuId() {
-        return stuId;
-    }
+    <span class="token keyword">public</span> String <span class="token function">getStuId</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> stuId<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    public void setStuId(String stuId) {
-        this.stuId = stuId;
-    }
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">setStuId</span><span class="token punctuation">(</span>String stuId<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>stuId <span class="token operator">=</span> stuId<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    public String getPhone() {
-        return phone;
-    }
+    <span class="token keyword">public</span> String <span class="token function">getPhone</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> phone<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">setPhone</span><span class="token punctuation">(</span>String phone<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>phone <span class="token operator">=</span> phone<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    public int getSex() {
-        return sex;
-    }
+    <span class="token keyword">public</span> <span class="token keyword">int</span> <span class="token function">getSex</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> sex<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    public void setSex(int sex) {
-        this.sex = sex;
-    }
-}
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">setSex</span><span class="token punctuation">(</span><span class="token keyword">int</span> sex<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>sex <span class="token operator">=</span> sex<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 
 
-// SQLGenerator.java SQL语句生成器
+<span class="token comment" spellcheck="true">// SQLGenerator.java SQL语句生成器</span>
 
-package annotation;
+<span class="token keyword">package</span> annotation<span class="token punctuation">;</span>
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>lang<span class="token punctuation">.</span>reflect<span class="token punctuation">.</span>Field<span class="token punctuation">;</span>
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>lang<span class="token punctuation">.</span>reflect<span class="token punctuation">.</span>Method<span class="token punctuation">;</span>
 
-/**
+<span class="token comment" spellcheck="true">/**
  * Created by wangw on 2016/1/28. 通过注解和反射技术来根据条件拼接查询语句
- */
-public class SQLGenerator {
-    public String query(Object j) {
-        StringBuilder sb = new StringBuilder();
+ */</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">SQLGenerator</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> String <span class="token function">query</span><span class="token punctuation">(</span>Object j<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        StringBuilder sb <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">StringBuilder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-        // 先通过反射获取表名
-        Class c = j.getClass();
-        // 判断是否存在对应的注解
-        boolean isTablePresent = c.isAnnotationPresent(Table.class);
-        if (!isTablePresent)
-            return null;
-        // 拿到对应的注解对象
-        Table table = (Table) c.getAnnotation(Table.class);
-        String tableValue = table.value();
-        sb.append(&quot;select * from &quot;).append(tableValue).append(&quot; where 1=1 &quot;);
+        <span class="token comment" spellcheck="true">// 先通过反射获取表名</span>
+        Class <span class="token class-name">c</span> <span class="token operator">=</span> j<span class="token punctuation">.</span><span class="token function">getClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">// 判断是否存在对应的注解</span>
+        <span class="token keyword">boolean</span> isTablePresent <span class="token operator">=</span> c<span class="token punctuation">.</span><span class="token function">isAnnotationPresent</span><span class="token punctuation">(</span>Table<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>isTablePresent<span class="token punctuation">)</span>
+            <span class="token keyword">return</span> null<span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">// 拿到对应的注解对象</span>
+        Table table <span class="token operator">=</span> <span class="token punctuation">(</span>Table<span class="token punctuation">)</span> c<span class="token punctuation">.</span><span class="token function">getAnnotation</span><span class="token punctuation">(</span>Table<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        String tableValue <span class="token operator">=</span> table<span class="token punctuation">.</span><span class="token function">value</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        sb<span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span><span class="token string">"select * from "</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span>tableValue<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span><span class="token string">" where 1=1 "</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-        // 然后通过反射机制获取字段名和值
-        Field[] fields = c.getDeclaredFields();
-        for (Field field : fields) {
-            boolean isFieldPresent = field.isAnnotationPresent(Column.class);
-            if (!isFieldPresent)
-                continue;
-            else {
-                Column column = field.getAnnotation(Column.class);
+        <span class="token comment" spellcheck="true">// 然后通过反射机制获取字段名和值</span>
+        Field<span class="token punctuation">[</span><span class="token punctuation">]</span> fields <span class="token operator">=</span> c<span class="token punctuation">.</span><span class="token function">getDeclaredFields</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">for</span> <span class="token punctuation">(</span>Field field <span class="token operator">:</span> fields<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">boolean</span> isFieldPresent <span class="token operator">=</span> field<span class="token punctuation">.</span><span class="token function">isAnnotationPresent</span><span class="token punctuation">(</span>Column<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>isFieldPresent<span class="token punctuation">)</span>
+                <span class="token keyword">continue</span><span class="token punctuation">;</span>
+            <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                Column column <span class="token operator">=</span> field<span class="token punctuation">.</span><span class="token function">getAnnotation</span><span class="token punctuation">(</span>Column<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-                // 获取到了字段名
-                String fieldName = column.value();
+                <span class="token comment" spellcheck="true">// 获取到了字段名</span>
+                String fieldName <span class="token operator">=</span> column<span class="token punctuation">.</span><span class="token function">value</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-                // 通过get方法获取对应字段的值
-                String getFunName = &quot;get&quot; + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
-                try {
-                    Method getMethod = c.getDeclaredMethod(getFunName);
-                    Object o = getMethod.invoke(j);
-                    // 假如字段尚未赋值
-                    if (o == null || (o instanceof Integer &amp;&amp; ((Integer) o).intValue() == 0))
-                        continue;
-                    // 假如字段的类型是字符串
-                    if (o instanceof String) {
-                        sb.append(&quot;and &quot;).append(fieldName).append(&quot; = ‘&quot;);
-                        sb.append(o.toString()).append(&quot;&#39; &quot;);
-                    }
-                    // 否则的话
-                    else
-                        sb.append(&quot;and &quot;).append(fieldName).append(&quot; = &quot;).append(o.toString()).append(&quot; &quot;);
+                <span class="token comment" spellcheck="true">// 通过get方法获取对应字段的值</span>
+                String getFunName <span class="token operator">=</span> <span class="token string">"get"</span> <span class="token operator">+</span> fieldName<span class="token punctuation">.</span><span class="token function">substring</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">toUpperCase</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">+</span> fieldName<span class="token punctuation">.</span><span class="token function">substring</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">try</span> <span class="token punctuation">{</span>
+                    Method getMethod <span class="token operator">=</span> c<span class="token punctuation">.</span><span class="token function">getDeclaredMethod</span><span class="token punctuation">(</span>getFunName<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    Object o <span class="token operator">=</span> getMethod<span class="token punctuation">.</span><span class="token function">invoke</span><span class="token punctuation">(</span>j<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token comment" spellcheck="true">// 假如字段尚未赋值</span>
+                    <span class="token keyword">if</span> <span class="token punctuation">(</span>o <span class="token operator">==</span> null <span class="token operator">||</span> <span class="token punctuation">(</span>o <span class="token keyword">instanceof</span> <span class="token class-name">Integer</span> <span class="token operator">&amp;&amp;</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>Integer<span class="token punctuation">)</span> o<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">intValue</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+                        <span class="token keyword">continue</span><span class="token punctuation">;</span>
+                    <span class="token comment" spellcheck="true">// 假如字段的类型是字符串</span>
+                    <span class="token keyword">if</span> <span class="token punctuation">(</span>o <span class="token keyword">instanceof</span> <span class="token class-name">String</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                        sb<span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span><span class="token string">"and "</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span>fieldName<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span><span class="token string">" = ‘"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                        sb<span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span>o<span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span><span class="token string">"' "</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token punctuation">}</span>
+                    <span class="token comment" spellcheck="true">// 否则的话</span>
+                    <span class="token keyword">else</span>
+                        sb<span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span><span class="token string">"and "</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span>fieldName<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span><span class="token string">" = "</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span>o<span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span><span class="token string">" "</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return sb.toString();
-    }
+                <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">Exception</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    e<span class="token punctuation">.</span><span class="token function">printStackTrace</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">return</span> sb<span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-}
+<span class="token punctuation">}</span>
 
 
-// Test.java 测试类
+<span class="token comment" spellcheck="true">// Test.java 测试类</span>
 
-package annotation;
+<span class="token keyword">package</span> annotation<span class="token punctuation">;</span>
 
-/**
+<span class="token comment" spellcheck="true">/**
  * Created by wangw on 2016/1/28.
- */
-public class Test {
-    private static SQLGenerator sqlGenerator = new SQLGenerator();
+ */</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">Test</span> <span class="token punctuation">{</span>
+    <span class="token keyword">private</span> <span class="token keyword">static</span> SQLGenerator sqlGenerator <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">SQLGenerator</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    public static void main(String[] args) {
-        User zhangsan = new User();
-        zhangsan.setName(&quot;zhangsan&quot;);
-        zhangsan.setAge(10);
-        String sql = sqlGenerator.query(zhangsan);
-        System.out.println(sql);
-    }
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        User zhangsan <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">User</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        zhangsan<span class="token punctuation">.</span><span class="token function">setName</span><span class="token punctuation">(</span><span class="token string">"zhangsan"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        zhangsan<span class="token punctuation">.</span><span class="token function">setAge</span><span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        String sql <span class="token operator">=</span> sqlGenerator<span class="token punctuation">.</span><span class="token function">query</span><span class="token punctuation">(</span>zhangsan<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>sql<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-}
+<span class="token punctuation">}</span>
 
 </code></pre>
 

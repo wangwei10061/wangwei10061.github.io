@@ -34,7 +34,7 @@ compile默认的scope，表示 de">
     </style>
 
     <script src="/libs/jquery/jquery-2.2.0.min.js"></script>
-</head>
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
 
 
 <body>
@@ -97,15 +97,6 @@ compile默认的scope，表示 de">
             <i class="fa fa-user-circle-o"></i>
             
             <span>关于</span>
-        </a>
-    </li>
-    
-    <li class="hide-on-med-and-down">
-        <a href="/friends" class="waves-effect waves-light">
-            
-            <i class="fa fa-address-book"></i>
-            
-            <span>友情链接</span>
         </a>
     </li>
     
@@ -176,15 +167,6 @@ compile默认的scope，表示 de">
                 <i class="fa fa-fw fa-user-circle-o"></i>
                 
                 关于
-            </a>
-        </li>
-        
-        <li>
-            <a href="/friends" class="waves-effect waves-light">
-                
-                <i class="fa fa-fw fa-address-book"></i>
-                
-                友情链接
             </a>
         </li>
         
@@ -364,19 +346,19 @@ compile默认的scope，表示 de">
 <li>provided<br>跟compile相似，但是表明了dependency 由JDK或者容器提供，例如Servlet AP和一些Java EE APIs。这个scope 只能作用在编译和测试时，同时没有传递性。</li>
 <li>runtime<br>表示dependency不作用在编译时，但会作用在运行和测试时</li>
 <li>test<br>表示dependency作用在测试时，不作用在运行时。</li>
-<li>system<br>跟provided 相似，但是在系统中要以外部JAR包的形式提供，maven不会在repository查找它。<br>例如：<pre><code class="xml">&lt;project&gt;
+<li>system<br>跟provided 相似，但是在系统中要以外部JAR包的形式提供，maven不会在repository查找它。<br>例如：<pre class=" language-xml"><code class="language-xml"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>project</span><span class="token punctuation">></span></span>
 ...
- &lt;dependencies&gt;
-       &lt;dependency&gt;
-       &lt;groupId&gt;javax.sql&lt;/groupId&gt;
-       &lt;artifactId&gt;jdbc-stdext&lt;/artifactId&gt;
-       &lt;version&gt;2.0&lt;/version&gt;
-           &lt;scope&gt;system&lt;/scope&gt;
-       &lt;systemPath&gt;${java.home}/lib/rt.jar&lt;/systemPath&gt;
-       &lt;/dependency&gt;
- &lt;/dependencies&gt;
+ <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependencies</span><span class="token punctuation">></span></span>
+       <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependency</span><span class="token punctuation">></span></span>
+       <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>groupId</span><span class="token punctuation">></span></span>javax.sql<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>groupId</span><span class="token punctuation">></span></span>
+       <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>artifactId</span><span class="token punctuation">></span></span>jdbc-stdext<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>artifactId</span><span class="token punctuation">></span></span>
+       <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>version</span><span class="token punctuation">></span></span>2.0<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>version</span><span class="token punctuation">></span></span>
+           <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>scope</span><span class="token punctuation">></span></span>system<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>scope</span><span class="token punctuation">></span></span>
+       <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>systemPath</span><span class="token punctuation">></span></span>${java.home}/lib/rt.jar<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>systemPath</span><span class="token punctuation">></span></span>
+       <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>dependency</span><span class="token punctuation">></span></span>
+ <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>dependencies</span><span class="token punctuation">></span></span>
  ...
-&lt;/project&gt;
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>project</span><span class="token punctuation">></span></span>
 </code></pre>
 </li>
 <li>import<br>它只使用在<code>&lt;dependencyManagement&gt;</code>中，表示从其它的pom中导入dependency的配置。</li>

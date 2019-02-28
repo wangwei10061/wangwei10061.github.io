@@ -28,7 +28,7 @@
     </style>
 
     <script src="/libs/jquery/jquery-2.2.0.min.js"></script>
-</head>
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
 
 
 <body>
@@ -91,15 +91,6 @@
             <i class="fa fa-user-circle-o"></i>
             
             <span>关于</span>
-        </a>
-    </li>
-    
-    <li class="hide-on-med-and-down">
-        <a href="/friends" class="waves-effect waves-light">
-            
-            <i class="fa fa-address-book"></i>
-            
-            <span>友情链接</span>
         </a>
     </li>
     
@@ -173,15 +164,6 @@
             </a>
         </li>
         
-        <li>
-            <a href="/friends" class="waves-effect waves-light">
-                
-                <i class="fa fa-fw fa-address-book"></i>
-                
-                友情链接
-            </a>
-        </li>
-        
         
     </ul>
 </div>
@@ -233,9 +215,17 @@ $('.bg-cover').css('background-image', 'url(/medias/banner/' + new Date().getDay
                 
                 
                 
+                <a href="/categories/JAVA/" title="JAVA: 20">
+                    <span class="chip center-align waves-effect waves-light
+                             chip-active " style="background-color: #F9EBEA;">JAVA
+                        <span class="tag-length">20</span>
+                    </span>
+                </a>
+                
+                
                 <a href="/categories/git/" title="git: 2">
                     <span class="chip center-align waves-effect waves-light
-                             chip-default " style="background-color: #F9EBEA;">git
+                             chip-default " style="background-color: #F5EEF8;">git
                         <span class="tag-length">2</span>
                     </span>
                 </a>
@@ -243,32 +233,24 @@ $('.bg-cover').css('background-image', 'url(/medias/banner/' + new Date().getDay
                 
                 <a href="/categories/web/" title="web: 10">
                     <span class="chip center-align waves-effect waves-light
-                             chip-default " style="background-color: #F5EEF8;">web
+                             chip-default " style="background-color: #D5F5E3;">web
                         <span class="tag-length">10</span>
-                    </span>
-                </a>
-                
-                
-                <a href="/categories/JAVA/" title="JAVA: 20">
-                    <span class="chip center-align waves-effect waves-light
-                             chip-active " style="background-color: #D5F5E3;">JAVA
-                        <span class="tag-length">20</span>
-                    </span>
-                </a>
-                
-                
-                <a href="/categories/maven/" title="maven: 8">
-                    <span class="chip center-align waves-effect waves-light
-                             chip-default " style="background-color: #E8F8F5;">maven
-                        <span class="tag-length">8</span>
                     </span>
                 </a>
                 
                 
                 <a href="/categories/linux/" title="linux: 1">
                     <span class="chip center-align waves-effect waves-light
-                             chip-default " style="background-color: #FEF9E7;">linux
+                             chip-default " style="background-color: #E8F8F5;">linux
                         <span class="tag-length">1</span>
+                    </span>
+                </a>
+                
+                
+                <a href="/categories/maven/" title="maven: 8">
+                    <span class="chip center-align waves-effect waves-light
+                             chip-default " style="background-color: #FEF9E7;">maven
+                        <span class="tag-length">8</span>
                     </span>
                 </a>
                 
@@ -358,19 +340,25 @@ $('.bg-cover').css('background-image', 'url(/medias/banner/' + new Date().getDay
             
             <div class="article tag-post col s12 m6 l4" data-aos="zoom-in">
                 <div class="card">
-                    <a href="/2016/09/18/java/wen-ti-ji-nextint-hou-nextline-du-qu-kong-zhi/">
+                    <a href="/2016/09/18/java/wen-ti-ji-tong-ming-bian-liang-wen-ti/">
                         <div class="card-image tag-image">
                             
                             
-                            <img src="/medias/featureimages/20.jpg" class="responsive-img" alt="问题集：nextInt后nextLine读取空值">
+                            <img src="/medias/featureimages/0.jpg" class="responsive-img" alt="问题集：同名变量问题">
                             
-                            <span class="card-title">问题集：nextInt后nextLine读取空值</span>
+                            <span class="card-title">问题集：同名变量问题</span>
                         </div>
                     </a>
                     <div class="card-content article-content">
                         <div class="summary">
                             
-                                在学习Scanner类的时候遇到一个问题，在使用nextInt()获取到一个整数之后，如果接着调用nextLine()方法，nextLine
+                                
+本文介绍什么情况下在同一个类中同名变量可以共存
+
+相关代码如下：
+class Test{
+ static int x = 1;
+ publ
                             
                         </div>
                         <div class="publish-info">
@@ -500,22 +488,20 @@ Java中有一个特殊的关键字，叫static关键字，一个变量或方法�
             
             <div class="article tag-post col s12 m6 l4" data-aos="zoom-in">
                 <div class="card">
-                    <a href="/2016/09/18/java/she-ji-mo-shi-dan-li/">
+                    <a href="/2016/09/18/java/she-ji-mo-shi-mo-ban-she-ji-mo-shi/">
                         <div class="card-image tag-image">
                             
                             
-                            <img src="/medias/featureimages/17.jpg" class="responsive-img" alt="设计模式：单例">
+                            <img src="/medias/featureimages/8.jpg" class="responsive-img" alt="设计模式：模板设计模式">
                             
-                            <span class="card-title">设计模式：单例</span>
+                            <span class="card-title">设计模式：模板设计模式</span>
                         </div>
                     </a>
                     <div class="card-content article-content">
                         <div class="summary">
                             
                                 
-单例设计模式是应用非常广泛的一种设计模式，分为饿汉式和懒汉式。本文将分别予以介绍。
-
-单例设计模式：对于一个特定的类只允许其建立唯一的一个
+模板方法设计模式：在定义功能时，功能的一部分是确定的，而另一部分是不确定的，又确定的部分调用不确定的部分，这时把不确定的部分封装起来，暴露
                             
                         </div>
                         <div class="publish-info">
@@ -553,20 +539,22 @@ Java中有一个特殊的关键字，叫static关键字，一个变量或方法�
             
             <div class="article tag-post col s12 m6 l4" data-aos="zoom-in">
                 <div class="card">
-                    <a href="/2016/09/18/java/she-ji-mo-shi-mo-ban-she-ji-mo-shi/">
+                    <a href="/2016/09/18/java/she-ji-mo-shi-dan-li/">
                         <div class="card-image tag-image">
                             
                             
-                            <img src="/medias/featureimages/8.jpg" class="responsive-img" alt="设计模式：模板设计模式">
+                            <img src="/medias/featureimages/17.jpg" class="responsive-img" alt="设计模式：单例">
                             
-                            <span class="card-title">设计模式：模板设计模式</span>
+                            <span class="card-title">设计模式：单例</span>
                         </div>
                     </a>
                     <div class="card-content article-content">
                         <div class="summary">
                             
                                 
-模板方法设计模式：在定义功能时，功能的一部分是确定的，而另一部分是不确定的，又确定的部分调用不确定的部分，这时把不确定的部分封装起来，暴露
+单例设计模式是应用非常广泛的一种设计模式，分为饿汉式和懒汉式。本文将分别予以介绍。
+
+单例设计模式：对于一个特定的类只允许其建立唯一的一个
                             
                         </div>
                         <div class="publish-info">

@@ -31,7 +31,7 @@ public class Test">
     </style>
 
     <script src="/libs/jquery/jquery-2.2.0.min.js"></script>
-</head>
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
 
 
 <body>
@@ -94,15 +94,6 @@ public class Test">
             <i class="fa fa-user-circle-o"></i>
             
             <span>关于</span>
-        </a>
-    </li>
-    
-    <li class="hide-on-med-and-down">
-        <a href="/friends" class="waves-effect waves-light">
-            
-            <i class="fa fa-address-book"></i>
-            
-            <span>友情链接</span>
         </a>
     </li>
     
@@ -173,15 +164,6 @@ public class Test">
                 <i class="fa fa-fw fa-user-circle-o"></i>
                 
                 关于
-            </a>
-        </li>
-        
-        <li>
-            <a href="/friends" class="waves-effect waves-light">
-                
-                <i class="fa fa-fw fa-address-book"></i>
-                
-                友情链接
             </a>
         </li>
         
@@ -352,24 +334,24 @@ public class Test">
         <div class="card-content article-card-content">
             <div id="articleContent">
                 <p>在学习Scanner类的时候遇到一个问题，在使用nextInt()获取到一个整数之后，如果接着调用nextLine()方法，nextLine()方法将获取不到值？</p>
-<pre><code class="java">import java.util.*;
+<pre class=" language-java"><code class="language-java"><span class="token keyword">import</span> java<span class="token punctuation">.</span>util<span class="token punctuation">.</span>*<span class="token punctuation">;</span>
 
-public class Test {
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">Test</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        Scanner sc <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Scanner</span><span class="token punctuation">(</span>System<span class="token punctuation">.</span>in<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-        int n = sc.nextInt();
-        String name = sc.nextLine();
-        String motto = sc.nextLine();
+        <span class="token keyword">int</span> n <span class="token operator">=</span> sc<span class="token punctuation">.</span><span class="token function">nextInt</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        String name <span class="token operator">=</span> sc<span class="token punctuation">.</span><span class="token function">nextLine</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        String motto <span class="token operator">=</span> sc<span class="token punctuation">.</span><span class="token function">nextLine</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-        System.out.println(&quot;----------------------&quot;);
-        System.out.println(n);
-        System.out.println(name);
-        System.out.println(motto);
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"----------------------"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>n<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>name<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>motto<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-        sc.close();
-    }
-}
+        sc<span class="token punctuation">.</span><span class="token function">close</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <p>当输入1和abc时，程序结束，name和motto的值分别被赋为空串和abc</p>
 <pre><code>NPP_EXEC: &quot;java&quot;
@@ -598,22 +580,24 @@ def
             <div class="article-badge left-badge text-color">
                 <i class="fa fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2016/09/18/java/wen-ti-ji-liang-ge-string-shi-fou-xiang-deng/">
+                <a href="/2016/09/18/java/wen-ti-ji-2-2-5/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/21.jpg" class="responsive-img" alt="问题集：两个String是否相等">
+                        <img src="/medias/featureimages/11.jpg" class="responsive-img" alt="问题集：2 + 2 = 5">
                         
-                        <span class="card-title">问题集：两个String是否相等</span>
+                        <span class="card-title">问题集：2 + 2 = 5</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary">
-我们知道String类私有的维护一个字符串池，在判断两个字符串对象是否==时，要考虑到这一点
+一个有趣的实验：2 + 2 = 5
 
-首先来看一段代码：  
-class StringDemo {
- public static void main(String[] args) </div>
+相关代码如下：
+import java.lang.reflect.*;
+
+public class Test {
+    public static void main(String[] args) </div>
                     <div class="publish-info">
                         <span class="publish-date">
                             <i class="fa fa-clock-o fa-fw icon-date"></i>2016-09-18
@@ -648,24 +632,22 @@ class StringDemo {
                 下一篇&nbsp;<i class="fa fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2016/09/18/java/wen-ti-ji-zi-ding-yi-java.lang.object-lei/">
+                <a href="/2016/09/18/java/wen-ti-ji-liang-ge-string-shi-fou-xiang-deng/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/21.jpg" class="responsive-img" alt="问题集：自定义java.lang.Object类">
+                        <img src="/medias/featureimages/21.jpg" class="responsive-img" alt="问题集：两个String是否相等">
                         
-                        <span class="card-title">问题集：自定义java.lang.Object类</span>
+                        <span class="card-title">问题集：两个String是否相等</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary">
-同学去阿里面试的时候被问到的问题：可否自定义一个String类，放在一个名为java.lang的包中？与此问题有异曲同工之妙。
+我们知道String类私有的维护一个字符串池，在判断两个字符串对象是否==时，要考虑到这一点
 
-相关代码如下：
-package java.lang;
-
-public class Object {
-    </div>
+首先来看一段代码：  
+class StringDemo {
+ public static void main(String[] args) </div>
                     <div class="publish-info">
                             <span class="publish-date">
                                 <i class="fa fa-clock-o fa-fw icon-date"></i>2016-09-18

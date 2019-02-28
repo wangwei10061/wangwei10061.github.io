@@ -36,7 +36,7 @@ IO流是一个重要的概念，它用于处理数据之间的传输。
     </style>
 
     <script src="/libs/jquery/jquery-2.2.0.min.js"></script>
-</head>
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
 
 
 <body>
@@ -99,15 +99,6 @@ IO流是一个重要的概念，它用于处理数据之间的传输。
             <i class="fa fa-user-circle-o"></i>
             
             <span>关于</span>
-        </a>
-    </li>
-    
-    <li class="hide-on-med-and-down">
-        <a href="/friends" class="waves-effect waves-light">
-            
-            <i class="fa fa-address-book"></i>
-            
-            <span>友情链接</span>
         </a>
     </li>
     
@@ -178,15 +169,6 @@ IO流是一个重要的概念，它用于处理数据之间的传输。
                 <i class="fa fa-fw fa-user-circle-o"></i>
                 
                 关于
-            </a>
-        </li>
-        
-        <li>
-            <a href="/friends" class="waves-effect waves-light">
-                
-                <i class="fa fa-fw fa-address-book"></i>
-                
-                友情链接
             </a>
         </li>
         
@@ -374,283 +356,283 @@ IO流是一个重要的概念，它用于处理数据之间的传输。
 </ul>
 </li>
 </ul>
-<pre><code class="java">package io;
+<pre class=" language-java"><code class="language-java"><span class="token keyword">package</span> io<span class="token punctuation">;</span>
 
-import java.io.*;
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>io<span class="token punctuation">.</span>*<span class="token punctuation">;</span>
 
-/**
+<span class="token comment" spellcheck="true">/**
  * Created by wangw on 2016/1/27. 演示字符流中的FileWriter的用法
- */
+ */</span>
 
-class FileWriterDemo {
-    public static void main(String[] args) throws IOException {
-        // 在创建FileWriter对象时就必须明确它要操作的文件
-        // 若目标目录下存在同名的文件，将覆盖该文件
-        FileWriter fw = new FileWriter(&quot;demo.txt&quot;);
-        // 在文件末尾添加数据，不覆盖源文件
-        // FileWriter fw = new FileWriter(&quot;demo.txt&quot;,true);
+<span class="token keyword">class</span> <span class="token class-name">FileWriterDemo</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token keyword">throws</span> IOException <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// 在创建FileWriter对象时就必须明确它要操作的文件</span>
+        <span class="token comment" spellcheck="true">// 若目标目录下存在同名的文件，将覆盖该文件</span>
+        FileWriter fw <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">FileWriter</span><span class="token punctuation">(</span><span class="token string">"demo.txt"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">// 在文件末尾添加数据，不覆盖源文件</span>
+        <span class="token comment" spellcheck="true">// FileWriter fw = new FileWriter("demo.txt",true);</span>
 
-        // 向流中写入数据
-        fw.write(&quot;haha&quot;);
+        <span class="token comment" spellcheck="true">// 向流中写入数据</span>
+        fw<span class="token punctuation">.</span><span class="token function">write</span><span class="token punctuation">(</span><span class="token string">"haha"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-        // 将流中数据刷入指定文件中
-        fw.flush();
+        <span class="token comment" spellcheck="true">// 将流中数据刷入指定文件中</span>
+        fw<span class="token punctuation">.</span><span class="token function">flush</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-        // fw.write(&quot; i \nds sd &quot;); //？\n不起作用，因为在Windows中换行用\r\n表示
-        fw.write(&quot; i \r \nds sd &quot;);
-        // 关闭流。 在流关闭之前会调用一次flush()方法将流中数据写入指定文件
-        fw.close();
+        <span class="token comment" spellcheck="true">// fw.write(" i \nds sd "); //？\n不起作用，因为在Windows中换行用\r\n表示</span>
+        fw<span class="token punctuation">.</span><span class="token function">write</span><span class="token punctuation">(</span><span class="token string">" i \r \nds sd "</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">// 关闭流。 在流关闭之前会调用一次flush()方法将流中数据写入指定文件</span>
+        fw<span class="token punctuation">.</span><span class="token function">close</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    }
-}
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <ul>
 <li>Reader</li>
 </ul>
-<pre><code class="java">package io;
+<pre class=" language-java"><code class="language-java"><span class="token keyword">package</span> io<span class="token punctuation">;</span>
 
-import java.io.*;
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>io<span class="token punctuation">.</span>*<span class="token punctuation">;</span>
 
-/**
+<span class="token comment" spellcheck="true">/**
  * Created by wangw on 2016/1/27.
- */
-class FileReaderDemo {
-    public static void main(String[] args) throws IOException {
-        // 建立一个FileReader对象读取指定文件中的内容
-        FileReader fr = new FileReader(&quot;demo.wangwei&quot;);
-        int num = 0;
-        /*
+ */</span>
+<span class="token keyword">class</span> <span class="token class-name">FileReaderDemo</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token keyword">throws</span> IOException <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// 建立一个FileReader对象读取指定文件中的内容</span>
+        FileReader fr <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">FileReader</span><span class="token punctuation">(</span><span class="token string">"demo.wangwei"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">int</span> num <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">/*
          * //每次读取一个字符，以int值形式返回 while((num = fr.read())!=-1) {
          * System.out.print((char)num); }
-         */
-        // 每次读取的值存在一个字符数组中
-        char[] buf = new char[1024];
-        while ((num = fr.read(buf)) != -1) {
-            System.out.print(new String(buf, 0, num));
-        }
-        fr.close();
-    }
-}
+         */</span>
+        <span class="token comment" spellcheck="true">// 每次读取的值存在一个字符数组中</span>
+        <span class="token keyword">char</span><span class="token punctuation">[</span><span class="token punctuation">]</span> buf <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">char</span><span class="token punctuation">[</span><span class="token number">1024</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>num <span class="token operator">=</span> fr<span class="token punctuation">.</span><span class="token function">read</span><span class="token punctuation">(</span>buf<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">!=</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">print</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">String</span><span class="token punctuation">(</span>buf<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> num<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        fr<span class="token punctuation">.</span><span class="token function">close</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <ul>
 <li>字节流</li>
 </ul>
-<pre><code class="java">package io;
+<pre class=" language-java"><code class="language-java"><span class="token keyword">package</span> io<span class="token punctuation">;</span>
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>io<span class="token punctuation">.</span>FileInputStream<span class="token punctuation">;</span>
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>io<span class="token punctuation">.</span>FileOutputStream<span class="token punctuation">;</span>
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>io<span class="token punctuation">.</span>IOException<span class="token punctuation">;</span>
 
-/**
+<span class="token comment" spellcheck="true">/**
  * 字节流用法的简单演示 Created by wangw on 2016/2/2.
- */
-public class InputOutputStreamDemo {
-    public static void main(String[] args) throws IOException {
-        outputStreamWrite();
-        inputStreamRead_1();
-        inputStreamRead_2();
-        inputStreamRead_3();
-    }
+ */</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">InputOutputStreamDemo</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token keyword">throws</span> IOException <span class="token punctuation">{</span>
+        <span class="token function">outputStreamWrite</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">inputStreamRead_1</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">inputStreamRead_2</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">inputStreamRead_3</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    // FileOutputStream写一个文件
-    public static void outputStreamWrite() throws IOException {
-        FileOutputStream fos = new FileOutputStream(&quot;fos.txt&quot;);
-        fos.write(&quot;haha&quot;.getBytes());
-        // 此处不需要flush，因为直接操作的字节数据，没有缓冲
-        fos.close();
-    }
+    <span class="token comment" spellcheck="true">// FileOutputStream写一个文件</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">outputStreamWrite</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">throws</span> IOException <span class="token punctuation">{</span>
+        FileOutputStream fos <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">FileOutputStream</span><span class="token punctuation">(</span><span class="token string">"fos.txt"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        fos<span class="token punctuation">.</span><span class="token function">write</span><span class="token punctuation">(</span><span class="token string">"haha"</span><span class="token punctuation">.</span><span class="token function">getBytes</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">// 此处不需要flush，因为直接操作的字节数据，没有缓冲</span>
+        fos<span class="token punctuation">.</span><span class="token function">close</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    // FileInputStream读一个文件
-    public static void inputStreamRead_1() throws IOException {
-        FileInputStream fis = new FileInputStream(&quot;fos.txt&quot;);
-        int num = 0;
-        while ((num = fis.read()) != -1) {
-            System.out.println((char) num);
-        }
-        fis.close();
-    }
+    <span class="token comment" spellcheck="true">// FileInputStream读一个文件</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">inputStreamRead_1</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">throws</span> IOException <span class="token punctuation">{</span>
+        FileInputStream fis <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">FileInputStream</span><span class="token punctuation">(</span><span class="token string">"fos.txt"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">int</span> num <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+        <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>num <span class="token operator">=</span> fis<span class="token punctuation">.</span><span class="token function">read</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">!=</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token keyword">char</span><span class="token punctuation">)</span> num<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        fis<span class="token punctuation">.</span><span class="token function">close</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    public static void inputStreamRead_2() throws IOException {
-        FileInputStream fis = new FileInputStream(&quot;fos.txt&quot;);
-        byte[] buf = new byte[1024];
-        int len = 0;
-        while ((len = fis.read(buf)) != -1) {
-            System.out.println(new String(buf, 0, len));
-        }
-        fis.close();
-    }
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">inputStreamRead_2</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">throws</span> IOException <span class="token punctuation">{</span>
+        FileInputStream fis <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">FileInputStream</span><span class="token punctuation">(</span><span class="token string">"fos.txt"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">byte</span><span class="token punctuation">[</span><span class="token punctuation">]</span> buf <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">byte</span><span class="token punctuation">[</span><span class="token number">1024</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token keyword">int</span> len <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+        <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>len <span class="token operator">=</span> fis<span class="token punctuation">.</span><span class="token function">read</span><span class="token punctuation">(</span>buf<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">!=</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">String</span><span class="token punctuation">(</span>buf<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> len<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        fis<span class="token punctuation">.</span><span class="token function">close</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    public static void inputStreamRead_3() throws IOException {
-        FileInputStream fis = new FileInputStream(&quot;fos.txt&quot;);
-        // 字节流特有的方法，返回剩余的字节数
-        byte[] buf = new byte[fis.available()];
-        fis.read(buf);
-        System.out.println(new String(buf));
-        fis.close();
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">inputStreamRead_3</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">throws</span> IOException <span class="token punctuation">{</span>
+        FileInputStream fis <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">FileInputStream</span><span class="token punctuation">(</span><span class="token string">"fos.txt"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">// 字节流特有的方法，返回剩余的字节数</span>
+        <span class="token keyword">byte</span><span class="token punctuation">[</span><span class="token punctuation">]</span> buf <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">byte</span><span class="token punctuation">[</span>fis<span class="token punctuation">.</span><span class="token function">available</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+        fis<span class="token punctuation">.</span><span class="token function">read</span><span class="token punctuation">(</span>buf<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">String</span><span class="token punctuation">(</span>buf<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        fis<span class="token punctuation">.</span><span class="token function">close</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    }
+    <span class="token punctuation">}</span>
 
-}
+<span class="token punctuation">}</span>
 </code></pre>
 <h5 id="处理IO异常"><a href="#处理IO异常" class="headerlink" title="处理IO异常"></a>处理IO异常</h5><ol>
 <li>try catch处理，并最终释放空间，在释放空间时同样try catch 捕获异常</li>
 <li>try catch代码块外部建立引用</li>
 <li>关闭之前判断fw是否为空</li>
 </ol>
-<pre><code class="java">import java.io.*;
+<pre class=" language-java"><code class="language-java"><span class="token keyword">import</span> java<span class="token punctuation">.</span>io<span class="token punctuation">.</span>*<span class="token punctuation">;</span>
 
-class FileWriterDemo2 {
-    public static void main(String[] args) {
-        // try catch代码块外部建立引用
-        FileWriter fw = null;
+<span class="token keyword">class</span> <span class="token class-name">FileWriterDemo2</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// try catch代码块外部建立引用</span>
+        FileWriter fw <span class="token operator">=</span> null<span class="token punctuation">;</span>
 
-        try {
-            // 引用与创建的对象进行绑定
-            fw = new FileWriter(&quot;demo.wangwei&quot;);
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">// 引用与创建的对象进行绑定</span>
+            fw <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">FileWriter</span><span class="token punctuation">(</span><span class="token string">"demo.wangwei"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-            fw.write(&quot;hahaha&quot;);
-        } catch (IOException e) {
-            System.out.println(e.toString());
-        } finally {
-            try {
-                // 判断fw是否为空
-                if (fw != null)
-                    fw.close();
-            } catch (IOException e) {
-                System.out.println(e.toString());
-            }
+            fw<span class="token punctuation">.</span><span class="token function">write</span><span class="token punctuation">(</span><span class="token string">"hahaha"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">IOException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>e<span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">finally</span> <span class="token punctuation">{</span>
+            <span class="token keyword">try</span> <span class="token punctuation">{</span>
+                <span class="token comment" spellcheck="true">// 判断fw是否为空</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>fw <span class="token operator">!=</span> null<span class="token punctuation">)</span>
+                    fw<span class="token punctuation">.</span><span class="token function">close</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">IOException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>e<span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
 
-        }
-    }
-}
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <h5 id="文件缓冲"><a href="#文件缓冲" class="headerlink" title="文件缓冲"></a>文件缓冲</h5><p>为了便于对数据的高效操作，Java为我们提供了四个缓冲类，BufferedReader，BufferedWriter，BufferedInputStream，BufferedOutputStream，这四个类在进行操作时，它的底层实现实际还是被封装的流的操作，只是封装后操作更方便，这里用到了装饰设计模式的思想。  </p>
 <p>其中BufferedReader提供了一个readLine()方法，便于按行读取文件，BufferedWriter提供了一个newLine()方法，便于写入一个行分隔符，示例程序如下：</p>
 <ul>
 <li>缓存字符流  </li>
 </ul>
-<pre><code class="java">package io;
+<pre class=" language-java"><code class="language-java"><span class="token keyword">package</span> io<span class="token punctuation">;</span>
 
-import java.io.*;
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>io<span class="token punctuation">.</span>*<span class="token punctuation">;</span>
 
-/**
+<span class="token comment" spellcheck="true">/**
  * Created by wangw on 2016/1/27. 文件复制，加入了缓冲区机制
- */
-public class BufferedFileCopy {
-    public static void main(String[] args) {
-        copy(&quot;BufferedFileCopy.java&quot;,
-                &quot;BufferedFileCopy.txt&quot;);
-    }
+ */</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">BufferedFileCopy</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">copy</span><span class="token punctuation">(</span><span class="token string">"BufferedFileCopy.java"</span><span class="token punctuation">,</span>
+                <span class="token string">"BufferedFileCopy.txt"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    /**
+    <span class="token comment" spellcheck="true">/**
      * 拷贝文件
      *
      * @param sourcePath
      *            源文件的路径，按windows的路径格式
      * @param destination
      *            目的地址，按windows的路径格式
-     */
-    public static void copy(String sourcePath, String destination) {
+     */</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">copy</span><span class="token punctuation">(</span>String sourcePath<span class="token punctuation">,</span> String destination<span class="token punctuation">)</span> <span class="token punctuation">{</span>
 
-        BufferedWriter bw = null;
-        BufferedReader br = null;
+        BufferedWriter bw <span class="token operator">=</span> null<span class="token punctuation">;</span>
+        BufferedReader br <span class="token operator">=</span> null<span class="token punctuation">;</span>
 
-        try {
-            // 建立缓冲区，与相应的输入输出流相绑定
-            bw = new BufferedWriter(new FileWriter(destination));
-            br = new BufferedReader(new FileReader(sourcePath));
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">// 建立缓冲区，与相应的输入输出流相绑定</span>
+            bw <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">BufferedWriter</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">FileWriter</span><span class="token punctuation">(</span>destination<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            br <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">BufferedReader</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">FileReader</span><span class="token punctuation">(</span>sourcePath<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-            // 循环按行读取数据
-            String line = null;
-            while ((line = br.readLine()) != null) {
-                bw.write(line);
-                bw.newLine();
-                bw.flush();
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(&quot;复制异常&quot;);
-        } finally {
-            if (br == null)
-                try {
-                    br.close();
-                } catch (IOException e) {
-                    throw new RuntimeException(&quot;复制异常&quot;);
-                }
-            if (bw == null)
-                try {
-                    bw.close();
-                } catch (IOException e) {
-                    throw new RuntimeException(&quot;复制异常&quot;);
-                }
+            <span class="token comment" spellcheck="true">// 循环按行读取数据</span>
+            String line <span class="token operator">=</span> null<span class="token punctuation">;</span>
+            <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>line <span class="token operator">=</span> br<span class="token punctuation">.</span><span class="token function">readLine</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                bw<span class="token punctuation">.</span><span class="token function">write</span><span class="token punctuation">(</span>line<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                bw<span class="token punctuation">.</span><span class="token function">newLine</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                bw<span class="token punctuation">.</span><span class="token function">flush</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">IOException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">RuntimeException</span><span class="token punctuation">(</span><span class="token string">"复制异常"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">finally</span> <span class="token punctuation">{</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>br <span class="token operator">==</span> null<span class="token punctuation">)</span>
+                <span class="token keyword">try</span> <span class="token punctuation">{</span>
+                    br<span class="token punctuation">.</span><span class="token function">close</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">IOException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">RuntimeException</span><span class="token punctuation">(</span><span class="token string">"复制异常"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>bw <span class="token operator">==</span> null<span class="token punctuation">)</span>
+                <span class="token keyword">try</span> <span class="token punctuation">{</span>
+                    bw<span class="token punctuation">.</span><span class="token function">close</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">IOException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">RuntimeException</span><span class="token punctuation">(</span><span class="token string">"复制异常"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
 
-        }
+        <span class="token punctuation">}</span>
 
-    }
+    <span class="token punctuation">}</span>
 
-}
+<span class="token punctuation">}</span>
 </code></pre>
 <ul>
 <li>缓存字节流  </li>
 </ul>
-<pre><code class="java">package io;
+<pre class=" language-java"><code class="language-java"><span class="token keyword">package</span> io<span class="token punctuation">;</span>
 
-import java.io.*;
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>io<span class="token punctuation">.</span>*<span class="token punctuation">;</span>
 
-/**
+<span class="token comment" spellcheck="true">/**
  * 复制一个mp3文件 Created by wangw on 2016/2/2.
- */
-public class CopyMp3 {
-    public static void main(String[] args) throws IOException {
-        plainCopyMethod();
-        bufferedCopyMethod();
-    }
+ */</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">CopyMp3</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token keyword">throws</span> IOException <span class="token punctuation">{</span>
+        <span class="token function">plainCopyMethod</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">bufferedCopyMethod</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    // 用Buffered对象操作
-    public static void bufferedCopyMethod() throws IOException {
-        BufferedInputStream bis = new BufferedInputStream(new FileInputStream(&quot;BEYOND - 喜欢你.mp3&quot;));
-        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(&quot;喜欢你_副本2.mp3&quot;));
+    <span class="token comment" spellcheck="true">// 用Buffered对象操作</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">bufferedCopyMethod</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">throws</span> IOException <span class="token punctuation">{</span>
+        BufferedInputStream bis <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">BufferedInputStream</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">FileInputStream</span><span class="token punctuation">(</span><span class="token string">"BEYOND - 喜欢你.mp3"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        BufferedOutputStream bos <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">BufferedOutputStream</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">FileOutputStream</span><span class="token punctuation">(</span><span class="token string">"喜欢你_副本2.mp3"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-        int num = 0;
-        while ((num = bis.read()) != -1) {
-            bos.write(num);
-        }
+        <span class="token keyword">int</span> num <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+        <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>num <span class="token operator">=</span> bis<span class="token punctuation">.</span><span class="token function">read</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">!=</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            bos<span class="token punctuation">.</span><span class="token function">write</span><span class="token punctuation">(</span>num<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
 
-        bis.close();
-        bos.close();
-    }
+        bis<span class="token punctuation">.</span><span class="token function">close</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        bos<span class="token punctuation">.</span><span class="token function">close</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    // 没有用到BufferedInputStream，BufferedOutputStream包装类
-    public static void plainCopyMethod() {
-        FileInputStream fis = null;
-        FileOutputStream fos = null;
-        try {
-            fis = new FileInputStream(&quot;BEYOND - 喜欢你.mp3&quot;);
-            fos = new FileOutputStream(&quot;喜欢你_副本.mp3&quot;);
+    <span class="token comment" spellcheck="true">// 没有用到BufferedInputStream，BufferedOutputStream包装类</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">plainCopyMethod</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        FileInputStream fis <span class="token operator">=</span> null<span class="token punctuation">;</span>
+        FileOutputStream fos <span class="token operator">=</span> null<span class="token punctuation">;</span>
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            fis <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">FileInputStream</span><span class="token punctuation">(</span><span class="token string">"BEYOND - 喜欢你.mp3"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            fos <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">FileOutputStream</span><span class="token punctuation">(</span><span class="token string">"喜欢你_副本.mp3"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-            byte[] buf = new byte[1024];
-            int len = 0;
-            while ((len = fis.read(buf)) != -1) {
-                fos.write(buf, 0, len);
-            }
-        } catch (IOException e) {
-            // e.printStackTrace();
-            throw new RuntimeException(&quot;复制出错&quot;);
-        } finally {
-            if (fis != null)
-                try {
-                    fis.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            if (fos != null)
-                try {
-                    fos.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-        }
-    }
-}
+            <span class="token keyword">byte</span><span class="token punctuation">[</span><span class="token punctuation">]</span> buf <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">byte</span><span class="token punctuation">[</span><span class="token number">1024</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+            <span class="token keyword">int</span> len <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+            <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>len <span class="token operator">=</span> fis<span class="token punctuation">.</span><span class="token function">read</span><span class="token punctuation">(</span>buf<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">!=</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                fos<span class="token punctuation">.</span><span class="token function">write</span><span class="token punctuation">(</span>buf<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> len<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">IOException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">// e.printStackTrace();</span>
+            <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">RuntimeException</span><span class="token punctuation">(</span><span class="token string">"复制出错"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">finally</span> <span class="token punctuation">{</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>fis <span class="token operator">!=</span> null<span class="token punctuation">)</span>
+                <span class="token keyword">try</span> <span class="token punctuation">{</span>
+                    fis<span class="token punctuation">.</span><span class="token function">close</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">IOException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    e<span class="token punctuation">.</span><span class="token function">printStackTrace</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>fos <span class="token operator">!=</span> null<span class="token punctuation">)</span>
+                <span class="token keyword">try</span> <span class="token punctuation">{</span>
+                    fos<span class="token punctuation">.</span><span class="token function">close</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">IOException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    e<span class="token punctuation">.</span><span class="token function">printStackTrace</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 </code></pre>
 
             </div>

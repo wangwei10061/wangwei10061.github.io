@@ -36,7 +36,7 @@ class Test{
     </style>
 
     <script src="/libs/jquery/jquery-2.2.0.min.js"></script>
-</head>
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
 
 
 <body>
@@ -99,15 +99,6 @@ class Test{
             <i class="fa fa-user-circle-o"></i>
             
             <span>关于</span>
-        </a>
-    </li>
-    
-    <li class="hide-on-med-and-down">
-        <a href="/friends" class="waves-effect waves-light">
-            
-            <i class="fa fa-address-book"></i>
-            
-            <span>友情链接</span>
         </a>
     </li>
     
@@ -178,15 +169,6 @@ class Test{
                 <i class="fa fa-fw fa-user-circle-o"></i>
                 
                 关于
-            </a>
-        </li>
-        
-        <li>
-            <a href="/friends" class="waves-effect waves-light">
-                
-                <i class="fa fa-fw fa-address-book"></i>
-                
-                友情链接
             </a>
         </li>
         
@@ -360,31 +342,31 @@ class Test{
 <p>本文介绍什么情况下在同一个类中同名变量可以共存</p>
 <hr>
 <p>相关代码如下：</p>
-<pre><code class="java">class Test{
- static int x = 1;
- public static void main(String[] args){
-  int x=2;
-  System.out.println(x);
- }
-}
+<pre class=" language-java"><code class="language-java"><span class="token keyword">class</span> <span class="token class-name">Test</span><span class="token punctuation">{</span>
+ <span class="token keyword">static</span> <span class="token keyword">int</span> x <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+ <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span><span class="token punctuation">{</span>
+  <span class="token keyword">int</span> x<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">;</span>
+  System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span><span class="token punctuation">;</span>
+ <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 
-class Test1 {
- public static void main(String[] args) {
-  int x = 2;
-  for(int i = 0; i &lt; 2; i++) {
-      int x = 3;
-      System.out.println(x);
-  }
- }
-}
+<span class="token keyword">class</span> <span class="token class-name">Test1</span> <span class="token punctuation">{</span>
+ <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">int</span> x <span class="token operator">=</span> <span class="token number">2</span><span class="token punctuation">;</span>
+  <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token number">2</span><span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">int</span> x <span class="token operator">=</span> <span class="token number">3</span><span class="token punctuation">;</span>
+      System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+ <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 
-class Test2{
- int x = 1;
- public static void main(String[] args){
-  int x=2;
-  System.out.println(x);
- }
-}
+<span class="token keyword">class</span> <span class="token class-name">Test2</span><span class="token punctuation">{</span>
+ <span class="token keyword">int</span> x <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+ <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span><span class="token punctuation">{</span>
+  <span class="token keyword">int</span> x<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">;</span>
+  System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span><span class="token punctuation">;</span>
+ <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <p>运行结果分别如下：<br><img src="/images/2016/10/.png" alt="Test"><br><img src="/images/2016/10/Test1.png" alt="Test1"><br><img src="/images/2016/10/test2.png" alt="Test2"><br>可以看到，除开第二个编译失败之外，其余两个的运行结果都是2。为什么呢？这个问题在我的有道笔记中躺了一年的时间，从静态变量和实例变量的角度去考虑怎么也不能接受，直到后来我接触到了虚拟机，尼玛，这太应该了。<br>首先，对于Test程序，我们定义了一个静态变量x，这个x随着类的加载被分配到了内存的方法区模块，然后我们再定义了一个局部变量x，它随着方法一起被分配到了内存的运行时栈区，那自然这两个变量可以共存，打印结果为什么是2也就不足为奇了。那么怎么访问静态变量x呢？跟之前一样的访问规则：类名.变量名，读者可以自行尝试。<br>而对于Test1，在同一个方法体中，我们试图定义两个同名的变量x，如果可以，那意味着在栈中的该方法帧中存在两同名的变量x，显然这是不允许的，编译失败。<br>对于Test2，也很好接受了，实例变量被分配到了堆内存中，局部变量分配到了栈中，我们可以通过this.变量名来访问实例变量。<br>以前学长跟我说，学习JAVA做了一定的项目，看了一定的书籍之后你需要了解一下虚拟机的相关知识来进阶。嗯，我觉得很有必要了，路漫漫其修远兮，吾将上下而求索。</p>
 
@@ -582,24 +564,22 @@ class Test2{
             <div class="article-badge left-badge text-color">
                 <i class="fa fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2016/09/18/java/wen-ti-ji-2-2-5/">
+                <a href="/2016/09/18/java/wen-ti-ji-liang-ge-string-shi-fou-xiang-deng/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/11.jpg" class="responsive-img" alt="问题集：2 + 2 = 5">
+                        <img src="/medias/featureimages/21.jpg" class="responsive-img" alt="问题集：两个String是否相等">
                         
-                        <span class="card-title">问题集：2 + 2 = 5</span>
+                        <span class="card-title">问题集：两个String是否相等</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary">
-一个有趣的实验：2 + 2 = 5
+我们知道String类私有的维护一个字符串池，在判断两个字符串对象是否==时，要考虑到这一点
 
-相关代码如下：
-import java.lang.reflect.*;
-
-public class Test {
-    public static void main(String[] args) </div>
+首先来看一段代码：  
+class StringDemo {
+ public static void main(String[] args) </div>
                     <div class="publish-info">
                         <span class="publish-date">
                             <i class="fa fa-clock-o fa-fw icon-date"></i>2016-09-18
@@ -634,22 +614,24 @@ public class Test {
                 下一篇&nbsp;<i class="fa fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2016/09/18/java/wen-ti-ji-liang-ge-string-shi-fou-xiang-deng/">
+                <a href="/2016/09/18/java/wen-ti-ji-zi-ding-yi-java.lang.object-lei/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/21.jpg" class="responsive-img" alt="问题集：两个String是否相等">
+                        <img src="/medias/featureimages/21.jpg" class="responsive-img" alt="问题集：自定义java.lang.Object类">
                         
-                        <span class="card-title">问题集：两个String是否相等</span>
+                        <span class="card-title">问题集：自定义java.lang.Object类</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary">
-我们知道String类私有的维护一个字符串池，在判断两个字符串对象是否==时，要考虑到这一点
+同学去阿里面试的时候被问到的问题：可否自定义一个String类，放在一个名为java.lang的包中？与此问题有异曲同工之妙。
 
-首先来看一段代码：  
-class StringDemo {
- public static void main(String[] args) </div>
+相关代码如下：
+package java.lang;
+
+public class Object {
+    </div>
                     <div class="publish-info">
                             <span class="publish-date">
                                 <i class="fa fa-clock-o fa-fw icon-date"></i>2016-09-18

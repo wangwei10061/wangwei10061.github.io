@@ -35,7 +35,7 @@ public class Test {
     </style>
 
     <script src="/libs/jquery/jquery-2.2.0.min.js"></script>
-</head>
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
 
 
 <body>
@@ -98,15 +98,6 @@ public class Test {
             <i class="fa fa-user-circle-o"></i>
             
             <span>关于</span>
-        </a>
-    </li>
-    
-    <li class="hide-on-med-and-down">
-        <a href="/friends" class="waves-effect waves-light">
-            
-            <i class="fa fa-address-book"></i>
-            
-            <span>友情链接</span>
         </a>
     </li>
     
@@ -177,15 +168,6 @@ public class Test {
                 <i class="fa fa-fw fa-user-circle-o"></i>
                 
                 关于
-            </a>
-        </li>
-        
-        <li>
-            <a href="/friends" class="waves-effect waves-light">
-                
-                <i class="fa fa-fw fa-address-book"></i>
-                
-                友情链接
             </a>
         </li>
         
@@ -359,71 +341,71 @@ public class Test {
 <p>一个有趣的实验：2 + 2 = 5</p>
 <hr>
 <p>相关代码如下：</p>
-<pre><code class="java">import java.lang.reflect.*;
+<pre class=" language-java"><code class="language-java"><span class="token keyword">import</span> java<span class="token punctuation">.</span>lang<span class="token punctuation">.</span>reflect<span class="token punctuation">.</span>*<span class="token punctuation">;</span>
 
-public class Test {
-    public static void main(String[] args) throws NoSuchFieldException, IllegalAccessException {
-        Class cache = Integer.class.getDeclaredClasses()[0];
-        Field myCache = cache.getDeclaredField(&quot;cache&quot;);
-        myCache.setAccessible(true);
-        Integer[] newCache = (Integer[])myCache.get(cache);
-        newCache[132] = newCache[133];
-        int a = 2;
-        int b = a + a;
-        System.out.printf(&quot;%d + %d = %d&quot;, a, a, b);
-    }
-}
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">Test</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token keyword">throws</span> NoSuchFieldException<span class="token punctuation">,</span> IllegalAccessException <span class="token punctuation">{</span>
+        Class <span class="token class-name">cache</span> <span class="token operator">=</span> Integer<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">.</span><span class="token function">getDeclaredClasses</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+        Field myCache <span class="token operator">=</span> cache<span class="token punctuation">.</span><span class="token function">getDeclaredField</span><span class="token punctuation">(</span><span class="token string">"cache"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        myCache<span class="token punctuation">.</span><span class="token function">setAccessible</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Integer<span class="token punctuation">[</span><span class="token punctuation">]</span> newCache <span class="token operator">=</span> <span class="token punctuation">(</span>Integer<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span>myCache<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>cache<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        newCache<span class="token punctuation">[</span><span class="token number">132</span><span class="token punctuation">]</span> <span class="token operator">=</span> newCache<span class="token punctuation">[</span><span class="token number">133</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token keyword">int</span> a <span class="token operator">=</span> <span class="token number">2</span><span class="token punctuation">;</span>
+        <span class="token keyword">int</span> b <span class="token operator">=</span> a <span class="token operator">+</span> a<span class="token punctuation">;</span>
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"%d + %d = %d"</span><span class="token punctuation">,</span> a<span class="token punctuation">,</span> a<span class="token punctuation">,</span> b<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <p>运行结果如下：<br><img src="/images/2016/10/结果.png" alt="结果">  </p>
 <p>很神奇，a为2，b赋值为a + a，很明显是4，控制台却偏偏输出了2 + 2 = 5。第一眼看到这个程序时，我的心情是这样的–借用同学的话，程序猿遇到的事鬼都没法解释。但是毕竟我们还是相信科学的。随着自己对于JAVA的理解的加深，我了解了反射，了解了自动拆包，解包，终于有一天我鼓足勇气，一点一点的查阅jdk的源码，找到了这个中的原因所在。<br>为了方便解释，我们执果索因，在最后输出语句之前加入一行调试语句，单独输出b的值，可以看到b的值还是4  </p>
 <p><img src="/images/2016/10/调试.png" alt="调试">  </p>
 <p>那么原因自然就出在了printf上，为何？查阅源码，源码中printf的代码段如下：</p>
-<pre><code class="java">        public PrintStream printf(String format, Object ... args) {
-        return format(format, args);
-    }
+<pre class=" language-java"><code class="language-java">        <span class="token keyword">public</span> PrintStream <span class="token function">printf</span><span class="token punctuation">(</span>String format<span class="token punctuation">,</span> Object <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span> args<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token function">format</span><span class="token punctuation">(</span>format<span class="token punctuation">,</span> args<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 </code></pre>
 <p>这能说明什么？说明我们传printf方法里边的参数是以Object对象的形式存在的，而不是简单的int类型，那自然就会用到JAVA里边的自动封包的机制，那照这么看来，难道是4在被封装成Integer类型时被封装成了5？我们验证一下，在最后的输出语句后加上：</p>
-<pre><code class="java">System.out.printf(&quot;\n%d&quot;, 4);
+<pre class=" language-java"><code class="language-java">System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"\n%d"</span><span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 </code></pre>
 <p>果不其然，我们得到了我们想要的结果：  </p>
 <p><img src="/images/2016/10/Image 6.png" alt>  </p>
 <p>那到底是为什么int的4会被封装成Integer的5呢？显然该是前面这段代码的原因了，还请随我细细来看</p>
-<pre><code class="java">Class cache = Integer.class.getDeclaredClasses()[0];
+<pre class=" language-java"><code class="language-java">Class <span class="token class-name">cache</span> <span class="token operator">=</span> Integer<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">.</span><span class="token function">getDeclaredClasses</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
 </code></pre>
 <p>继续剖析代码，通过反射的基本知识我们知道这个语句的意思是获取Integer的第一个内部类，那么是什么呢，查阅源码，我们发现，这个class叫做IntegerCache，那我们来看看它的作用是什么</p>
-<pre><code class="java">        private static class IntegerCache {
-        static final int low = -128;
-        static final int high;
-        static final Integer cache[];
+<pre class=" language-java"><code class="language-java">        <span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">class</span> <span class="token class-name">IntegerCache</span> <span class="token punctuation">{</span>
+        <span class="token keyword">static</span> <span class="token keyword">final</span> <span class="token keyword">int</span> low <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">128</span><span class="token punctuation">;</span>
+        <span class="token keyword">static</span> <span class="token keyword">final</span> <span class="token keyword">int</span> high<span class="token punctuation">;</span>
+        <span class="token keyword">static</span> <span class="token keyword">final</span> Integer cache<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
 
-        static {
-            // high value may be configured by property
-            int h = 127;
-            String integerCacheHighPropValue =
-                sun.misc.VM.getSavedProperty(&quot;java.lang.Integer.IntegerCache.high&quot;);
-            if (integerCacheHighPropValue != null) {
-                try {
-                    int i = parseInt(integerCacheHighPropValue);
-                    i = Math.max(i, 127);
-                    // Maximum array size is Integer.MAX_VALUE
-                    h = Math.min(i, Integer.MAX_VALUE - (-low) -1);
-                } catch( NumberFormatException nfe) {
-                    // If the property cannot be parsed into an int, ignore it.
-                }
-            }
-            high = h;
+        <span class="token keyword">static</span> <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">// high value may be configured by property</span>
+            <span class="token keyword">int</span> h <span class="token operator">=</span> <span class="token number">127</span><span class="token punctuation">;</span>
+            String integerCacheHighPropValue <span class="token operator">=</span>
+                sun<span class="token punctuation">.</span>misc<span class="token punctuation">.</span>VM<span class="token punctuation">.</span><span class="token function">getSavedProperty</span><span class="token punctuation">(</span><span class="token string">"java.lang.Integer.IntegerCache.high"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>integerCacheHighPropValue <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">try</span> <span class="token punctuation">{</span>
+                    <span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token function">parseInt</span><span class="token punctuation">(</span>integerCacheHighPropValue<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    i <span class="token operator">=</span> Math<span class="token punctuation">.</span><span class="token function">max</span><span class="token punctuation">(</span>i<span class="token punctuation">,</span> <span class="token number">127</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token comment" spellcheck="true">// Maximum array size is Integer.MAX_VALUE</span>
+                    h <span class="token operator">=</span> Math<span class="token punctuation">.</span><span class="token function">min</span><span class="token punctuation">(</span>i<span class="token punctuation">,</span> Integer<span class="token punctuation">.</span>MAX_VALUE <span class="token operator">-</span> <span class="token punctuation">(</span><span class="token operator">-</span>low<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span> <span class="token keyword">catch</span><span class="token punctuation">(</span> NumberFormatException nfe<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    <span class="token comment" spellcheck="true">// If the property cannot be parsed into an int, ignore it.</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span>
+            high <span class="token operator">=</span> h<span class="token punctuation">;</span>
 
-            cache = new Integer[(high - low) + 1];
-            int j = low;
-            for(int k = 0; k &lt; cache.length; k++)
-                cache[k] = new Integer(j++);
+            cache <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Integer</span><span class="token punctuation">[</span><span class="token punctuation">(</span>high <span class="token operator">-</span> low<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+            <span class="token keyword">int</span> j <span class="token operator">=</span> low<span class="token punctuation">;</span>
+            <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">int</span> k <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> k <span class="token operator">&lt;</span> cache<span class="token punctuation">.</span>length<span class="token punctuation">;</span> k<span class="token operator">++</span><span class="token punctuation">)</span>
+                cache<span class="token punctuation">[</span>k<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Integer</span><span class="token punctuation">(</span>j<span class="token operator">++</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-            // range [-128, 127] must be interned (JLS7 5.1.7)
-            assert IntegerCache.high &gt;= 127;
-        }
+            <span class="token comment" spellcheck="true">// range [-128, 127] must be interned (JLS7 5.1.7)</span>
+            <span class="token keyword">assert</span> IntegerCache<span class="token punctuation">.</span>high <span class="token operator">>=</span> <span class="token number">127</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
 
-        private IntegerCache() {}
-    }
+        <span class="token keyword">private</span> <span class="token function">IntegerCache</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
 </code></pre>
 <p>这是官方的解释，它告诉我们这个类是在自动封包的时候作缓存用的，缓存的范围为-128~127，4在范围内</p>
 <blockquote>
@@ -439,60 +421,60 @@ public class Test {
  * sun.misc.VM class.
  */
 </code></pre><p>我们看看IntegerCache里边都做了些什么：</p>
-<pre><code class="java">//声明下界上界和cache数组
-static final int low = -128;
-static final int high;
-static final Integer cache[];
+<pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">//声明下界上界和cache数组</span>
+<span class="token keyword">static</span> <span class="token keyword">final</span> <span class="token keyword">int</span> low <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">128</span><span class="token punctuation">;</span>
+<span class="token keyword">static</span> <span class="token keyword">final</span> <span class="token keyword">int</span> high<span class="token punctuation">;</span>
+<span class="token keyword">static</span> <span class="token keyword">final</span> Integer cache<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
 
-static {
-      //判断上界是否被显示设定，如果被设定，将上界赋值为显示值
-        // high value may be configured by property
-        int h = 127;
-        String integerCacheHighPropValue =
-                sun.misc.VM.getSavedProperty(&quot;java.lang.Integer.IntegerCache.high&quot;);
-        if (integerCacheHighPropValue != null) {
-                try {
-                        int i = parseInt(integerCacheHighPropValue);
-                        i = Math.max(i, 127);
-                        // Maximum array size is Integer.MAX_VALUE
-                        h = Math.min(i, Integer.MAX_VALUE - (-low) -1);
-                } catch( NumberFormatException nfe) {
-                        // If the property cannot be parsed into an int, ignore it.
-                }
-        }
-        high = h;
+<span class="token keyword">static</span> <span class="token punctuation">{</span>
+      <span class="token comment" spellcheck="true">//判断上界是否被显示设定，如果被设定，将上界赋值为显示值</span>
+        <span class="token comment" spellcheck="true">// high value may be configured by property</span>
+        <span class="token keyword">int</span> h <span class="token operator">=</span> <span class="token number">127</span><span class="token punctuation">;</span>
+        String integerCacheHighPropValue <span class="token operator">=</span>
+                sun<span class="token punctuation">.</span>misc<span class="token punctuation">.</span>VM<span class="token punctuation">.</span><span class="token function">getSavedProperty</span><span class="token punctuation">(</span><span class="token string">"java.lang.Integer.IntegerCache.high"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>integerCacheHighPropValue <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">try</span> <span class="token punctuation">{</span>
+                        <span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token function">parseInt</span><span class="token punctuation">(</span>integerCacheHighPropValue<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                        i <span class="token operator">=</span> Math<span class="token punctuation">.</span><span class="token function">max</span><span class="token punctuation">(</span>i<span class="token punctuation">,</span> <span class="token number">127</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                        <span class="token comment" spellcheck="true">// Maximum array size is Integer.MAX_VALUE</span>
+                        h <span class="token operator">=</span> Math<span class="token punctuation">.</span><span class="token function">min</span><span class="token punctuation">(</span>i<span class="token punctuation">,</span> Integer<span class="token punctuation">.</span>MAX_VALUE <span class="token operator">-</span> <span class="token punctuation">(</span><span class="token operator">-</span>low<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span> <span class="token keyword">catch</span><span class="token punctuation">(</span> NumberFormatException nfe<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                        <span class="token comment" spellcheck="true">// If the property cannot be parsed into an int, ignore it.</span>
+                <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+        high <span class="token operator">=</span> h<span class="token punctuation">;</span>
 
-        //定义数组并为数组循环赋值
-        cache = new Integer[(high - low) + 1];
-        int j = low;
-        for(int k = 0; k &lt; cache.length; k++)
-                cache[k] = new Integer(j++);
+        <span class="token comment" spellcheck="true">//定义数组并为数组循环赋值</span>
+        cache <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Integer</span><span class="token punctuation">[</span><span class="token punctuation">(</span>high <span class="token operator">-</span> low<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token keyword">int</span> j <span class="token operator">=</span> low<span class="token punctuation">;</span>
+        <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">int</span> k <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> k <span class="token operator">&lt;</span> cache<span class="token punctuation">.</span>length<span class="token punctuation">;</span> k<span class="token operator">++</span><span class="token punctuation">)</span>
+                cache<span class="token punctuation">[</span>k<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Integer</span><span class="token punctuation">(</span>j<span class="token operator">++</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 </code></pre>
 <p>到这，开始有点眉目了，IntegerCache里边放了一cache数组，cache[0] ~ cache[high - low]分别存着low ~ high对应的Integer值，那这自动封装就是取的int值对应到cache数组中的Integer元素，4的话应该是对应cache[132]，5对应cache[133]，那么再来看我们最初的代码</p>
-<pre><code class="java">        //获取到cache字段
-        Field myCache = cache.getDeclaredField(&quot;cache&quot;);
-        //设置cache字段可以被访问
-        myCache.setAccessible(true);
-        //拿到cache字段并修改该字段的值
-        Integer[] newCache = (Integer[])myCache.get(cache);
-        //制造&quot;4是5&quot;的假象
-        newCache[132] = newCache[133];
-        int a = 2;
-        int b = a + a;
-        System.out.printf(&quot;%d + %d = %d&quot;, a, a, b);
+<pre class=" language-java"><code class="language-java">        <span class="token comment" spellcheck="true">//获取到cache字段</span>
+        Field myCache <span class="token operator">=</span> cache<span class="token punctuation">.</span><span class="token function">getDeclaredField</span><span class="token punctuation">(</span><span class="token string">"cache"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//设置cache字段可以被访问</span>
+        myCache<span class="token punctuation">.</span><span class="token function">setAccessible</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//拿到cache字段并修改该字段的值</span>
+        Integer<span class="token punctuation">[</span><span class="token punctuation">]</span> newCache <span class="token operator">=</span> <span class="token punctuation">(</span>Integer<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span>myCache<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>cache<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//制造"4是5"的假象</span>
+        newCache<span class="token punctuation">[</span><span class="token number">132</span><span class="token punctuation">]</span> <span class="token operator">=</span> newCache<span class="token punctuation">[</span><span class="token number">133</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token keyword">int</span> a <span class="token operator">=</span> <span class="token number">2</span><span class="token punctuation">;</span>
+        <span class="token keyword">int</span> b <span class="token operator">=</span> a <span class="token operator">+</span> a<span class="token punctuation">;</span>
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"%d + %d = %d"</span><span class="token punctuation">,</span> a<span class="token punctuation">,</span> a<span class="token punctuation">,</span> b<span class="token punctuation">)</span><span class="token punctuation">;</span>
 </code></pre>
 <p>至此，真相大白，水落石出，2 + 2 = 5也就自然成立了，不过是原来int的4对应于Integer中的缓存是(Integer)4，而我们把这个缓存值改成了(Integer)5而已，是反射利用自动封包机制搞的鬼，笔者当时明晓答案之后只有一个感慨，反射这个东西真是挺牛逼的，比鬼厉害，哈哈。</p>
 <p>后来哥大四找工作的时候，参加各大互联网公司的笔面试，各种被虐，但是好多次都见到这么一个题，哥笑了，题目如下，请大家自行解答：</p>
-<pre><code class="java">int v1_1 = 127;
-int v1_2 = 127;
+<pre class=" language-java"><code class="language-java"><span class="token keyword">int</span> v1_1 <span class="token operator">=</span> <span class="token number">127</span><span class="token punctuation">;</span>
+<span class="token keyword">int</span> v1_2 <span class="token operator">=</span> <span class="token number">127</span><span class="token punctuation">;</span>
 
-int v2_1 = 128;
-int v2_2 = 128;
+<span class="token keyword">int</span> v2_1 <span class="token operator">=</span> <span class="token number">128</span><span class="token punctuation">;</span>
+<span class="token keyword">int</span> v2_2 <span class="token operator">=</span> <span class="token number">128</span><span class="token punctuation">;</span>
 
-System.out.println(v1_1 == v1_2);
-System.out.println(v2_1 == v2_2);
+System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>v1_1 <span class="token operator">==</span> v1_2<span class="token punctuation">)</span><span class="token punctuation">;</span>
+System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>v2_1 <span class="token operator">==</span> v2_2<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-//问输出的结果是什么？
+<span class="token comment" spellcheck="true">//问输出的结果是什么？</span>
 </code></pre>
 
             </div>
@@ -689,20 +671,20 @@ System.out.println(v2_1 == v2_2);
             <div class="article-badge left-badge text-color">
                 <i class="fa fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2016/09/18/git/git-zong-jie/">
+                <a href="/2016/09/18/java/yu-fa-java7-xin-te-xing-shu-zi-zhi-jian-xia-hua-xian-fen-ge/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/10.jpg" class="responsive-img" alt="Git总结">
+                        <img src="/medias/featureimages/13.jpg" class="responsive-img" alt="语法：JAVA7新特性--数字之间下划线分隔">
                         
-                        <span class="card-title">Git总结</span>
+                        <span class="card-title">语法：JAVA7新特性--数字之间下划线分隔</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
-                    <div class="summary">
-git作为一种分布式的版本控制工具，相对svn的优势是很明显的，曾被阿里的面试官问到git与svn的区别，在这里对git做一个简要的介绍。
+                    <div class="summary">在Oracle Java程序设计大赛模拟题中见到了这么一道题：
 
-why git?我本人用svn有三年的时间了，你要是不嫌弃的话其实svn也没有那么烂，我感觉会用</div>
+当时就懵逼了，这不是全错了么，还有这么个用法？心中当然知道出题者的意图是考察对于数字数据类型的掌握程度，赶忙写了个demo测试了一下。
+public class Test {</div>
                     <div class="publish-info">
                         <span class="publish-date">
                             <i class="fa fa-clock-o fa-fw icon-date"></i>2016-09-18
@@ -711,8 +693,8 @@ why git?我本人用svn有三年的时间了，你要是不嫌弃的话其实svn
                             
                             <i class="fa fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/git/" class="post-category" target="_blank">
-                                    git
+                            <a href="/categories/JAVA/" class="post-category" target="_blank">
+                                    JAVA
                                 </a>
                             
                             
@@ -722,8 +704,8 @@ why git?我本人用svn有三年的时间了，你要是不嫌弃的话其实svn
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/git/" target="_blank">
-                        <span class="chip bg-color">git</span>
+                    <a href="/tags/JAVA/" target="_blank">
+                        <span class="chip bg-color">JAVA</span>
                     </a>
                     
                 </div>
@@ -737,25 +719,20 @@ why git?我本人用svn有三年的时间了，你要是不嫌弃的话其实svn
                 下一篇&nbsp;<i class="fa fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2016/09/18/java/wen-ti-ji-tong-ming-bian-liang-wen-ti/">
+                <a href="/2016/09/18/java/wen-ti-ji-nextint-hou-nextline-du-qu-kong-zhi/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/0.jpg" class="responsive-img" alt="问题集：同名变量问题">
+                        <img src="/medias/featureimages/20.jpg" class="responsive-img" alt="问题集：nextInt后nextLine读取空值">
                         
-                        <span class="card-title">问题集：同名变量问题</span>
+                        <span class="card-title">问题集：nextInt后nextLine读取空值</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
-                    <div class="summary">
-本文介绍什么情况下在同一个类中同名变量可以共存
+                    <div class="summary">在学习Scanner类的时候遇到一个问题，在使用nextInt()获取到一个整数之后，如果接着调用nextLine()方法，nextLine()方法将获取不到值？
+import java.util.*;
 
-相关代码如下：
-class Test{
- static int x = 1;
- public static void main(String[] args){
-  int x=2;
-  S</div>
+public class Test</div>
                     <div class="publish-info">
                             <span class="publish-date">
                                 <i class="fa fa-clock-o fa-fw icon-date"></i>2016-09-18
