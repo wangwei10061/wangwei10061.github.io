@@ -1,0 +1,953 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head><meta name="generator" content="Hexo 3.8.0">
+    <meta charset="utf-8">
+    <meta name="keywords" content="模式匹配, 顽逗">
+    <meta name="description" content="
+之前一直对KMP算法不大理解，感觉很难接受，昨天胖子也卡在这一块了，问我会不会，索性就静下心来好好了解了一下模式匹配这一块的内容。皮毛的一些东西，但是毕竟也是自己的理解。
+
+
+模式匹配  
+BF算法
+KMP算法
+jdk String源码i">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>模式匹配 | 顽逗</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+    <style type="text/css">
+        
+    </style>
+
+    <script src="/libs/jquery/jquery-2.2.0.min.js"></script>
+</head>
+
+
+<body>
+
+<header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">顽逗</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fa fa-navicon"></i></a>
+<ul class="right">
+    
+    <li class="hide-on-med-and-down">
+        <a href="/" class="waves-effect waves-light">
+            
+            <i class="fa fa-home"></i>
+            
+            <span>首页</span>
+        </a>
+    </li>
+    
+    <li class="hide-on-med-and-down">
+        <a href="/tags" class="waves-effect waves-light">
+            
+            <i class="fa fa-tags"></i>
+            
+            <span>标签</span>
+        </a>
+    </li>
+    
+    <li class="hide-on-med-and-down">
+        <a href="/categories" class="waves-effect waves-light">
+            
+            <i class="fa fa-bookmark"></i>
+            
+            <span>分类</span>
+        </a>
+    </li>
+    
+    <li class="hide-on-med-and-down">
+        <a href="/archives" class="waves-effect waves-light">
+            
+            <i class="fa fa-archive"></i>
+            
+            <span>归档</span>
+        </a>
+    </li>
+    
+    <li class="hide-on-med-and-down">
+        <a href="/about" class="waves-effect waves-light">
+            
+            <i class="fa fa-user-circle-o"></i>
+            
+            <span>关于</span>
+        </a>
+    </li>
+    
+    <li class="hide-on-med-and-down">
+        <a href="/friends" class="waves-effect waves-light">
+            
+            <i class="fa fa-address-book"></i>
+            
+            <span>友情链接</span>
+        </a>
+    </li>
+    
+    <li>
+        <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+            <i id="searchIcon" class="fa fa-search" title="搜索"></i>
+        </a>
+    </li>
+</ul>
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">顽逗</div>
+        <div class="logo-desc">
+            
+            --wangwei10061
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li>
+            <a href="/" class="waves-effect waves-light">
+                
+                <i class="fa fa-fw fa-home"></i>
+                
+                首页
+            </a>
+        </li>
+        
+        <li>
+            <a href="/tags" class="waves-effect waves-light">
+                
+                <i class="fa fa-fw fa-tags"></i>
+                
+                标签
+            </a>
+        </li>
+        
+        <li>
+            <a href="/categories" class="waves-effect waves-light">
+                
+                <i class="fa fa-fw fa-bookmark"></i>
+                
+                分类
+            </a>
+        </li>
+        
+        <li>
+            <a href="/archives" class="waves-effect waves-light">
+                
+                <i class="fa fa-fw fa-archive"></i>
+                
+                归档
+            </a>
+        </li>
+        
+        <li>
+            <a href="/about" class="waves-effect waves-light">
+                
+                <i class="fa fa-fw fa-user-circle-o"></i>
+                
+                关于
+            </a>
+        </li>
+        
+        <li>
+            <a href="/friends" class="waves-effect waves-light">
+                
+                <i class="fa fa-fw fa-address-book"></i>
+                
+                友情链接
+            </a>
+        </li>
+        
+        
+    </ul>
+</div>
+
+        </div>
+
+        
+    </nav>
+
+</header>
+
+
+<script src="/libs/cryptojs/crypto-js.min.js"></script>
+<script>
+    (function() {
+        let pwd = '';
+        if (pwd && pwd.length > 0) {
+            if (pwd !== CryptoJS.SHA256(prompt('请输入访问本文章的密码')).toString(CryptoJS.enc.Hex)) {
+                alert('密码错误，将返回主页！');
+                location.href = '/';
+            }
+        }
+    })();
+</script>
+
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/2.jpg')">
+    <div class="container">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <div class="description center-align post-title">
+                        模式匹配
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        margin: 35px 0 15px 0;
+        padding-left: 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #toc-content .is-active-link::before {
+        background-color: #42b983;
+    }
+</style>
+<div class="row">
+    <div class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/算法/" target="_blank">
+                                <span class="chip bg-color">算法</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fa fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/算法与数据结构/" class="post-category" target="_blank">
+                                算法与数据结构
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                <div class="post-date info-break-policy">
+                    <i class="fa fa-calendar-minus-o fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2016-10-22
+                </div>
+
+                
+				
+				
+                    <div id="busuanzi_container_page_pv" class="info-break-policy">
+                        <i class="fa fa-eye fa-fw"></i>阅读次数:&nbsp;&nbsp;
+                        <span id="busuanzi_value_page_pv"></span>
+                    </div>
+				
+            </div>
+        </div>
+        <hr class="clearfix">
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <hr>
+<p>之前一直对KMP算法不大理解，感觉很难接受，昨天胖子也卡在这一块了，问我会不会，索性就静下心来好好了解了一下模式匹配这一块的内容。皮毛的一些东西，但是毕竟也是自己的理解。</p>
+<hr>
+<ul>
+<li>模式匹配  </li>
+<li>BF算法</li>
+<li>KMP算法</li>
+<li>jdk String源码indexOf(String str)的实现</li>
+</ul>
+<h5 id="模式匹配"><a href="#模式匹配" class="headerlink" title="模式匹配"></a>模式匹配</h5><p>所谓模式匹配，个人的理解就是用一个模式去匹配一个字符串，也就是从一个字符串中去找有没有包含另外一个字符子串，如果有，匹配成功，返回最开始出现子串的位置，如果没有，匹配失败，返回-1。<br>举个简单的例子：给定源串n：adcabcdefadcad，模式m：cad，匹配的结果应该是11，因为模式cad在源串的第11位才开始出现。</p>
+<h5 id="BF算法"><a href="#BF算法" class="headerlink" title="BF算法"></a>BF算法</h5><p>模式匹配的一个最容易想到的思想就是拿目标串也就是我们的模式与源串的每一位进行比较，相同继续往后比较，不同则回溯到最开始比较的位置的下一位继续该比较过程。不多解释，就是你脑子里边第一时间反应到的算法。</p>
+<h5 id="KMP"><a href="#KMP" class="headerlink" title="KMP"></a>KMP</h5><p>BF算法的效率着实是太低了，时间复杂度为O(mn)级了，为什么呢？我们总结为：BF算法在每趟匹配不成功时存在大量回溯，没有利用已经部分匹配的结果。<br>那么如何更高效地来做这件事呢？可以选择让源串不回溯，而让模式向右滑动一段距离，滑动多长的距离呢？这就需要我们把已经部分匹配的结果利用起来了。于是著名的”看毛片”算法就诞生了。  </p>
+<ul>
+<li>KMP的原理<br>KMP算法的基本原理可以参看这篇博客：<a href="http://kb.cnblogs.com/page/176818/" target="_blank" rel="noopener">字符串匹配的KMP算法</a>(原文链接打不开了，且看这个转载的链接吧)，讲解得非常通俗易懂。  </li>
+<li>next数组<br>但是如胖子所说，这篇博文忽略了一个问题，KMP算法的核心问题：next数组的计算。<br>什么是next数组？在上面提到的博文中，你应该接触到一个部分匹配表的概念，那就是next数组。也就是说在模式串中，从开始位置到每一个位置的子串的最大公共前后缀长度。比如“cad”，next[1]代表c的最大公共前后缀长度，next[3]代表cad的最大公共前后缀长度。  </li>
+<li>next数组的计算及代码<br>上面的博文介绍了它的实质，这里我们介绍一下，如何计算得出这个next数组。<br>注意一点，我们约定next数组的下标从1开始，为什么这么约定，我想是因为我们现在是从算法的层面来考虑这个问题吧，毕竟只有程序猿才认为万物从0开始。其实你非要从0开始也没毛病，不影响分析的过程。<br>下面这一段内容不大好理解，请沉下心来看。<br>next数组的计算采用递推的方式来进行。假设我们现在已经求得next[1]、next[2]、……next[i]，分别表示长度为1到i的字符串的最大公共前后缀长度，现在要求next[i+1]。从next[i]求next[i+1]，只是添加了一个元素第i+1位（注意前面提到的下标从1开始），那么存在如图所示的关系。<br><img src="/images/2016/10/nexti.png" alt="nexti"><br>下面开始next[i+1]的计算：<br><img src="/images/2016/10/next数组.png" alt="next数组"><br>如果位置i和位置next[i]+1处的两个字符相同，则next[i+1]等于next[i]加1；<br>如果两个位置的字符不相同，我们可以将长度为next[i]的字符串继续分割（如图，对A的分割，得到公共前后缀为A1，A2），获得其最大公共长度next[next[i]]，然后将next[next[i]]+1处的字符和位置i的字符比较，如果位置next[next[i]]+1和位置i的字符相同，则next[i+1]就等于next[next[i]]加1。如果不相等，就可以继续分割长度为next[next[i]]的字符串，直到公共前缀长度为0为止。<br>为什么这样计算？如果位置i和位置next[i]+1处的两个字符不相同，那么对于长度为i+1的子串，最大公共前后缀中的前缀只能出现在A内部，且是A的前缀，这比较容易理解，那么这个前缀是多长？上面的做法每一步都在取最长的可能长度，否则的话，假设取该前缀为C=[A1 + 后续的几个元素]，那么在A中不存在与C相等的后缀，那意味着在B中也不存在与C相等的后缀，自然[C + C后的第一位元素]不会等于[B的某后缀 + 第(i+1)的元素]。<br>分析完了，上代码：  </li>
+</ul>
+<pre><code class="java">public static int[] getNextArray(String s) {
+        // 因为我们分析时下标从1开始，所以多分配一位
+        int[] next = new int[s.length() + 1];
+
+        // next[0]约定为0，反正没用 
+        next[0] = next[1] = 0;
+        int j = 0;
+
+        // 注意在算法中的next[i]+1位置在程序中表示为next[i]，因为数组元素从0开始
+        for(int i = 1; i &lt; s.length(); i++) {
+            while(j &gt; 0 &amp;&amp; s.charAt(i) != s.charAt(j)) {
+                j = next[j];
+            }
+            if(s.charAt(i) == s.charAt(j)) {
+                j++;
+            }
+            next[i + 1] = j;
+        }
+        return next;
+    }
+</code></pre>
+<ul>
+<li>kmp的实现<br>有了next数组，当每次比较到两个字符串的字符不同时，我们就可以根据next数组将模式串向前移动(已匹配长度-next[i])位，接着继续比较下一个位置。算法实现如下：  </li>
+</ul>
+<pre><code class="java">public static int findFirstSubStrInString(String source, String pattern) {
+        int[] next = getNextArray(pattern);
+
+        int i = 0;
+        int j = 1;
+
+        while(i &lt; source.length() &amp;&amp; j &lt;= pattern.length()) {
+            // 如果当前比较位置相等，判断是否得到结果，如果是，返回位置
+            if(source.charAt(i) == pattern.charAt(j - 1)) {
+                if(j == pattern.length()) {
+                    return i - j + 1;
+                }
+                i++;
+                j++;
+            } else if(j == 1) { // 如果不相等，并且j没有开始移动
+                i++;
+            } else { // 如果不相等，且j已经开始移动
+                i -= next[j]; // i = i - compared + (compared - next[j]);
+                j = 1;
+            }
+        }
+
+        return -1;
+}
+</code></pre>
+<p>至此kmp算法介绍完毕。  </p>
+<h5 id="jdk-String源码indexOf-String-str-的实现"><a href="#jdk-String源码indexOf-String-str-的实现" class="headerlink" title="jdk String源码indexOf(String str)的实现"></a>jdk String源码indexOf(String str)的实现</h5><p>理解了KMP算法之后，不自觉地想到String的indexOf(String str)方法是不是也用KMP实现的呢？赶紧看了一下源码。其实现如下： </p>
+<pre><code class="java">public int indexOf(String str) {
+        return indexOf(str, 0);
+}
+
+public int indexOf(String str, int fromIndex) {
+    return indexOf(value, 0, value.length,
+            str.value, 0, str.value.length, fromIndex);
+}
+
+static int indexOf(char[] source, int sourceOffset, int sourceCount,
+        char[] target, int targetOffset, int targetCount,
+        int fromIndex) {
+    if (fromIndex &gt;= sourceCount) {
+        return (targetCount == 0 ? sourceCount : -1);
+    }
+    if (fromIndex &lt; 0) {
+        fromIndex = 0;
+    }
+    if (targetCount == 0) {
+        return fromIndex;
+    }
+
+    char first = target[targetOffset];
+    int max = sourceOffset + (sourceCount - targetCount);
+
+    for (int i = sourceOffset + fromIndex; i &lt;= max; i++) {
+        /* Look for first character. */
+        if (source[i] != first) {
+            while (++i &lt;= max &amp;&amp; source[i] != first);
+        }
+
+        /* Found first character, now look at the rest of v2 */
+        if (i &lt;= max) {
+            int j = i + 1;
+            int end = j + targetCount - 1;
+            for (int k = targetOffset + 1; j &lt; end &amp;&amp; source[j]
+                    == target[k]; j++, k++);
+
+            if (j == end) {
+                /* Found whole string. */
+                return i - sourceOffset;
+            }
+        }
+    }
+    return -1;
+}
+</code></pre>
+<p>可以看到jdk源码中的indexOf方法采用的是最朴素的模式匹配算法也就是BF算法来实现的，jdk实现时为什么不采用kmp呢？答案暂时还未知，但是KMP算法对这个例子运行不出结果：  </p>
+<pre><code class="java">findFirstSubStrInString(&quot;aaaaaaaaaaaaaaaaaaaaaa&quot; + 
+            &quot;aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&quot;
+            + &quot;aaaaaaaaaaaaaaaaaaaaaaaaaaaaab&quot;, &quot;aaab&quot;);
+</code></pre>
+<p>感觉这不是正宗的KMP算法，但是按照那哥们那篇博客确实是这样的，苦笑，进一步探究原因中。</p>
+
+            </div>
+            <hr>
+
+            
+            <style>
+    #reward {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    #reward .reward-link {
+        font-size: 1.88rem;
+    }
+
+    #reward .btn-floating:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #rewardModal {
+        width: 320px;
+        height: 350px;
+    }
+
+    #rewardModal .reward-title {
+        margin: 15px auto;
+        padding-bottom: 5px;
+    }
+
+    #rewardModal .modal-content {
+        padding: 10px;
+    }
+
+    #rewardModal .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.3rem;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    #rewardModal .close:hover {
+        color: #ef5350;
+        transform: scale(1.3);
+        -moz-transform:scale(1.3);
+        -webkit-transform:scale(1.3);
+        -o-transform:scale(1.3);
+    }
+
+    #rewardModal .reward-tabs {
+        margin: 0 auto;
+        width: 210px;
+    }
+
+    .reward-tabs .tabs {
+        height: 38px;
+        margin: 10px auto;
+        padding-left: 0;
+    }
+
+    .reward-content ul {
+        padding-left: 0 !important;
+    }
+
+    .reward-tabs .tabs .tab {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .reward-tabs .tab a {
+        color: #fff;
+        background-color: #ccc;
+    }
+
+    .reward-tabs .tab a:hover {
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .reward-tabs .wechat-tab .active {
+        color: #fff !important;
+        background-color: #22AB38 !important;
+    }
+
+    .reward-tabs .alipay-tab .active {
+        color: #fff !important;
+        background-color: #019FE8 !important;
+    }
+
+    .reward-tabs .reward-img {
+        width: 210px;
+        height: 210px;
+    }
+</style>
+
+<div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-large waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fa fa-close"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/images/alipay.png" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/images/wechat.png" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+            
+
+            <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+
+<!-- <div id="article-share">
+    
+    <div class="social-share" data-disabled="qzone" data-wechat-qrcode-helper="<p>微信里点“发现”->“扫一扫”二维码便可查看分享。</p>"></div>
+    
+</div> -->
+
+<script src="/libs/share/js/social-share.min.js"></script>
+
+
+            <div class="reprint">
+                <p>
+                    <span class="reprint-tip">
+                        <i class="fa fa-exclamation-circle"></i>&nbsp;&nbsp;转载请注明:
+                    </span>
+                    <a href="wangwei10061.github.io" class="b-link-green">顽逗</a>
+                    <i class="fa fa-angle-right fa-lg fa-fw text-color"></i>
+                    <a href="/2016/10/22/suan-fa-yu-shu-ju-jie-gou/mo-shi-pi-pei/" class="b-link-green">模式匹配</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    
+        <link rel="stylesheet" href="/libs/gitalk/gitalk.css">
+<link rel="stylesheet" href="/css/my-gitalk.css">
+
+<div class="card gitalk-card" data-aos="fade-up">
+    <div id="gitalk-container" class="card-content"></div>
+</div>
+
+<script src="/libs/gitalk/gitalk.min.js"></script>
+<script>
+    let gitalk = new Gitalk({
+        clientID: '4f5459a7ef09d284b76f',
+        clientSecret: '2ae198a7284cc09092870816a2db9e9c715642a1',
+        repo: 'wangwei10061.github.io',
+        owner: 'wangwei10061',
+        admin: ["wangwei10061"],
+        id: '2016-10-22T09-18-00',
+        distractionFreeMode: false  // Facebook-like distraction free mode
+    });
+
+    gitalk.render('gitalk-container');
+</script>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fa fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/2016/10/30/java/ssh-kuang-jia/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/16.jpg" class="responsive-img" alt="SSH框架">
+                        
+                        <span class="card-title">SSH框架</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary">
+最近不忙，把SSH的框架的内容复读了一遍，看的是英文网站tutorialspoint，第一次看完英文的教程，个人觉得总结得很好，收获颇丰，倾情推荐。   
+
+传送门：struts2，spring，hibernate
+</div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="fa fa-clock-o fa-fw icon-date"></i>2016-10-30
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fa fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/JAVA/" class="post-category" target="_blank">
+                                    JAVA
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/JAVA/" target="_blank">
+                        <span class="chip bg-color">JAVA</span>
+                    </a>
+                    
+                    <a href="/tags/SSH/" target="_blank">
+                        <span class="chip bg-color">SSH</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fa fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2016/10/21/mysql/pi-liang-xiu-gai-mysql-biao-de-suo-you-lie-lie-ming-wei-xiao-xie/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/13.jpg" class="responsive-img" alt="批量修改mysql表的所有列列名为小写">
+                        
+                        <span class="card-title">批量修改mysql表的所有列列名为小写</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary">
+今天接到一个外包的需求，一个表中的字段含有大写也含小写，要全部转换为小写，批量转换。
+
+表结构相关的信息肯定是从information_schema中搞，sql语句如下：
+SELECT CONCAT(&#39;ALTER TABLE `&</div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="fa fa-clock-o fa-fw icon-date"></i>2016-10-21
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fa fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/mysql/" class="post-category" target="_blank">
+                                    mysql
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/mysql/" target="_blank">
+                        <span class="chip bg-color">mysql</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+</div>
+
+
+<script>
+    $('#articleContent').on('copy', function (e) {
+        // IE8 or earlier browser is 'undefined'
+        if (typeof window.getSelection === 'undefined') return;
+
+        var selection = window.getSelection();
+        // if the selection is short let's not annoy our users.
+        if (('' + selection).length < Number.parseInt('120')) {
+            return;
+        }
+
+        // create a div outside of the visible area and fill it with the selected text.
+        var bodyElement = document.getElementsByTagName('body')[0];
+        var newdiv = document.createElement('div');
+        newdiv.style.position = 'absolute';
+        newdiv.style.left = '-99999px';
+        bodyElement.appendChild(newdiv);
+        newdiv.appendChild(selection.getRangeAt(0).cloneContents());
+
+        // we need a <pre> tag workaround.
+        // otherwise the text inside "pre" loses all the line breaks!
+        if (selection.getRangeAt(0).commonAncestorContainer.nodeName === 'PRE') {
+            newdiv.innerHTML = "<pre>" + newdiv.innerHTML + "</pre>";
+        }
+
+        var url = document.location.href;
+        newdiv.innerHTML += '<br />'
+            + '来源: 顽逗<br />'
+            + '作者: 威少<br />'
+            + '链接: <a href="' + url + '">' + url + '</a><br />'
+            + '本文章著作权归作者所有，任何形式的转载都请注明出处。';
+
+        selection.selectAllChildren(newdiv);
+        window.setTimeout(function () {bodyElement.removeChild(newdiv);}, 200);
+    });
+</script>
+
+    </div>
+    <div class="col l3 hide-on-med-and-down">
+        <div class="toc-widget">
+            <div class="toc-title"><i class="fa fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            // headingsOffset: -205,
+            headingSelector: 'h1, h2, h3, h4, h5, h6'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h1, h2, h3, h4, h5, h6').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+    });
+</script>
+    
+
+</main>
+
+
+<footer class="page-footer bg-color">
+    <div class="container row center-align">
+        <div class="col s12 m8 l8 copy-right">
+            本站&copy;基于
+            <a href="https://hexo.io/" target="_blank">Hexo</a>的 
+            <a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">hexo-theme-matery</a>主题搭建.
+
+            
+
+            
+			
+                <br>
+                
+                <span id="busuanzi_container_site_pv">
+                    <i class="fa fa-heart-o"></i>
+                    本站总访问量 <span id="busuanzi_value_site_pv" class="white-color"></span>
+                </span>
+                
+                
+                <span id="busuanzi_container_site_uv">
+                    <i class="fa fa-users"></i>
+                    次,&nbsp;访客数 <span id="busuanzi_value_site_uv" class="white-color"></span> 人.
+                </span>
+                
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/wangwei10061" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fa fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:153692771@qq.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fa fa-envelope-open"></i>
+    </a>
+
+
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+<!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fa fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字" class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script src="/js/search.js"></script>
+<script type="text/javascript">
+$(function () {
+    searchFunc("/" + "search.xml", 'searchInput', 'searchResult');
+});
+</script>
+<!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fa fa-angle-up"></i>
+    </a>
+</div>
+
+
+<script src="/libs/materialize/materialize.min.js"></script>
+<script src="/libs/masonry/masonry.pkgd.min.js"></script>
+<script src="/libs/aos/aos.js"></script>
+<script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+<script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+<script src="/js/matery.js"></script>
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+
+    <script src="/libs/others/clicklove.js"></script>
+
+
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+
+
+</body>
+</html>

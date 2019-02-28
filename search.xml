@@ -1,0 +1,1217 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search> 
+  
+  
+    
+    <entry>
+      <title>并发：java并发机制的底层实现原理</title>
+      <link href="/2018/03/03/java/bing-fa-java-bing-fa-ji-zhi-de-di-ceng-shi-xian-yuan-li/"/>
+      <url>/2018/03/03/java/bing-fa-java-bing-fa-ji-zhi-de-di-ceng-shi-xian-yuan-li/</url>
+      
+        <content type="html"><![CDATA[<hr><p>对java并发编程的艺术一书第二章节对java并发机制底层原理的介绍的总结。</p><hr><h4 id="1-volatile关键字"><a href="#1-volatile关键字" class="headerlink" title="1.volatile关键字"></a>1.volatile关键字</h4><h5 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h5><p>volatile的中文含义为易变的，在java中，volatile变量是一种稍弱的同步机制，如果一个字段被声明成为volatile，java线程内存模型会确保所有线程在同一时刻看到的这个变量的值是一致的。  </p><h5 id="volatile保证可见性的原理"><a href="#volatile保证可见性的原理" class="headerlink" title="volatile保证可见性的原理"></a>volatile保证可见性的原理</h5><p>对volatile共享变量的写操作，执行时被转化成汇编指令，其中保证可见性的指令为lock指令，lock指令在多核处理器下会引发两件事情：<br>1） 将当前处理器缓存行的数据写回内存<br>2） 这个写回内存的操作会导致其他CPU里缓存了该内存地址的数据无效</p><h5 id="使用优化"><a href="#使用优化" class="headerlink" title="使用优化"></a>使用优化</h5><p>可以通过追加64字节来提升性能，因为许多处理器的高速缓存行都是64字节，不支持部分填充缓存行，所以如果多个处理器分别要访问的数据都被缓存到同一个缓存行，当一个处理器访问该缓存行时，会将整个缓存行锁定，那么在缓存一致性机制的作用下，将导致其他处理器不能访问该缓存行中的数据。<br>此方法只应该在缓存行为64字节的处理器，并且共享变量写入比较频繁的情况下使用。</p><h4 id="2-synchronized关键字"><a href="#2-synchronized关键字" class="headerlink" title="2.synchronized关键字"></a>2.synchronized关键字</h4><h5 id="基础"><a href="#基础" class="headerlink" title="基础"></a>基础</h5><p>java中的每一个对象都可以作为锁。具体表现为：  </p><ul><li>对于同步方法，锁是当前实例对象</li><li>对于静态同步方法，锁是当前类的Class对象</li><li>对于同步代码块，锁是synchronized括号中配置的对象  </li></ul><h5 id="实现原理"><a href="#实现原理" class="headerlink" title="实现原理"></a>实现原理</h5><p>JVM基于进入和退出Monitor对象来实现方法同步和代码块同步。任何对象都有一个Monitor对象跟它关联，当一个Monitor对象被持有后，它将处于锁定状态。代码块同步是通过monitorenter和monitorexit指令实现的，monitorenter是在编译后插入同步代码块的开始位置，而monitorexit指令是插入在同步代码块结束或者异常的位置的，每个monitorenter指令都有一个monitorexit指令和它对应。方法同步是用另一种方式实现的，细节JVM规范没有描述，但是也可以采用monitorenter和monitorexit的方式来实现。</p><h5 id="锁的存储位置与状态"><a href="#锁的存储位置与状态" class="headerlink" title="锁的存储位置与状态"></a>锁的存储位置与状态</h5><p>synchronized关键字所使用的锁是存储在java对象头（Mark Word）中的。锁一共有四种状态，级别从低到高依次是：无锁状态，偏向锁状态，轻量级锁状态，重量级锁状态，这几种状态会随着竞争逐渐升级，锁可以升级但是不可以降级，这样设计的目的，是为了提高获得和释放锁的效率。</p><h5 id="synchronized锁流程"><a href="#synchronized锁流程" class="headerlink" title="synchronized锁流程"></a>synchronized锁流程</h5><ol><li>检测Mark Word里边是不是当前线程的ID，如果是，表示当前线程处于偏向锁</li><li>如果不是，则使用CAS将当前线程的ID替换Mark Word，如果成功则表示当前线程获得偏向锁，置偏向标志位为1</li><li>如果失败，则说明存在竞争，撤销偏向锁，进而升级成为轻量级锁</li><li>在当前线程栈帧中创建用于存储锁记录的空间，并将对象头中的Mark Word复制到锁记录中，当前线程使用CAS将对象头的Mark Word替换为锁记录指针，如果成功，当前线程获得锁</li><li>如果失败，表示其他线程竞争锁，当前线程便尝试使用自旋来获取锁</li><li>如果自旋成功，则依然处于轻量级的状态</li><li>如果自旋失败，则升级成为重量级锁</li></ol><h4 id="原子操作"><a href="#原子操作" class="headerlink" title="原子操作"></a>原子操作</h4><h5 id="术语"><a href="#术语" class="headerlink" title="术语"></a>术语</h5><p>原子操作：指一个或者一系列不可中断的操作<br>CAS: compare and swap，操作需要两个值，新值和就值，在操作期间检测旧值是否发生变化，如果是，不替换，如果否，才替换旧值为新的值  </p><h5 id="CPU原子操作实现"><a href="#CPU原子操作实现" class="headerlink" title="CPU原子操作实现"></a>CPU原子操作实现</h5><ol><li>使用总线锁：使用处理器提供的一个lock#信号，当一个处理器在总线上输出此信号时，其他处理器的请求将被阻塞住，那么该处理器独占共享内存</li><li>使用缓存锁：缓存一致性机制会阻止同时修改由两个以上处理器缓存的内存区域数据，当其他处理器回写已经被锁定的缓存行的数据时，会使缓存行无效，从而其他处理器不能回写已经被锁定的缓存行，实现原子性<h5 id="java原子操作实现"><a href="#java原子操作实现" class="headerlink" title="java原子操作实现"></a>java原子操作实现</h5></li><li><p>CAS方法<br>利用处理器提供的COMPXCHG指令实现。自旋CAS的基本思路就是循环执行CAS操作直到成功为止。JDK并发包里的Atomic系列包正是基于CAS方式的实现。<br>CAS操作存在三大问题：<br>a. ABA问题：可能旧值是A，被修改成了B，然后又被修改成了A，这个时候CAS操作认为A是不曾被改过的，会更新为新值，对于ABA问题，可以采用增加版本号的方法来解决。<br>b. 循环时长开销大的问题：自旋CAS长时间不成功的情况下发生。<br>c. 只能保证一个变量的原子操作：解决这一问题，可以用锁，也可以将多个变量封装到一个变量中，如JDK并发包中的AtomicReference。</p></li><li><p>加锁的方法<br>锁机制保证了只有获得锁的线程才能够操作锁定的内存区域。但是除了偏向锁，JVM实现锁的方式都用了循环CAS，即当一个线程想进入同步块的时候使用循环CAS的方式获得锁，当它退出同步块的时候采用循环CAS释放锁。</p></li></ol>]]></content>
+      
+      
+      <categories>
+          
+          <category> JAVA </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> JAVA </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>获取shell异常输出信息</title>
+      <link href="/2017/03/28/linux/huo-qu-shell-yi-chang-shu-chu-xin-xi/"/>
+      <url>/2017/03/28/linux/huo-qu-shell-yi-chang-shu-chu-xin-xi/</url>
+      
+        <content type="html"><![CDATA[<hr><p>好一段时间不写博客了，今天实在是忍不住。一个shell命令的问题调了两天，一句代码，shell这个东西，不会真是急人</p><hr><p>现在在做的系统使用了jenkins的pipeline插件，需求需要在pipeline中做一些功能性的操作，比如运行一个JAVA类啊，读取一个文件啊之类的，现在考虑编译并运行一个JAVA类Hello.java，代码如下：  </p><pre><code class="java">public class Hello {  public static void main(String[] args) {    System.out.println(&quot;Hello&quot;);  }}</code></pre><p>既然是编译运行，那理所当然要能够返回的结果对吧。以编译为例，在pipeline中使用以下语句可以编译并运行Hello.java。<br><code>sh &#39;javac Hello.java &amp;&amp; java Hello&#39;</code><br>这不是很简单嘛，有何难的？但是你会发现，编译是被执行了，但你根本得不到编译执行的结果，我尝试用一个变量去接收它，<code>var javacResult = sh &#39;javac Hello.java &amp;&amp; java Hello&#39;</code>，人家给我返回的结果是null。顿时觉得这个设计好傻逼，怎么办呢，改变不了这个世界就改变自己吧。对于shell的理解，命令的执行结果是可以重定向到文件的，于是我把我的代码改成了下边这样：  </p><pre><code class="shell">sh &#39;javac Hello.java &gt; temp.txt &amp;&amp; java Hello &gt; temp.txt&#39;var javacResult = readFile &#39;temp.txt&#39;</code></pre><p>情况有所改观，javac编译通过，那么java Hello的运行结果理所当然是Hello，查看temp.txt的内容果然是Hello，似乎用一种愚蠢笨拙的方式解决了这个问题。<br>后来经意间在stackoverflow上看到了这么一种优雅的写法：  </p><pre><code>javacSourceResult = sh script: &#39;javac &#39; + className + &#39;.java&#39;, returnStdout: true</code></pre><p>这是官方提供的获取shell命令输出结果的方式，果然还是官方的方法好用。好用归好用，它还是没能解决我的需求。我是要调用shell命令去编译运行Java程序，期待它在编译运行出错之后也能够给我以反馈。但是令我失望的是官方提供的这种方式并没有做到这一点，读者可以自己尝试，当编译出错时，javacSourceResult的结果是类似于exit 1的信息，之所以是exit 1，是因为shell执行失败了，人家给它的错误码1给返回了。<br>更改Hello.java文件如下，</p><pre><code class="java">public class Hello {  public static void main(String[] args) {    .out.println(&quot;Hello&quot;);  }}</code></pre><p>这是jenkins的执行结果：<br><img src="/images/2017/03/jenkins-err.png" alt="jenkins_err"><br>可以看到jenkins成功地执行了javac进行编译，并且成功的将错误信息打印在了控制台，我不知道为什么我用变量接收的时候不给我设计成接收shell命令的错误信息，万般不得解。<br>没办法，现在水平还不够，不能去改他的源码，再找找其他路子吧，pipeline支持groovy的语法，考虑了用groovy去调用shell，但是得到的效果也不理想，结果依然是null。<br>最终在google上泡了一天，综合了SO上好几位高人的回答，还是把之前那个笨拙的方法做了一下改进：  </p><pre><code class="shell">node() {    sh script: &#39;echo &quot;$(javac Hello.java 2&gt;&amp;1)&quot; &gt; temp.txt&#39;}</code></pre><p>对上面这句命令进行一下解释，2&gt;&amp;1的意思是将错误流的内容合并到输出流，具体解释如下：<br><img src="/images/2017/03/2-1.png" alt="2&gt;&amp;1"><br>运行效果：<br><img src="/images/2017/03/效果.png" alt="效果"><br>尽管不怎么欣赏使用临时文件这种方式，但是至少解决了问题，暂时先用着，在用的过程中看能不能找到更好的方法。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> linux </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> shell </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Jenkins + Gitlab CI环境搭建</title>
+      <link href="/2017/02/21/git/jenkins-gitlab-ci-huan-jing-da-jian/"/>
+      <url>/2017/02/21/git/jenkins-gitlab-ci-huan-jing-da-jian/</url>
+      
+        <content type="html"><![CDATA[<hr><p>本科毕业设计基于jenkins+gitlab持续集成环境，配置时候踩过不少坑，整理一下搭建过程。</p><hr><h5 id="1-安装配置jenkins"><a href="#1-安装配置jenkins" class="headerlink" title="1. 安装配置jenkins"></a>1. 安装配置jenkins</h5><p>参照<a href="https://wiki.jenkins-ci.org/display/JENKINS/Installing+Jenkins+on+Ubuntu" target="_blank" rel="noopener">官网wiki</a>：</p><blockquote><p>wget -q -O - <a href="https://pkg.jenkins.io/debian/jenkins-ci.org.key" target="_blank" rel="noopener">https://pkg.jenkins.io/debian/jenkins-ci.org.key</a> | sudo apt-key add -<br>sudo sh -c ‘echo deb <a href="http://pkg.jenkins.io/debian-stable" target="_blank" rel="noopener">http://pkg.jenkins.io/debian-stable</a> binary/ &gt; /etc/apt/sources.list.d/jenkins.list’<br>sudo apt-get update<br>sudo apt-get install jenkins  </p></blockquote><p>安装后的jenkin在/var/lib/jenkins<br>启动关闭jenkins:  </p><blockquote><p>sudo /etc/init.d/jenkins start<br>sudo /etc/init.d/jenkins stop  </p></blockquote><p>Jenkins安装完毕后，可以通过浏览器，例如192.168.16.183:8080，此处IP地址为Jenkins所在机器的IP地址。 这时候可能会卡在Setup<br>Wizard这个页面，原因是它要测试是否能与Google连通来判断网络是否连通，翻一下墙就好了。<br>按照提示一步一步走到dashboard界面。  </p><p>Jenkins安装好之后，需要为其安装gitlab插件:<br>在主面板上点击Manage Jenkins -&gt; Manage Plugins，选择安装Gitlab Plugin和Gitlab Hook Plugin。</p><h5 id="2-搭建gitlab源码服务器"><a href="#2-搭建gitlab源码服务器" class="headerlink" title="2. 搭建gitlab源码服务器"></a>2. 搭建gitlab源码服务器</h5><p>直接从官网下载gitlab的deb包已经下载不下来了，阿里云和网易的源也没有gitlab的源，现在我所找到的源只有<a href="https://mirror.tuna.tsinghua.edu.cn/help/gitlab-ce/" target="_blank" rel="noopener">清华</a>的镜像<br>首先信任 GitLab 的 GPG 公钥:  </p><blockquote><p>curl <a href="https://packages.gitlab.com/gpg.key" target="_blank" rel="noopener">https://packages.gitlab.com/gpg.key</a> 2&gt; /dev/null | sudo apt-key add - &amp;&gt;/dev/null  </p></blockquote><p>然后将清华源写入/etc/apt/sources.list.d/gitlab-ce.list，内容为：  </p><blockquote><p>deb <a href="https://mirrors.tuna.tsinghua.edu.cn/gitlab-ce/ubuntu" target="_blank" rel="noopener">https://mirrors.tuna.tsinghua.edu.cn/gitlab-ce/ubuntu</a> xenial main  </p></blockquote><p>接下来就能使用清华的源安装gitlab了  </p><blockquote><p>sudo apt-get update<br>sudo apt-get install curl openssh-server ca-certificates postfix<br>sudo apt-get install gitlab-ce</p></blockquote><p>安装完之后默认是只能本机通过localhost访问的，修改</p><blockquote><p>external_url ‘<a href="http://your" target="_blank" rel="noopener">http://your</a> ip:8080’<br>nginx[‘listen_addresses’] = [‘your ip’]<br>nginx[‘listen_port’] = 8080  </p></blockquote><p>修改之后保存，并执行如下命令让配置生效</p><blockquote><p>sudo gitlab-ctl reconfigure  </p></blockquote><h5 id="3-jenkins与gitlab集成"><a href="#3-jenkins与gitlab集成" class="headerlink" title="3. jenkins与gitlab集成"></a>3. jenkins与gitlab集成</h5><ol><li><p>配置SSH key<br>由于jenkins需要从gitlab上拉取代码，通过ssh方式。所以需要在jenkins机器上安装git，并且将jenkins机器上生成的ssh密钥<br>的公钥（id_rsa.pub中的内容）添加到gitlab的ssh keys中：  </p><ul><li><p>在jenkins安装机器上安装git</p><blockquote><p>sudo apt-get install git  </p></blockquote></li><li><p>配置username和Email，生成ssh密钥  </p><blockquote><p>git config –global user.name “your name”<br>git config –global user.email “your email”<br>ssh-keygen -t rsa -C “<a href="mailto:10010@gmail.com" target="_blank" rel="noopener">10010@gmail.com</a>”  </p></blockquote></li><li><p>拷贝公钥内容填到gitlab服务器<br><img src="/images/2017/02/ssh-pub.png" alt="ssh pub">  </p></li></ul></li><li><p>配置GitLab connections<br>连接到gitlab拉取代码使用，配置证书，使用gitlab api token。<br>token从gitlab中获取，在个人设置中有Access Token一栏，<br>创建一个token，填入jenkins的系统管理 -&gt; 系统设置 -&gt; gitlab配置中。<br><img src="/images/2017/02/token.png" alt="token"><br><img src="/images/2017/02/jenkins-gitlab.png" alt="jenkins gitlab"><br>Test Connection，显示success则表示配置成功。  </p></li></ol><h5 id="4-测试集成环境"><a href="#4-测试集成环境" class="headerlink" title="4. 测试集成环境"></a>4. 测试集成环境</h5><p>新建一个项目，源码管理选git，填入对应的仓库URL，配置    Credentials，<br>这里可以选择用ssh username with private key（其他的我也没试成功过。。），输入用户名和对应的私钥即可<br><img src="/images/2017/02/源码管理.png" alt="源码管理"><br>接下来构建触发器选择Build when a change is pushed to GitLab. GitLab CI Service URL: …<br><img src="/images/2017/02/构建触发器.png" alt="构建触发器"><br>注意： 由于我们的jenkins任务由webhook事件来通知，所以需要将上面的CI<br>service URL添加到gitlab对应项目的Integrations配置中。<br><img src="/images/2017/02/integrations配置.png" alt="Integrations配置"><br>配置完之后apply，保存。jenkins任务就新建完成了<br>此时我们在本地push代码到gitlab服务器，可以看到：<br>成功地触发一次jenkins构建，效果如下：<br><img src="/images/2017/02/jenkins-build.png" alt="jenkins build">  </p><p>至此jenkins+gitlab持续集成环境搭建完成！</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> git </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> git </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>mysql实现两列共同唯一</title>
+      <link href="/2016/12/05/mysql/mysql-shi-xian-liang-lie-gong-tong-wei-yi/"/>
+      <url>/2016/12/05/mysql/mysql-shi-xian-liang-lie-gong-tong-wei-yi/</url>
+      
+        <content type="html"><![CDATA[<hr><p>通过数据库的操作保证两个列的数据共同唯一，也就是说A列中的元素唯一，B列中的元素唯一，并且A中的元素不能出现在B中</p><hr><p>第一想法是通过check约束来实现，但是尝试了一下发现check约束局限于对单独的列进行操作。<br>后来几经周折采用了触发器：<br>测试表的信息：  </p><pre><code class="sql">    CREATE TABLE `test` (      `A` varchar(255) DEFAULT NULL,      `B` varchar(255) DEFAULT NULL    ) ENGINE=InnoDB DEFAULT CHARSET=utf8</code></pre><p>创建触发器的语句：</p><pre><code class="sql">    delimiter |    CREATE TRIGGER unique_AB BEFORE INSERT ON test      FOR EACH ROW      BEGIN             DECLARE msg varchar(200);           DECLARE flag int;         set flag = (select count(*) from test where A = new.A or B = new.A or A = new.B or B = new.B);         IF flag &gt; 0 THEN            set msg = &quot;column duplicate!!!&quot;;                  SIGNAL SQLSTATE &#39;45000&#39; SET MESSAGE_TEXT = msg;           END IF;      END;    |</code></pre><p>解释：<br>创建了一个before insert 触发器，<code>select count(*) from test where A = new.A or B = new.A or A = new.B or B = new.B</code>这条语句从数据库中查找当前的A或B是否曾经出现，<code>SIGNAL SQLSTATE &#39;45000&#39; SET MESSAGE_TEXT = msg;</code>这条语句创建了一个“unhandled user-defined exception.”，所以当当前A或B曾经出现在表中时，新的插入会报一个column duplicate!!!的错误。关于sql中如何抛出一个异常参考：<a href="https://dev.mysql.com/doc/refman/5.5/en/signal.html#signal-effects" target="_blank" rel="noopener">mysql官方文档</a><br>运行结果：<br><img src="/images/2016/11/insert.png" alt="insert"></p><p>说这个问题的应用场景在哪呢？<br>我当时是公司在看一个培训视频的时候，有这么一个设计，我们讨论到了这个问题：<br><img src="/images/2016/11/登录名编码唯一.png" alt="登录名编码唯一"><br>这里的登录名是用户自己指定的，编码是系统指定的，但是他们都可以在用户登录的时候作为用户名使用，所以要求共同唯一。</p><p>还有一个实例，stackoverflow上有这么一个问题：  </p><blockquote><p>I have two fields, email and new_email. When someone changes their email address, I store it into the new_email field until the accept the change. Since email is unique because it’s used as their login, I HAVE to ensure that the email is unique across both fields.</p></blockquote><pre><code>Table: usersid   name   email          new_email102  foo    foo@mail.com   foo2@mail.com103  bar    bar@mail.com   bar2@mail.com104  baz    baz@mail.com   NULL</code></pre>]]></content>
+      
+      
+      <categories>
+          
+          <category> mysql </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> mysql </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>css总结</title>
+      <link href="/2016/11/20/web/css-zong-jie/"/>
+      <url>/2016/11/20/web/css-zong-jie/</url>
+      
+        <content type="html"><![CDATA[<hr><p>做网站也有三年的时间了，之前总是对前台的东西不屑一顾，现在在一个小公司实习，一切都得自己一手来了，补了下前端的东西。</p><hr><h4 id="CSS的基本语法"><a href="#CSS的基本语法" class="headerlink" title="CSS的基本语法"></a>CSS的基本语法</h4><p>CSS的语法格式如下：<br>selector + property + value  </p><ol><li><p>selector<br>selector指你所要加样式的元素，分为四种选择器：  </p><ul><li>标签选择器</li><li>id选择器 (#选)</li><li>class选择器 (.选)</li><li>属性选择器 ([])<br>此外还有几个相关的概念：  <ol><li>派生选择器</li><li>子元素选择器</li><li>相邻兄弟选择器</li></ol></li></ul></li><li><p>属性与值<br>诸如color，background之类的你所需要指定的元素的样式项称之为属性，他们的值就相应的称之为值，属性与值之间使用:分割，属性值对（我们呢称之为声明（description））之间使用;进行分隔。  </p></li></ol><h4 id="CSS的引用方式"><a href="#CSS的引用方式" class="headerlink" title="CSS的引用方式"></a>CSS的引用方式</h4><ul><li>行内嵌</li><li>文档内定义</li><li><p>文档外定义  </p><p>文档外定义的css引入到HTML文档有四种方式</p><ul><li>import</li><li>link</li><li>还有两种我不用，不写</li></ul></li></ul>]]></content>
+      
+      
+      <categories>
+          
+          <category> web </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> css </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>虚拟机：class文件的结构</title>
+      <link href="/2016/10/31/java/xu-ni-ji-class-wen-jian-de-jie-gou/"/>
+      <url>/2016/10/31/java/xu-ni-ji-class-wen-jian-de-jie-gou/</url>
+      
+        <content type="html"><![CDATA[<hr><p>介绍了class文件的结构，摘自周志明老师的《深入理解Java虚拟机：JVM高级特性与最佳实践(第2版)》</p><hr><h5 id="一、概述"><a href="#一、概述" class="headerlink" title="一、概述"></a>一、概述</h5><p>Class文件是一组以字节（8bit）为基础单位的二进制流，各个数据项目严格按照顺序紧凑地排列在Class文件之中，当数据项需要占用一个以上字节的空间时，按照Big-Endian(高位字节在地址最低位)的顺序来存储。  </p><p>Class文件格式采用一种类似于C语言结构体的伪结构来存储数据，这种伪结构只有两种数据类型：无符号数和表。</p><p>无符号数属于基本的数据类型，以u1，u2，u4，u8来分别代表1，2，4，8个字节的无符号数，无符号数可以用来描述数字，索引引用，数量值和按照UTF-8编码构成的字符串值。  </p><p>表是由多个无符号数或者其他表作为数据项构成的复合数据类型，所有表都习惯性地以“_info”结尾。表用于描述有层次关系的复合结构的数据。</p><h5 id="二、Class文件的结构"><a href="#二、Class文件的结构" class="headerlink" title="二、Class文件的结构"></a>二、Class文件的结构</h5><ol><li>整个Class文件本质上就是一张表。Class表的数据项如下<br><img src="/images/2016/10/class1.png" alt="class1">  </li><li><p>魔数（magic）与Class文件的版本（minor_version，major_version）<br>每个Class文件的头四个字节称之为魔数，用于确定一个文件是否为能被虚拟机接受的class文件，Class文件的魔数为：0xCAFEBABE。<br>接下来四个字节为Class文件的版本号，其中两个字节的次版本号（minor_version），两个字节的主版本号（major_version），JDK1.1（主版本号为45）之后的每个JDK大版本号发布主版本号向上加1，高版本的JDK能向下兼容以前版本的Class文件，而不能向上兼容。如JDK1.7版本可生成的Class文件主版本号的最大值为51，能支持45.0~51.65535的Class文件。</p></li><li><p>常量池<br>紧跟在主版本号之后的是常量池入口，常量池可以理解为Class文件中的资源仓库，它是Class文件结构中与其他项目关联最多的数据类型，也是占用Class文件空间最大的项目之一，是一个表类型的数据项目。<br>由于常量池中的常量数量不是固定的，所以在常量池的入口需要放置一项u2类型的常量池容量计数值（constant_pool_count），这里有一点需要注意的是这个计数器是从1开始而不是从0开始的，计数器值为0用来表达某些指向常量池的索引不需要引用任何一个常量值项目的含义。<br>常量池中主要存放两大类的变量：字面量和符号引用。字面量比较接近于Java语言层面的常量概念，如文本字符串、声明为final的常量值等，而符号引用则包括以下三类常量：</p><ul><li>类和接口的全限定名</li><li>字段的名称与描述符</li><li>方法的名称与描述符<br>常量池是一个表类型的数据项目，常量池中的每一个常量也是一个表类型的数据项目。一共有14中类型的常量，它们有一个共同的特点，就是表开始的第一位是一个u1类型的标志位，代表当前这个常量属于哪种常量类型。这些常量的具体类型如下：<br><img src="/images/2016/10/class2.png" alt><br>常量池是一个非常繁琐的表，因为它其中的每一个数据项目还是一个表，还分别有自己的结构，比如标志为0x07的CONSTANT_Class_info常量，它身的结构为：<br><img src="/images/2016/10/class3.png" alt><br>其中Tag为标志位，name_index是一个索引值，它指向常量池中一个CONSTANT_Utf-8_info类型常量，此常量代表了这个类（或接口）的全限定名。而对于CONSTANT_Utf-8_info类型常量的结构定义如下：<br><img src="/images/2016/10/class4.png" alt><br>length值说明这个UTF-8编码的字符串长度是多少字节，紧跟着的是长度为length字节的用UTF-8缩略编码表示的字符串。<br>以上只是常量池中的两种常量类型，下面列出常量池中所有常量类型的具体结构如下：<br><img src="/images/2016/10/class5.png" alt><br><img src="/images/2016/10/class6.png" alt><br><img src="/images/2016/10/class7.png" alt>  </li></ul></li><li><p>访问标志<br>在常量池结束之后，紧接着的两个字节代表访问标志，这个标志用于识别一些类或者是接口层次的访问信息，包括：这个Class是类还是接口，是否定义为public类型，是否定义为abstract类型，如果是类的话，是否声明为final等，具体如下：<br><img src="/images/2016/10/class8.png" alt>  </p></li><li><p>类索引，父类索引与接口索引集合<br>接下来是类索引，父类索引与接口索引集合的信息。类索引和父类索引都是一个u2类型的数据，而接口索引是一组u2类型数据的集合，Class文件由这三项数据来确定这个类的继承关系。类索引用于确定这个类的全限定名，父类索引用于确定父类的全限定名。除了Object类外，所有的Java类的父类索引都不为0。接口索引集合用来描述这个类实现了哪些接口，这些被实现的接口按照implements语句（如果这个类本身是一个接口，则应当是extends语句）后的接口顺序从左到右排列在接口索引集合中。<br>类索引和父类索引都是u2类型的索引值，各自指向一个类型为CONSTANT_Class_info的类描述符常量，通过CONSTANT_Class_info类型的常量中的索引值找到定义在CONSTANT_Utf8_info类型的常量中的全限定名称字符串。<br>而对于接口索引集合，由于允许实现（继承）多个接口，所以需要一个u2类型的接口计数器（interfaces_count）。</p></li><li><p>字段表集合<br>字段表（field_info）用于描述接口或者类中声明的变量。字段包括类变量和实例变量，但是不包括在方法内部声明的局部变量。我们可以回忆一下，Java中描述一个字段可以包含哪些信息？可以包括的信息有：<br>字段的作用域（public、private、protected修饰符）、是实例变量还是类变量（static修饰符）、可变性（final）、并发可见性（volatile修饰符）、是否可被序列化（transient修饰符）、字段数据类型（基本类型，引用类型）、字段名称。上述信息中，各个修饰符是布尔值，可以用标志位来表示，而字段叫什么名字、字段被定义为什么数据类型，这些都是无法固定的，只能引用常量池中的常量来描述。字段表的格式如下：<br><img src="/images/2016/10/class9.png" alt><br>字段修饰符放在access_flags项目中，它与类中的access_flags项目是非常类似的，具体标志位及含义如下：<br><img src="/images/2016/10/class10.png" alt><br>name_index和descriptor_index是两项索引值，分别代表字段的简单名称以及字段的描述符。简单名称不解释了，就是一个字符串常量，描述符的作用是用来描述字段的数据类型。根据描述符规则，基本数据类型用一个大写字符来表示，而对象类型则用字符L加上对象的全限定名来表示，对于数组类型，每一维度使用一个前置的“[”字符来描述，如String[][]的二维数组，将被记录为“[[Ljava/lang/String”。详见下表：<br><img src="/images/2016/10/class11.png" alt><br>字段表都包含的固定数据是以上几项，而对于某些字段可能还会有一些额外的信息需要储存（比如”final static int m = 123;“，就会需要一个ConstantValue属性，值指向123），这是属性表attributes要表达的内容。  </p></li><li><p>方法表集合<br>Class文件存储格式对方法的描述与对字段的描述几乎采用了完全一直的方式，方法表的结构如下：<br><img src="/images/2016/10/class12.png" alt><br>可以修饰方法的关键字与可以修饰字段的关键字有所区别，方法表中的access_flags标志位取值及含义如下：<br><img src="/images/2016/10/class13.png" alt><br>那么，问题来了，方法的定义可以通过访问标志、名称索引、描述符索引表达清楚，但是方法里边的代码去哪里了呢？这正是属性表attributes的作用，方法里的Java代码，经过编译器编译成字节码指令后，存放在方法属性表集合中一个名为“Code”的属性里边。在方法表和字段表中不会出现父类中的方法（没有重写的情况下）和字段，但是，有可能出现由编译器添加的方法和字段，如<clinit>方法和内部类中的外部类的引用字段。</clinit></p></li><li><p>属性表集合<br>现在，有必要讲一讲在Class文件，字段表和方法表中均有出现的属性表集合了，属性表集合用于描述某些场景专有的信息。<br>属性表集合与Class文件中其他的数据项目不一样，不要求严格的顺序。在《Java虚拟机规范（Java SE 7）》版中，预定义属性有21项，具体内容如下：<br><img src="/images/2016/10/class14.png" alt><br><img src="/images/2016/10/class15.png" alt><br><img src="/images/2016/10/class16.png" alt><br>对于每一个属性，它的名称需要从常量池中引用一个CONSTANT_Utf8_info类型的常量来表示，而属性值的结构则是完全自定义的，只需要通过一个u4的长度属性说明属性值所占用的位数即可。<br>属性表的结构如下：<br><img src="/images/2016/10/class17.png" alt><br>取部分属性说明如下：</p><ul><li>Code属性<br>Java程序方法体中的代码经过Javac编译器处理之后，最终变为字节码指令存储在Code属性内。不是所有的方法都有这个属性，如抽象方法。Code属性的表结构如下：<br><img src="/images/2016/10/class18.png" alt>  </li><li>Exceptions属性<br>Exceptions属性的作用是列举出方法中可能抛出的必检异常，也就是方法描述时在throws关键字后面列举的异常。结构如下：<br><img src="/images/2016/10/class19.png" alt>  </li><li>LineNumberTable属性<br>LineNumberTable属性用于描述Java源码行号与字节码行号（字节码的偏移量）之间的对应关系。结构如下：<br><img src="/images/2016/10/class20.png" alt><br>其中line_number_info表包括了start_pc和line_number两个u2类型的数据项，前者是字节码行号，后者是Java源代码。  </li><li>LocalVariableTable属性<br>LocalVariableTable属性用于描述栈帧中局部变量表中的变量与Java源码中定义的变量之间的关系。结构如下：<br><img src="/images/2016/10/class21.png" alt><br>其中，local_variable_info的结构如下：<br><img src="/images/2016/10/class22.png" alt>  </li><li>SourceFile属性<br>SourceFile属性用于记录生成这个Class文件的源码文件的名称。<br><img src="/images/2016/10/class23.png" alt><br>sourcefile_index属性指向常量池中的一个CONSTANT_Utf8_info常量。</li><li>ConstantValue属性<br>ConstantValue属性的作用是通知虚拟机自动为静态变量赋值，是类变量才有的属性。对于实例变量的赋值是在实例构造器<init>方法中进行的，而对于类变量，则有两种方式可以选择：在类构造器<clinit>方法中或使用ConstantValue属性。目前Sun Javac编译器的选择是：如果同时使用final和static来修饰一个变量，并且这个变量的数据类型是基本类型或者java.lang.String类型的话，就生成ConstantValue属性进行初始化，否则将会选择在<clinit>方法中进行初始化。ConstantValue属性的表结构如下：<br><img src="/images/2016/10/class25.png" alt></clinit></clinit></init></li></ul></li></ol>]]></content>
+      
+      
+      <categories>
+          
+          <category> JAVA </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> JAVA </tag>
+            
+            <tag> 虚拟机 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>语法：IO</title>
+      <link href="/2016/10/31/java/yu-fa-io/"/>
+      <url>/2016/10/31/java/yu-fa-io/</url>
+      
+        <content type="html"><![CDATA[<hr><p>IO流是一个重要的概念，它用于处理数据之间的传输。</p><hr><h5 id="分类"><a href="#分类" class="headerlink" title="分类"></a>分类</h5><ul><li>按操作数据分：字节流，字符流（字符流基于字节流而出现，只是对字节流加以特定的编码方式）</li><li>按流向分：输入流，输出流</li></ul><h5 id="基类"><a href="#基类" class="headerlink" title="基类"></a>基类</h5><ul><li>字节流：InputStream ， OutputStream</li><li>字符流： Reader ， Writer</li></ul><p>这四个基类都是抽象的，它们派生出来的子类的类名均以对应的父类为后缀<br>如：FileInputStream ， FileReader (前缀指示功能)</p><h5 id="demo"><a href="#demo" class="headerlink" title="demo"></a>demo</h5><ul><li>字符流<ul><li>writer  </li></ul></li></ul><pre><code class="java">package io;import java.io.*;/** * Created by wangw on 2016/1/27. 演示字符流中的FileWriter的用法 */class FileWriterDemo {    public static void main(String[] args) throws IOException {        // 在创建FileWriter对象时就必须明确它要操作的文件        // 若目标目录下存在同名的文件，将覆盖该文件        FileWriter fw = new FileWriter(&quot;demo.txt&quot;);        // 在文件末尾添加数据，不覆盖源文件        // FileWriter fw = new FileWriter(&quot;demo.txt&quot;,true);        // 向流中写入数据        fw.write(&quot;haha&quot;);        // 将流中数据刷入指定文件中        fw.flush();        // fw.write(&quot; i \nds sd &quot;); //？\n不起作用，因为在Windows中换行用\r\n表示        fw.write(&quot; i \r \nds sd &quot;);        // 关闭流。 在流关闭之前会调用一次flush()方法将流中数据写入指定文件        fw.close();    }}</code></pre><ul><li>Reader</li></ul><pre><code class="java">package io;import java.io.*;/** * Created by wangw on 2016/1/27. */class FileReaderDemo {    public static void main(String[] args) throws IOException {        // 建立一个FileReader对象读取指定文件中的内容        FileReader fr = new FileReader(&quot;demo.wangwei&quot;);        int num = 0;        /*         * //每次读取一个字符，以int值形式返回 while((num = fr.read())!=-1) {         * System.out.print((char)num); }         */        // 每次读取的值存在一个字符数组中        char[] buf = new char[1024];        while ((num = fr.read(buf)) != -1) {            System.out.print(new String(buf, 0, num));        }        fr.close();    }}</code></pre><ul><li>字节流</li></ul><pre><code class="java">package io;import java.io.FileInputStream;import java.io.FileOutputStream;import java.io.IOException;/** * 字节流用法的简单演示 Created by wangw on 2016/2/2. */public class InputOutputStreamDemo {    public static void main(String[] args) throws IOException {        outputStreamWrite();        inputStreamRead_1();        inputStreamRead_2();        inputStreamRead_3();    }    // FileOutputStream写一个文件    public static void outputStreamWrite() throws IOException {        FileOutputStream fos = new FileOutputStream(&quot;fos.txt&quot;);        fos.write(&quot;haha&quot;.getBytes());        // 此处不需要flush，因为直接操作的字节数据，没有缓冲        fos.close();    }    // FileInputStream读一个文件    public static void inputStreamRead_1() throws IOException {        FileInputStream fis = new FileInputStream(&quot;fos.txt&quot;);        int num = 0;        while ((num = fis.read()) != -1) {            System.out.println((char) num);        }        fis.close();    }    public static void inputStreamRead_2() throws IOException {        FileInputStream fis = new FileInputStream(&quot;fos.txt&quot;);        byte[] buf = new byte[1024];        int len = 0;        while ((len = fis.read(buf)) != -1) {            System.out.println(new String(buf, 0, len));        }        fis.close();    }    public static void inputStreamRead_3() throws IOException {        FileInputStream fis = new FileInputStream(&quot;fos.txt&quot;);        // 字节流特有的方法，返回剩余的字节数        byte[] buf = new byte[fis.available()];        fis.read(buf);        System.out.println(new String(buf));        fis.close();    }}</code></pre><h5 id="处理IO异常"><a href="#处理IO异常" class="headerlink" title="处理IO异常"></a>处理IO异常</h5><ol><li>try catch处理，并最终释放空间，在释放空间时同样try catch 捕获异常</li><li>try catch代码块外部建立引用</li><li>关闭之前判断fw是否为空</li></ol><pre><code class="java">import java.io.*;class FileWriterDemo2 {    public static void main(String[] args) {        // try catch代码块外部建立引用        FileWriter fw = null;        try {            // 引用与创建的对象进行绑定            fw = new FileWriter(&quot;demo.wangwei&quot;);            fw.write(&quot;hahaha&quot;);        } catch (IOException e) {            System.out.println(e.toString());        } finally {            try {                // 判断fw是否为空                if (fw != null)                    fw.close();            } catch (IOException e) {                System.out.println(e.toString());            }        }    }}</code></pre><h5 id="文件缓冲"><a href="#文件缓冲" class="headerlink" title="文件缓冲"></a>文件缓冲</h5><p>为了便于对数据的高效操作，Java为我们提供了四个缓冲类，BufferedReader，BufferedWriter，BufferedInputStream，BufferedOutputStream，这四个类在进行操作时，它的底层实现实际还是被封装的流的操作，只是封装后操作更方便，这里用到了装饰设计模式的思想。  </p><p>其中BufferedReader提供了一个readLine()方法，便于按行读取文件，BufferedWriter提供了一个newLine()方法，便于写入一个行分隔符，示例程序如下：</p><ul><li>缓存字符流  </li></ul><pre><code class="java">package io;import java.io.*;/** * Created by wangw on 2016/1/27. 文件复制，加入了缓冲区机制 */public class BufferedFileCopy {    public static void main(String[] args) {        copy(&quot;BufferedFileCopy.java&quot;,                &quot;BufferedFileCopy.txt&quot;);    }    /**     * 拷贝文件     *     * @param sourcePath     *            源文件的路径，按windows的路径格式     * @param destination     *            目的地址，按windows的路径格式     */    public static void copy(String sourcePath, String destination) {        BufferedWriter bw = null;        BufferedReader br = null;        try {            // 建立缓冲区，与相应的输入输出流相绑定            bw = new BufferedWriter(new FileWriter(destination));            br = new BufferedReader(new FileReader(sourcePath));            // 循环按行读取数据            String line = null;            while ((line = br.readLine()) != null) {                bw.write(line);                bw.newLine();                bw.flush();            }        } catch (IOException e) {            throw new RuntimeException(&quot;复制异常&quot;);        } finally {            if (br == null)                try {                    br.close();                } catch (IOException e) {                    throw new RuntimeException(&quot;复制异常&quot;);                }            if (bw == null)                try {                    bw.close();                } catch (IOException e) {                    throw new RuntimeException(&quot;复制异常&quot;);                }        }    }}</code></pre><ul><li>缓存字节流  </li></ul><pre><code class="java">package io;import java.io.*;/** * 复制一个mp3文件 Created by wangw on 2016/2/2. */public class CopyMp3 {    public static void main(String[] args) throws IOException {        plainCopyMethod();        bufferedCopyMethod();    }    // 用Buffered对象操作    public static void bufferedCopyMethod() throws IOException {        BufferedInputStream bis = new BufferedInputStream(new FileInputStream(&quot;BEYOND - 喜欢你.mp3&quot;));        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(&quot;喜欢你_副本2.mp3&quot;));        int num = 0;        while ((num = bis.read()) != -1) {            bos.write(num);        }        bis.close();        bos.close();    }    // 没有用到BufferedInputStream，BufferedOutputStream包装类    public static void plainCopyMethod() {        FileInputStream fis = null;        FileOutputStream fos = null;        try {            fis = new FileInputStream(&quot;BEYOND - 喜欢你.mp3&quot;);            fos = new FileOutputStream(&quot;喜欢你_副本.mp3&quot;);            byte[] buf = new byte[1024];            int len = 0;            while ((len = fis.read(buf)) != -1) {                fos.write(buf, 0, len);            }        } catch (IOException e) {            // e.printStackTrace();            throw new RuntimeException(&quot;复制出错&quot;);        } finally {            if (fis != null)                try {                    fis.close();                } catch (IOException e) {                    e.printStackTrace();                }            if (fos != null)                try {                    fos.close();                } catch (IOException e) {                    e.printStackTrace();                }        }    }}</code></pre>]]></content>
+      
+      
+      <categories>
+          
+          <category> JAVA </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> JAVA </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>语法：GUI</title>
+      <link href="/2016/10/31/java/yu-fa-gui/"/>
+      <url>/2016/10/31/java/yu-fa-gui/</url>
+      
+        <content type="html"><![CDATA[<hr><p>JAVA GUI应用得不多了，从笔记中翻到了，也搬运过来罢。</p><hr><h5 id="系统概览"><a href="#系统概览" class="headerlink" title="系统概览"></a>系统概览</h5><p><img src="/images/2016/10/QQ截图20141208160732.png" alt>  </p><h5 id="布局管理器"><a href="#布局管理器" class="headerlink" title="布局管理器"></a>布局管理器</h5><p><img src="/images/2016/10/QQ截图20141208161621.png" alt>  </p><h5 id="创建图形化用户界面的步骤"><a href="#创建图形化用户界面的步骤" class="headerlink" title="创建图形化用户界面的步骤"></a>创建图形化用户界面的步骤</h5><ol><li>创建Frame对象</li><li>对窗体进行基本的设置：大小，位置等</li><li>定义组件</li><li>将组件add到窗体中</li><li>设置窗体为可见</li></ol><h5 id="用事件监听机制实现对应的功能"><a href="#用事件监听机制实现对应的功能" class="headerlink" title="用事件监听机制实现对应的功能"></a>用事件监听机制实现对应的功能</h5><ul><li>事件监听基本概念  <ul><li>事件源：awt或swing包中的组件</li><li>事件：每一个事件都有自己的对应事件和公共事件</li><li>监听器：某一事件对应的监听器封装了该事件可以触发的动作</li><li>事件处理：具体的处理需要我们来实现</li></ul></li><li><p>步骤<br><img src="/images/2016/10/QQ截图20141208171130.png" alt></p></li><li><p>注意<br>平常开发将图形界面与事件处理分离开来，以提高代码的可读性，<br>也使程序后期的修改维护更简单</p></li><li><p>例程</p></li></ul><pre><code class="java">import java.awt.*;import java.awt.event.*;//将图形用户界面和事件的处理分离开来public class SeparatedAwtListener {    // 建立引用    private Frame f;    private Button b;    private TextField tf;    SeparatedAwtListener() {        init();    }    // 初始化：    public void init() {        // 界面        f = new Frame(&quot;my frame&quot;);        f.setBounds(200, 300, 500, 400);        b = new Button(&quot;退出&quot;);        f.add(b);        tf = new TextField(20);        f.add(tf);        f.setLayout(new FlowLayout());        f.setVisible(true);        myEvent();    }    // 事件监听    public void myEvent() {        // 窗口事件        f.addWindowListener(new WindowAdapter() {            @Override            public void windowClosing(WindowEvent e) {                System.exit(0);            }        });        // 动作事件        b.addActionListener(new ActionListener() {            @Override            public void actionPerformed(ActionEvent e) {                System.out.println(&quot;Action&quot;);            }        });        // 鼠标事件        b.addMouseListener(new MouseAdapter() {            @Override            public void mouseClicked(MouseEvent e) {                System.out.println(&quot;点击&quot;);            }        });        // 键盘事件        b.addKeyListener(new KeyAdapter() {            public void keyPressed(KeyEvent e) {                if (e.isControlDown() &amp;&amp; e.getKeyCode() == KeyEvent.VK_ENTER) {                    System.exit(0);                }            }        });        tf.addKeyListener(new KeyAdapter() {            public void keyPressed(KeyEvent e) {                if (!(e.getKeyCode() &gt;= KeyEvent.VK_0 &amp;&amp; e.getKeyCode() &lt;= KeyEvent.VK_9))                    e.consume();            }        });    }    public static void main(String[] args) {        new SeparatedAwtListener();    }}// Dialog的使用，自制资源管理器import java.awt.*;import java.awt.event.*;import java.io.File;public class ImitateFileExplorer {    private Frame f;    private TextField tf;    private TextArea ta;    private Button but;    private Panel p;    private Dialog dlg;    private Button but_dlg;    ImitateFileExplorer() {        init();    }    private void init() {        f = new Frame(&quot;模拟文件管理器 &quot;);        tf = new TextField(50);        but = new Button(&quot;显示文件名&quot;);        ta = new TextArea();        p = new Panel();        f.setBounds(200, 100, 800, 700);        f.setLayout(new BorderLayout());        p.add(tf);        p.add(but);        f.add(p, BorderLayout.NORTH);        f.add(ta, BorderLayout.CENTER);        f.setVisible(true);        eventDo();    }    public void eventDo() {        // 关闭窗口        f.addWindowListener(new WindowAdapter() {            public void windowClosing(WindowEvent e) {                System.exit(0);            }        });        // 实现按钮点击对应的功能        but.addActionListener(new ActionListener() {            public void actionPerformed(ActionEvent e) {                String path = tf.getText();                File file = new File(path);                if (file.exists()) {                    if (file.isDirectory()) {                        ta.setText(&quot;&quot;);                        String[] fileNameList = file.list();                        int i = fileNameList.length - 1;                        System.out.println(i);                        while (i &gt; 0) {                            ta.append(fileNameList[i--] + &#39;\n&#39;);                        }                    } else                        ta.setText(file.getName());                } else {                    // 创建一个对话框提示输入有误                    dlg = new Dialog(f);                    dlg.setTitle(&quot;出错了&quot;);                    dlg.setBounds(400, 300, 200, 100);                    dlg.add(new TextField(tf.getText() + &quot;未找到!!!!&quot;));                    but_dlg = new Button(&quot;确定&quot;);                    dlg.add(but_dlg);                    dlg.setLayout(new FlowLayout());                    dlg.setVisible(true);                    doDialogEvent();                }            }        });    }    // 对对话框进行事件处理    public void doDialogEvent() {        dlg.addWindowListener(new WindowAdapter() {            public void windowClosing(WindowEvent e) {                dlg.setVisible(false);            }        });        but_dlg.addActionListener(new ActionListener() {            public void actionPerformed(ActionEvent e) {                dlg.setVisible(false);            }        });    }    public static void main(String[] args) {        new ImitateFileExplorer();    }}</code></pre>]]></content>
+      
+      
+      <categories>
+          
+          <category> JAVA </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> JAVA </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>语法：反射</title>
+      <link href="/2016/10/31/java/yu-fa-fan-she/"/>
+      <url>/2016/10/31/java/yu-fa-fan-she/</url>
+      
+        <content type="html"><![CDATA[<hr><p>什么是反射？反射是Java中允许程序在运行的过程中动态地获取类的信息的一种机制。</p><hr><p>我们知道，在面向对象的思想中，万物皆对象，那么类呢？</p><blockquote><p><strong>class itself is a class</strong></p></blockquote><p>实际上，类本身也是一个对象，它是Class类的对象，也就是Class类型的一个实例，每一个类对应的Class实例称之为该类的类类型。</p><h5 id="获取类的类类型"><a href="#获取类的类类型" class="headerlink" title="获取类的类类型"></a>获取类的类类型</h5><p>得到类的类类型有三种方式：</p><ul><li>通过Class类的forName方法</li><li>通过类名.class获取</li><li>通过对象.getClass()方法获取</li></ul><pre><code class="java">// GetClassType.javapackage reflect;/** * Created by wangw on 2016/1/25. */public class GetClassType {    public static void main(String args[]) {        Class clazz = null;        // 获取某个类的类类型的三种方式        try {            // 1.通过Class类的forName方法            clazz = Class.forName(&quot;wintervacation.reflect.Test&quot;);            System.out.println(clazz.getName());        } catch (ClassNotFoundException e) {            e.printStackTrace();        }        // 2.通过类名.class获取        Class clazz1 = Test.class;        System.out.println(clazz1.getPackage());        // 3.通过对象.getClass()方法获取        Test test = new Test();        Class clazz2 = test.getClass();        System.out.println(clazz1 == clazz2);        System.out.println(clazz == clazz2);    }}</code></pre><p>那么，通过类的类类型我们能干一些什么事情呢，为什么要去拿到类的类类型呢？<br>反射的最大用处在于动态加载类，获取类的信息，我们的目的便是从类中提取我们需要的信息。<br>此处涉及到一个概念，动态加载，什么是动态加载，什么又是静态加载？</p><h5 id="动态加载与静态加载"><a href="#动态加载与静态加载" class="headerlink" title="动态加载与静态加载"></a>动态加载与静态加载</h5><p>首先我们通过一个例子来说明什么是静态加载：</p><pre><code class="java">package wintervacation.reflect;/** * Created by wangw on 2016/1/25. 根据控制台的输入来启动office组件，示例来源于慕课网 */public class Test {    public static void main(String[] args) {        // 启动Word        if (args[0].equals(&quot;Word&quot;)) {            Word word = new Word();            word.start();        }        // 启动Excel        if (args[0].equals(&quot;Excel&quot;)) {            Excel excel = new Excel();            excel.start();        }        // ...    }}</code></pre><p>对该程序说明如下:</p><ul><li>该程序运行时Word类和Excel类并不存在，所以我们编译不会通过，会报ClassNotFoundException错误；</li><li>现在我们创建Word类，并在Word中声明start()方法，编译仍然无法通过，因为new运算符是静态地创建类，在编译的时候就加载全部的类；</li></ul><p>以上的方式就是静态地加载，那么就出现这么一种情况，当我们的Excel软件坏了启动不起来的时候，我们的Word和其他的Office软件都会启动不起来。<br>这并不是我们希望看到的，解决这个问题的办法是通过反射来动态地加载类，在程序运行的时候加载我们需要的类。</p><p>我们对这个程序做一下修改，用于演示动态加载的概念。<br>思路：通过一个接口OfficeAble抽取这些Office软件的共同属性，方便对Office软件的管理</p><pre><code class="java">// OfficeAble.javapackage reflect;/** * Created by wangw on 2016/1/25. */public interface OfficeAble {    public void start();}// Test.java 修改如下package reflect;/** * Created by wangw on 2016/1/25. 根据控制台的输入来启动office组件 */public class Test {    public static void main(String[] args) {        try {            Class clazz = Class.forName(args[0]);            OfficeAble oa = (OfficeAble) clazz.newInstance();            oa.start();        } catch (Exception e) {            e.printStackTrace();        }    }}</code></pre><p>运行结果如下，这里我仍然没有实现Excel类，但程序已经能正常运行。<br><img src="/images/2016/10/oa.png" alt="oa"><br>我相信这个例子已经很好的解释了什么是动态加载。</p><h5 id="动态获取类的信息"><a href="#动态获取类的信息" class="headerlink" title="动态获取类的信息"></a>动态获取类的信息</h5><p>我们可以通过反射获取类的哪些信息呢？<br>Java的API为我们提供了一组方便完善的API，可以获取类的所有信息，包括类全名，类名，成员变量，方法，构造方法，修饰符等。</p><pre><code class="java">// ReflectAPIDemo.javapackage reflect;import java.lang.reflect.*;/** * Created by wangw on 2016/1/25. 演示反射常用的API */public class ReflectAPIDemo {    public static void main(String[] args) {        printDeclaredFields(&quot;hello&quot;);        printDeclaredMethods(&quot;nihao&quot;);        printDeclaredConstructors(new Integer(1));    }    /**     * 获取成员变量的信息     *     * @param o     *            待获取信息的类的对象     */    public static void printDeclaredFields(Object o) {        // 拿到对应的类类型        Class clazz = o.getClass();        Field[] fields = clazz.getDeclaredFields();        for (Field field : fields) {            System.out.print(field.getType() + &quot; &quot;);            System.out.println(field.getName());        }    }    /**     * 获取普通方法的信息     *     * @param o     *            待获取信息的类的对象     */    public static void printDeclaredMethods(Object o) {        Class clazz = o.getClass();        // //获取所有的public方法，包括从父类继承下来的        // Method[] methods = clazz.getMethods();        // 获取本类声明的所有方法，包括私有的        Method[] methods = clazz.getDeclaredMethods();        for (Method method : methods) {            System.out.print(method.getReturnType() + &quot; &quot;);            System.out.print(method.getName() + &quot;(&quot;);            // 获取参数列表            Class[] parameters = method.getParameterTypes();            for (Class temp : parameters) {                System.out.print(temp.getName() + &quot;,&quot;);            }            System.out.println(&quot;)&quot;);        }    }    /**     * 获取构造方法的信息     *     * @param o     *            待获取信息的类的对象     */    public static void printDeclaredConstructors(Object o) {        Class clazz = o.getClass();        Constructor[] constructors = clazz.getConstructors();        for (Constructor constructor : constructors) {            System.out.print(constructor.getName() + &quot;(&quot;);            Class[] parameters = constructor.getParameterTypes();            for (Class temp : parameters) {                System.out.print(temp.getName() + &quot;,&quot;);            }            System.out.println(&quot;)&quot;);        }    }}</code></pre><h5 id="反射应用的小例子"><a href="#反射应用的小例子" class="headerlink" title="反射应用的小例子"></a>反射应用的小例子</h5><ul><li>绕过ArrayList的泛型验证</li><li><a href="JAVA/问题集：2%20+%202%20=%205">问题集：2 + 2 = 5</a></li><li><a href="JAVA/语法：注解">语法：注解</a></li></ul><p>下面我们看怎么通过反射来绕过ArrayList的泛型验证。<br>首先我们来看一个有意思的事情：</p><pre><code class="java">ArrayList list = new ArrayList();ArrayList&lt;String&gt; list1 = new ArrayList&lt;&gt;();Class clazz = list.getClass();Class clazz1 = list1.getClass();//看泛型化后的ArrayList与原始的ArrayList的类类型是否是一样的System.out.println(clazz==clazz1);</code></pre><p>这么一段代码，大家猜测一下输出会是什么呢？<br>答案是true，可见Java集合的泛型只是在编译的时候起的作用，那么如果我们不在编译的时候往一个集合里边添加泛型之外的数据类型，是否行得通呢？是不是可以绕过泛型呢，答案是可以的，我们用一个小程序检验一下：</p><pre><code class="java">package reflect;import java.util.ArrayList;import java.lang.reflect.*;/** * Created by wangw on 2016/1/25. */public class CollectionTest {    public static void main(String[] args) {        ArrayList list = new ArrayList();        ArrayList&lt;String&gt; list1 = new ArrayList&lt;&gt;();        Class clazz = list.getClass();        Class clazz1 = list1.getClass();        // 看泛型化后的ArrayList与原始的ArrayList的类类型是否是一样的        System.out.println(clazz == clazz1);        list1.add(&quot;haha&quot;);        // 这样是无法编译通过的        // list1.add(1);        // 下面通过反射的方式来调用add方法把1加入list1中        try {            // 方法获取，参数为由方法名和原参数类型列表组成            Method method = clazz1.getDeclaredMethod(&quot;add&quot;, Object.class);            // 方法调用，参数为待操作对象和原方法参数            method.invoke(list1, 1);        } catch (Exception e) {            e.printStackTrace();        }        System.out.println(list1);    }}</code></pre><p>运行结果：<br><img src="/images/2016/10/arraylist.png" alt="arraylist"><br>可以看到，我们成功的把一个int类型的数据添加到了一个只能装String类型数据的容器之中。</p><p>反射的作用非常强大，希望自己也希望各位读者能在开发过程中慢慢地掌握它。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> JAVA </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> JAVA </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>语法：注解</title>
+      <link href="/2016/10/31/java/yu-fa-zhu-jie/"/>
+      <url>/2016/10/31/java/yu-fa-zhu-jie/</url>
+      
+        <content type="html"><![CDATA[<hr><p>从jdk1.5开始，引入了Java注解的概念。时下流行的许多框架都有基于注解的配置方式，本文对注解进行一个简要的介绍。</p><hr><p>Java中注解分为四种：  </p><ul><li>JDK注解</li><li>第三方注解</li><li>自定义注解</li><li>元注解</li></ul><h5 id="JDK注解"><a href="#JDK注解" class="headerlink" title="JDK注解"></a>JDK注解</h5><p>所谓JDK注解是指：jdk使用的注解，例如：</p><ul><li>@Override：声明一个方法复写了父类的一个方法</li><li>@Deprecated：声明被注解的对象已经过时了，不推荐使用</li><li>@SuppressWarnings：声明忽略某种警告</li></ul><h5 id="第三方注解"><a href="#第三方注解" class="headerlink" title="第三方注解"></a>第三方注解</h5><p>第三方注解指被各类框架广泛使用的注解。是我们平常打交道最多的注解，如：<br>Spring框架的自动装配注解@Autowired，具体的注解作具体的学习，此处不作赘述。  </p><h5 id="元注解"><a href="#元注解" class="headerlink" title="元注解"></a>元注解</h5><p>元注解是指注解的注解，包含如下几个注解：  </p><ul><li>@Target(ElementType.TYPE) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;指定注解可作用的对象，可以是类，方法，字段等</li><li>@Retention(RetentionPolicy.RUNTIME)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;指定注解作用域，可以是源代码域，class域，运行时域</li><li>@Inherited&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;指定注解为可继承的</li><li>@Documented&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;指定注解在JavaDoc中出现</li></ul><h5 id="自定义注解"><a href="#自定义注解" class="headerlink" title="自定义注解"></a>自定义注解</h5><p>自定义注解指代用户自己定义的注解。<br>自定义注解的格式：</p><pre><code class="java">元注解public @interface 注解名 {    元素类型 元素名();}</code></pre><p>如：  </p><pre><code class="java">@Target(ElementType.TYPE)@Retention(RetentionPolicy.RUNTIME)public @interface Table {    String value();}</code></pre><p>当自定义注解只有一个元素时，元素名通常命名为value，这样在使用注解时可以省略元素名和“=”号。<br>使用注解的一般格式为：<code>@注解名(元素名1=&quot;值1&quot;,元素名2=&quot;值2&quot;)</code></p><h5 id="注解的解析：（通过反射机制解析）"><a href="#注解的解析：（通过反射机制解析）" class="headerlink" title="注解的解析：（通过反射机制解析）"></a>注解的解析：（通过反射机制解析）</h5><p>三个方法：  </p><ul><li>isAnnotationPresent(注解名.class)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//判断是否存在某个对象上名为注解名的注解</li><li>getAnnotation(Table.class);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//从某个对象上取名为注解名的注解</li><li>注解名.元素名()&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//解析注解中对应的元素</li></ul><p>示例程序（示例程序来源于慕课网）：  </p><pre><code class="java">/***    需求:根据输入条件自动拼接出对应的sql查询语句*    实现思路：自定义注解@Table，@column*/// Table.javapackage annotation;import java.lang.annotation.*;/** * Created by wangw on 2016/1/28. */@Target(ElementType.TYPE)@Retention(RetentionPolicy.RUNTIME)@Inherited@Documentedpublic @interface Table {    String value();}// Column.javapackage annotation;import java.lang.annotation.ElementType;import java.lang.annotation.Retention;import java.lang.annotation.RetentionPolicy;import java.lang.annotation.Target;/** * Created by wangw on 2016/1/28. */@Target(ElementType.FIELD)@Retention(RetentionPolicy.RUNTIME)public @interface Column {    String value();}// User.java 使用自定义注解定义的pojopackage annotation;/** * Created by wangw on 2016/1/28. */@Table(&quot;user&quot;)public class User {    @Column(&quot;name&quot;)    private String name;    @Column(&quot;age&quot;)    private int age;    @Column(&quot;stuId&quot;)    private String stuId;    @Column(&quot;phone&quot;)    private String phone;    @Column(&quot;sex&quot;)    private int sex; // 0代表男，1代表女    public String getName() {        return name;    }    public void setName(String name) {        this.name = name;    }    public int getAge() {        return age;    }    public void setAge(int age) {        this.age = age;    }    public String getStuId() {        return stuId;    }    public void setStuId(String stuId) {        this.stuId = stuId;    }    public String getPhone() {        return phone;    }    public void setPhone(String phone) {        this.phone = phone;    }    public int getSex() {        return sex;    }    public void setSex(int sex) {        this.sex = sex;    }}// SQLGenerator.java SQL语句生成器package annotation;import java.lang.reflect.Field;import java.lang.reflect.Method;/** * Created by wangw on 2016/1/28. 通过注解和反射技术来根据条件拼接查询语句 */public class SQLGenerator {    public String query(Object j) {        StringBuilder sb = new StringBuilder();        // 先通过反射获取表名        Class c = j.getClass();        // 判断是否存在对应的注解        boolean isTablePresent = c.isAnnotationPresent(Table.class);        if (!isTablePresent)            return null;        // 拿到对应的注解对象        Table table = (Table) c.getAnnotation(Table.class);        String tableValue = table.value();        sb.append(&quot;select * from &quot;).append(tableValue).append(&quot; where 1=1 &quot;);        // 然后通过反射机制获取字段名和值        Field[] fields = c.getDeclaredFields();        for (Field field : fields) {            boolean isFieldPresent = field.isAnnotationPresent(Column.class);            if (!isFieldPresent)                continue;            else {                Column column = field.getAnnotation(Column.class);                // 获取到了字段名                String fieldName = column.value();                // 通过get方法获取对应字段的值                String getFunName = &quot;get&quot; + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);                try {                    Method getMethod = c.getDeclaredMethod(getFunName);                    Object o = getMethod.invoke(j);                    // 假如字段尚未赋值                    if (o == null || (o instanceof Integer &amp;&amp; ((Integer) o).intValue() == 0))                        continue;                    // 假如字段的类型是字符串                    if (o instanceof String) {                        sb.append(&quot;and &quot;).append(fieldName).append(&quot; = ‘&quot;);                        sb.append(o.toString()).append(&quot;&#39; &quot;);                    }                    // 否则的话                    else                        sb.append(&quot;and &quot;).append(fieldName).append(&quot; = &quot;).append(o.toString()).append(&quot; &quot;);                } catch (Exception e) {                    e.printStackTrace();                }            }        }        return sb.toString();    }}// Test.java 测试类package annotation;/** * Created by wangw on 2016/1/28. */public class Test {    private static SQLGenerator sqlGenerator = new SQLGenerator();    public static void main(String[] args) {        User zhangsan = new User();        zhangsan.setName(&quot;zhangsan&quot;);        zhangsan.setAge(10);        String sql = sqlGenerator.query(zhangsan);        System.out.println(sql);    }}</code></pre>]]></content>
+      
+      
+      <categories>
+          
+          <category> JAVA </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> JAVA </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>SSH框架</title>
+      <link href="/2016/10/30/java/ssh-kuang-jia/"/>
+      <url>/2016/10/30/java/ssh-kuang-jia/</url>
+      
+        <content type="html"><![CDATA[<hr><p>最近不忙，把SSH的框架的内容复读了一遍，看的是英文网站<a href="https://www.tutorialspoint.com" target="_blank" rel="noopener">tutorialspoint</a>，第一次看完英文的教程，个人觉得总结得很好，收获颇丰，倾情推荐。   </p><hr><p>传送门：<br><a href="https://www.tutorialspoint.com/struts_2/" target="_blank" rel="noopener">struts2</a>，<br><a href="https://www.tutorialspoint.com/spring/" target="_blank" rel="noopener">spring</a>，<br><a href="http://www.tutorialspoint.com/hibernate/" target="_blank" rel="noopener">hibernate</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> JAVA </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> JAVA </tag>
+            
+            <tag> SSH </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>模式匹配</title>
+      <link href="/2016/10/22/suan-fa-yu-shu-ju-jie-gou/mo-shi-pi-pei/"/>
+      <url>/2016/10/22/suan-fa-yu-shu-ju-jie-gou/mo-shi-pi-pei/</url>
+      
+        <content type="html"><![CDATA[<hr><p>之前一直对KMP算法不大理解，感觉很难接受，昨天胖子也卡在这一块了，问我会不会，索性就静下心来好好了解了一下模式匹配这一块的内容。皮毛的一些东西，但是毕竟也是自己的理解。</p><hr><ul><li>模式匹配  </li><li>BF算法</li><li>KMP算法</li><li>jdk String源码indexOf(String str)的实现</li></ul><h5 id="模式匹配"><a href="#模式匹配" class="headerlink" title="模式匹配"></a>模式匹配</h5><p>所谓模式匹配，个人的理解就是用一个模式去匹配一个字符串，也就是从一个字符串中去找有没有包含另外一个字符子串，如果有，匹配成功，返回最开始出现子串的位置，如果没有，匹配失败，返回-1。<br>举个简单的例子：给定源串n：adcabcdefadcad，模式m：cad，匹配的结果应该是11，因为模式cad在源串的第11位才开始出现。</p><h5 id="BF算法"><a href="#BF算法" class="headerlink" title="BF算法"></a>BF算法</h5><p>模式匹配的一个最容易想到的思想就是拿目标串也就是我们的模式与源串的每一位进行比较，相同继续往后比较，不同则回溯到最开始比较的位置的下一位继续该比较过程。不多解释，就是你脑子里边第一时间反应到的算法。</p><h5 id="KMP"><a href="#KMP" class="headerlink" title="KMP"></a>KMP</h5><p>BF算法的效率着实是太低了，时间复杂度为O(mn)级了，为什么呢？我们总结为：BF算法在每趟匹配不成功时存在大量回溯，没有利用已经部分匹配的结果。<br>那么如何更高效地来做这件事呢？可以选择让源串不回溯，而让模式向右滑动一段距离，滑动多长的距离呢？这就需要我们把已经部分匹配的结果利用起来了。于是著名的”看毛片”算法就诞生了。  </p><ul><li>KMP的原理<br>KMP算法的基本原理可以参看这篇博客：<a href="http://kb.cnblogs.com/page/176818/" target="_blank" rel="noopener">字符串匹配的KMP算法</a>(原文链接打不开了，且看这个转载的链接吧)，讲解得非常通俗易懂。  </li><li>next数组<br>但是如胖子所说，这篇博文忽略了一个问题，KMP算法的核心问题：next数组的计算。<br>什么是next数组？在上面提到的博文中，你应该接触到一个部分匹配表的概念，那就是next数组。也就是说在模式串中，从开始位置到每一个位置的子串的最大公共前后缀长度。比如“cad”，next[1]代表c的最大公共前后缀长度，next[3]代表cad的最大公共前后缀长度。  </li><li>next数组的计算及代码<br>上面的博文介绍了它的实质，这里我们介绍一下，如何计算得出这个next数组。<br>注意一点，我们约定next数组的下标从1开始，为什么这么约定，我想是因为我们现在是从算法的层面来考虑这个问题吧，毕竟只有程序猿才认为万物从0开始。其实你非要从0开始也没毛病，不影响分析的过程。<br>下面这一段内容不大好理解，请沉下心来看。<br>next数组的计算采用递推的方式来进行。假设我们现在已经求得next[1]、next[2]、……next[i]，分别表示长度为1到i的字符串的最大公共前后缀长度，现在要求next[i+1]。从next[i]求next[i+1]，只是添加了一个元素第i+1位（注意前面提到的下标从1开始），那么存在如图所示的关系。<br><img src="/images/2016/10/nexti.png" alt="nexti"><br>下面开始next[i+1]的计算：<br><img src="/images/2016/10/next数组.png" alt="next数组"><br>如果位置i和位置next[i]+1处的两个字符相同，则next[i+1]等于next[i]加1；<br>如果两个位置的字符不相同，我们可以将长度为next[i]的字符串继续分割（如图，对A的分割，得到公共前后缀为A1，A2），获得其最大公共长度next[next[i]]，然后将next[next[i]]+1处的字符和位置i的字符比较，如果位置next[next[i]]+1和位置i的字符相同，则next[i+1]就等于next[next[i]]加1。如果不相等，就可以继续分割长度为next[next[i]]的字符串，直到公共前缀长度为0为止。<br>为什么这样计算？如果位置i和位置next[i]+1处的两个字符不相同，那么对于长度为i+1的子串，最大公共前后缀中的前缀只能出现在A内部，且是A的前缀，这比较容易理解，那么这个前缀是多长？上面的做法每一步都在取最长的可能长度，否则的话，假设取该前缀为C=[A1 + 后续的几个元素]，那么在A中不存在与C相等的后缀，那意味着在B中也不存在与C相等的后缀，自然[C + C后的第一位元素]不会等于[B的某后缀 + 第(i+1)的元素]。<br>分析完了，上代码：  </li></ul><pre><code class="java">public static int[] getNextArray(String s) {        // 因为我们分析时下标从1开始，所以多分配一位        int[] next = new int[s.length() + 1];        // next[0]约定为0，反正没用         next[0] = next[1] = 0;        int j = 0;        // 注意在算法中的next[i]+1位置在程序中表示为next[i]，因为数组元素从0开始        for(int i = 1; i &lt; s.length(); i++) {            while(j &gt; 0 &amp;&amp; s.charAt(i) != s.charAt(j)) {                j = next[j];            }            if(s.charAt(i) == s.charAt(j)) {                j++;            }            next[i + 1] = j;        }        return next;    }</code></pre><ul><li>kmp的实现<br>有了next数组，当每次比较到两个字符串的字符不同时，我们就可以根据next数组将模式串向前移动(已匹配长度-next[i])位，接着继续比较下一个位置。算法实现如下：  </li></ul><pre><code class="java">public static int findFirstSubStrInString(String source, String pattern) {        int[] next = getNextArray(pattern);        int i = 0;        int j = 1;        while(i &lt; source.length() &amp;&amp; j &lt;= pattern.length()) {            // 如果当前比较位置相等，判断是否得到结果，如果是，返回位置            if(source.charAt(i) == pattern.charAt(j - 1)) {                if(j == pattern.length()) {                    return i - j + 1;                }                i++;                j++;            } else if(j == 1) { // 如果不相等，并且j没有开始移动                i++;            } else { // 如果不相等，且j已经开始移动                i -= next[j]; // i = i - compared + (compared - next[j]);                j = 1;            }        }        return -1;}</code></pre><p>至此kmp算法介绍完毕。  </p><h5 id="jdk-String源码indexOf-String-str-的实现"><a href="#jdk-String源码indexOf-String-str-的实现" class="headerlink" title="jdk String源码indexOf(String str)的实现"></a>jdk String源码indexOf(String str)的实现</h5><p>理解了KMP算法之后，不自觉地想到String的indexOf(String str)方法是不是也用KMP实现的呢？赶紧看了一下源码。其实现如下： </p><pre><code class="java">public int indexOf(String str) {        return indexOf(str, 0);}public int indexOf(String str, int fromIndex) {    return indexOf(value, 0, value.length,            str.value, 0, str.value.length, fromIndex);}static int indexOf(char[] source, int sourceOffset, int sourceCount,        char[] target, int targetOffset, int targetCount,        int fromIndex) {    if (fromIndex &gt;= sourceCount) {        return (targetCount == 0 ? sourceCount : -1);    }    if (fromIndex &lt; 0) {        fromIndex = 0;    }    if (targetCount == 0) {        return fromIndex;    }    char first = target[targetOffset];    int max = sourceOffset + (sourceCount - targetCount);    for (int i = sourceOffset + fromIndex; i &lt;= max; i++) {        /* Look for first character. */        if (source[i] != first) {            while (++i &lt;= max &amp;&amp; source[i] != first);        }        /* Found first character, now look at the rest of v2 */        if (i &lt;= max) {            int j = i + 1;            int end = j + targetCount - 1;            for (int k = targetOffset + 1; j &lt; end &amp;&amp; source[j]                    == target[k]; j++, k++);            if (j == end) {                /* Found whole string. */                return i - sourceOffset;            }        }    }    return -1;}</code></pre><p>可以看到jdk源码中的indexOf方法采用的是最朴素的模式匹配算法也就是BF算法来实现的，jdk实现时为什么不采用kmp呢？答案暂时还未知，但是KMP算法对这个例子运行不出结果：  </p><pre><code class="java">findFirstSubStrInString(&quot;aaaaaaaaaaaaaaaaaaaaaa&quot; +             &quot;aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&quot;            + &quot;aaaaaaaaaaaaaaaaaaaaaaaaaaaaab&quot;, &quot;aaab&quot;);</code></pre><p>感觉这不是正宗的KMP算法，但是按照那哥们那篇博客确实是这样的，苦笑，进一步探究原因中。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 算法与数据结构 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 算法 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>批量修改mysql表的所有列列名为小写</title>
+      <link href="/2016/10/21/mysql/pi-liang-xiu-gai-mysql-biao-de-suo-you-lie-lie-ming-wei-xiao-xie/"/>
+      <url>/2016/10/21/mysql/pi-liang-xiu-gai-mysql-biao-de-suo-you-lie-lie-ming-wei-xiao-xie/</url>
+      
+        <content type="html"><![CDATA[<hr><p>今天接到一个外包的需求，一个表中的字段含有大写也含小写，要全部转换为小写，批量转换。</p><hr><p>表结构相关的信息肯定是从information_schema中搞，sql语句如下：</p><pre><code class="sql">SELECT CONCAT(&#39;ALTER TABLE `&#39;, table_schema, &#39;`.`&#39;, table_name,               &#39;` CHANGE `&#39;, column_name, &#39;` `&#39;, LOWER(column_name), &#39;` &#39;, column_type,              IF(IS_NULLABLE=&#39;NO&#39;,&#39; NOT NULL&#39;,&#39;&#39;),              IF(column_default &lt;&gt; &#39;&#39;, CONCAT(&#39; DEFAULT &#39;, column_default), &#39;&#39;),                &#39; &#39;, extra )  FROM information_schema.columns  WHERE column_name REGEXP &#39;^[A-Z]&#39; COLLATE utf8_bin    AND table_schema &lt;&gt; &#39;information_schema&#39;;</code></pre><p>原理是从information_schema动态拼出修改的sql语句,demo得到的结果如下：</p><pre><code class="sql">ALTER TABLE `test`.`haha` CHANGE `AAA` `aaa` int(255) unsigned zerofill NOT NULL auto_incrementALTER TABLE `test`.`haha` CHANGE `BBB` `bbb` int(11) ALTER TABLE `test`.`haha` CHANGE `CCC` `ccc` int(11) </code></pre><p>sql有了，拷贝出来批量执行一下就行了，settled~~</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> mysql </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> mysql </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>问题集：网站的根路径到底指什么？</title>
+      <link href="/2016/10/21/java/wen-ti-ji-wang-zhan-de-gen-lu-jing-dao-di-zhi-shi-me/"/>
+      <url>/2016/10/21/java/wen-ti-ji-wang-zhan-de-gen-lu-jing-dao-di-zhi-shi-me/</url>
+      
+        <content type="html"><![CDATA[<hr><p>之前一直用Myeclipse开发项目，今天转用eclipse for j2ee developers，遇到一小问题，折腾好一会，做个记录。</p><hr><p>用eclipse做网站开发，我们先得创建一个dynamic web project。项目建好之后，我把它跑在本地的tomcat上，问题来了，一个简单的a标签：  <code>&lt;a href=&quot;/next.jsp&quot;&gt;下一页&lt;/a&gt;</code>，死活给我跳不过去，跳转的链接都是<code>localhost:8080/next.jsp</code>，我就郁闷了，“/”代表网站根目录，这太不应该了。几番尝试不行之后，上网搜了一下，找了半天，看到了这个答案：<br><img src="/images/2016/10/根路径.png" alt="根路径"><br>赶紧看了一下我的server.xml文件，eclipse生成的配置果然是按答案里边提到的第一种方式配置的，再一想人家eclipse本就声明了你的项目不过是一个dynamic module，那自然根目录是<code>localhost:8080</code>了。习惯了第二种配置的方式，感觉这种方式真心挺不爽的，暂未找到合适的配置办法，郁闷。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> JAVA </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> JAVA </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>mysql5.6.10版本之后innodb支持全文索引</title>
+      <link href="/2016/10/05/mysql/mysql5.6-ban-ben-zhi-hou-innodb-zhi-chi-quan-wen-suo-yin/"/>
+      <url>/2016/10/05/mysql/mysql5.6-ban-ben-zhi-hou-innodb-zhi-chi-quan-wen-suo-yin/</url>
+      
+        <content type="html"><![CDATA[<hr><p>之前的认识里边innodb引擎是不支持全文索引的，今天了解到mysql5.6.10之后添加了innodb对全文索引的支持</p><hr><p>在学习数据库优化课程时用到了mysql官方给的sakila demo数据库，其中涉及到全文索引，但是引擎用的是innodb，sql语句导入时发生错误  </p><p><img src="/images/2016/10/error.png" alt="error">  </p><p>查看源代码知是数据库版本问题  </p><p><img src="/images/2016/10/sql.png" alt="sql">  </p><p><img src="/images/2016/10/版本.png" alt="版本"></p><p>把数据库升级成5.6.10版本，问题解决。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> mysql </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> mysql </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>[转载]字符编码</title>
+      <link href="/2016/09/19/web/zi-fu-bian-ma/"/>
+      <url>/2016/09/19/web/zi-fu-bian-ma/</url>
+      
+        <content type="html"><![CDATA[<hr><p>下面的内容是当时从网络上收藏到有道云笔记的，原作者已经不知道是谁，博客同时也是作为自己的笔记，无意侵权，如果您看到了这篇文章，并且您知道原出处，请您联系我，我将在博客中注明，或者如果您是原作者您介意我借用您的文章，请联系我，我将及时删除。</p><hr><p>文章介绍了Unicode为何而生，极易接受，很赞</p><blockquote></blockquote><p>1、美国人首先对其英文字符进行了编码，也就是最早的ascii码，用一个字节的低7位来表示英文的128个字符，高1位统一为0；<br>2、后来欧洲人发现尼玛你这128位哪够用，比如我高贵的法国人字母上面的还有注音符，这个怎么区分，得，把高1位编进来吧，这样欧洲普遍使用一个全字节进行编码，最多可表示256位。欧美人就是喜欢直来直去，字符少，编码用得位数少；<br>3、但是即使位数少，不同国家地区用不同的字符编码，虽然0–127表示的符号是一样的，但是128–255这一段的解释完全乱套了，即使2进制完全一样，表示的字符完全不一样，比如135在法语，希伯来语，俄语编码中完全是不同的符号；<br>4、更麻烦的是，尼玛这电脑高科技传到中国后，中国人发现我们有10万多个汉字，你们欧美这256字塞牙缝都不够。于是就发明了GB2312这些汉字编码，典型的用2个字节来表示绝大部分的常用汉字，最多可以表示65536个汉字字符，这样就不难理解有些汉字你在新华字典里查得到，但是电脑上如果不处理一下你是显示不出来的了吧。<br>5、这下各用各的字符集编码，这世界咋统一？俄国人发封email给中国人，两边字符集编码不同，尼玛显示都是乱码啊。为了统一，于是就发明了unicode，将世界上所有的符号都纳入其中，每一个符号都给予一个独一无二的编码，现在unicode可以容纳100多万个符号，每个符号的编码都不一样，这下可统一了，所有语言都可以互通，一个网页页面里可以同时显示各国文字。<br>6、然而，unicode虽然统一了全世界字符的二进制编码，但没有规定如何存储啊，亲。x86和amd体系结构的电脑小端序和大端序都分不清，别提计算机如何识别到底是unicode还是acsii了。如果Unicode统一规定，每个符号用三个或四个字节表示，那么每个英文字母前都必然有二到三个字节是0，文本文件的大小会因此大出二三倍，这对于存储来说是极大的浪费。这样导致一个后果：出现了Unicode的多种存储方式。<br>7、互联网的兴起，网页上要显示各种字符，必须统一啊，亲。utf-8就是Unicode最重要的实现方式之一。另外还有utf-16、utf-32等。UTF-8不是固定字长编码的，而是一种变长的编码方式。它可以使用1~4个字节表示一个符号，根据不同的符号而变化字节长度。这是种比较巧妙的设计，如果一个字节的第一位是0，则这个字节单独就是一个字符；如果第一位是1，则连续有多少个1，就表示当前字符占用多少个字节。<br>8、注意unicode的字符编码和utf-8的存储编码表示是不同的，例如”严”字的Unicode码是4E25，UTF-8编码是E4B8A5，这个7里面解释了的，UTF-8编码不仅考虑了编码，还考虑了存储，E4B8A5是在存储识别编码的基础上塞进了4E25。<br>9、UTF-8 使用一至四个字节为每个字符编码。128 个 ASCII 字符（Unicode 范围由 U+0000 至 U+007F）只需一个字节，带有变音符号的拉丁文、希腊文、西里尔字母、亚美尼亚语、希伯来文、阿拉伯文、叙利亚文及马尔代夫语（Unicode 范围由 U+0080 至 U+07FF）需要二个字节，其他基本多文种平面（BMP）中的字符（CJK属于此类-Qieqie注）使用三个字节，其他 Unicode 辅助平面的字符使用四字节编码。<br>10、最后，常规来看，中文汉字在utf-8中到底占几个字节，一般是3个字节，最常见的编码方式是1110xxxx 10xxxxxx 10xxxxxx。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> web </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 编码 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>08--maven依赖及模块之间的关系</title>
+      <link href="/2016/09/19/maven/08-maven-yi-lai-ji-mo-kuai-zhi-jian-de-guan-xi/"/>
+      <url>/2016/09/19/maven/08-maven-yi-lai-ji-mo-kuai-zhi-jian-de-guan-xi/</url>
+      
+        <content type="html"><![CDATA[<p>介绍一下maven依赖相关的一些概念</p><ol><li><p>三套classpath<br> maven采用三套classpath：编译时classpath，测试时classpath，运行时classpath</p></li><li><p>依赖的作用域</p><ul><li>compile<br>默认的scope，表示 dependency 都可以在生命周期中使用。而且，这些dependencies 会传递到依赖的项目中。</li><li>provided<br>跟compile相似，但是表明了dependency 由JDK或者容器提供，例如Servlet AP和一些Java EE APIs。这个scope 只能作用在编译和测试时，同时没有传递性。</li><li>runtime<br>表示dependency不作用在编译时，但会作用在运行和测试时</li><li>test<br>表示dependency作用在测试时，不作用在运行时。</li><li>system<br>跟provided 相似，但是在系统中要以外部JAR包的形式提供，maven不会在repository查找它。<br>例如：<pre><code class="xml">&lt;project&gt;... &lt;dependencies&gt;       &lt;dependency&gt;       &lt;groupId&gt;javax.sql&lt;/groupId&gt;       &lt;artifactId&gt;jdbc-stdext&lt;/artifactId&gt;       &lt;version&gt;2.0&lt;/version&gt;           &lt;scope&gt;system&lt;/scope&gt;       &lt;systemPath&gt;${java.home}/lib/rt.jar&lt;/systemPath&gt;       &lt;/dependency&gt; &lt;/dependencies&gt; ...&lt;/project&gt;</code></pre></li><li>import<br>它只使用在<code>&lt;dependencyManagement&gt;</code>中，表示从其它的pom中导入dependency的配置。</li></ul></li><li><p>依赖的传递<br> 比如a依赖于b，b依赖于c，那么默认情况下a就传递依赖于c</p></li><li><p>排除传递依赖<br> 上面提到的传递依赖，有时候我们不需要这种传递依赖，那么我们需要消除这种依赖，消除的方式是使用<code>&lt;exclusion&gt;</code>标签</p></li><li><p>依赖冲突<br> 当a依赖于两个或两个以上的模块，而这些模块又依赖于某一个jar的不同版本时，我们称发生了依赖冲突，依赖冲突不需要我们自己解决，maven有它的解决方案，遵照以下两个原则：  </p><ul><li>短路径优先：比如<br>a–&gt;b–&gt;c–&gt;x1.0，<br>a–&gt;d–&gt;x2.0，<br>那么a最终会依赖x的2.0版本</li><li>先配置优先：<br>在路径长度相同的时候，哪个依赖在前就以哪个依赖为准，如：<br>a–&gt;b–&gt;x1.0<br>a–&gt;c–&gt;x2.0<br>在a/pom.xml文件中声明的顺序：依赖b先于依赖c声明，那么a最终依赖x的1.0版本</li></ul></li><li><p>模块之间的关系  </p><ul><li>继承关系：<br>跟Java类似，把一些共性的依赖抽取出来放在一个模块中，然后其他模块要使用这些依赖时，声明该模块为其parent模块即可，由<code>&lt;parent&gt;</code>标签指定</li><li>聚合关系：<br>通常一个工程会由多个模块来构成，这个时候需要将多个模块聚合起来，这样可以进行批量编译打包等操作，由<code>&lt;modules&gt;</code>标签指定</li></ul></li></ol>]]></content>
+      
+      
+      <categories>
+          
+          <category> maven </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> maven </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>查找</title>
+      <link href="/2016/09/19/suan-fa-yu-shu-ju-jie-gou/cha-zhao/"/>
+      <url>/2016/09/19/suan-fa-yu-shu-ju-jie-gou/cha-zhao/</url>
+      
+        <content type="html"><![CDATA[<hr><p>个人笔记，无参考价值</p><hr><ol><li>静态查找<br> 顺序查找<br> 二分查找：有序，时间复杂度为log(n)<br> 斐波那契查找：n = Fu - 1 ，时间复杂度为log(n)<br> 分块查找：分块有序，索引部分折半，块内部顺序查找  </li><li>动态查找<br>待续》》》</li></ol>]]></content>
+      
+      
+      <categories>
+          
+          <category> 算法与数据结构 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> algorithm </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>树</title>
+      <link href="/2016/09/19/suan-fa-yu-shu-ju-jie-gou/shu/"/>
+      <url>/2016/09/19/suan-fa-yu-shu-ju-jie-gou/shu/</url>
+      
+        <content type="html"><![CDATA[<hr><p>个人笔记，无参考价值</p><hr><ol><li>树的一些概念，定义</li><li>二叉树的定义</li><li>二叉树的性质：<br> a. i层最大结点数：2^(i - 1)<br> b. k层满二叉树结点总数：2^k - 1<br> c. n0 = n2 + 1<br> d. 完全二叉树的深度：[log n] + 1 （[]表示下取整）<br> e. 完全二叉树孩子与双亲结点的关系</li><li>二叉树的存储结构：<br> 顺序存储：添加”虚结点”使二叉树成为完全二叉树，然后按照完全二叉树编号的顺序存储<br> 链式存储：  <ul><li>二叉链表：左右孩子指针 + 数据域            空链域数：n + 1</li><li>三叉链表：左右孩子指针 + 父结点指针 + 数据域        空链域数：n + 2</li></ul></li><li>二叉树遍历：  <ul><li>先序遍历：对应表达式 波兰式 非递归算法先访问根元素再往下走（借助栈）</li><li>中序遍历：非递归算法再往下走再访问根元素（借助栈）</li><li>后序遍历：对应逆波兰式，非递归算法需要借助TAG位（借助栈）</li><li>层序遍历：借助队列实现遍历</li></ul></li><li>线索二叉树：<br> 二叉树的二叉链表表示法中存在 n + 1 个空域，可以用来存储前驱后继信息<br> 对二叉链表增加两个标志域LTAG,RTAG，标志域为0时，表示左右孩子，为1时表示前驱后继结点<br> 那么在遍历过程中就能建立起线索二叉树的存储结构</li><li>树的存储结构：  <ul><li>双亲表示法（顺序存储）</li><li>孩子表示法（顺序存储）</li><li>孩子链表表示法（链式存储结构）：不加入父结点信息，加入父结点信息</li><li>孩子兄弟表示法（二叉链表示法）：结点的两个指针域分别指向第一个孩子结点与第一个孩子结点的右兄弟结点，是树和二叉树转换的基础</li></ul></li><li>树和二叉树，森林的转换</li><li>遍历树，森林<br> 树：先序与后序遍历    ————-   与森林的先序和中序遍历对应<br> 森林：先序，中序，后序遍历    ———– 与其对应二叉树的先中后序遍历对应</li><li>由遍历序列还原树结构  <ul><li>已知先序，中序  </li><li>已知后序，中序  </li></ul></li><li>Huffman树：带权路径长度最短的树</li><li><p>Huffman编码：Huffman树的左子树编码置为0，右子树编码置为1</p></li><li><p>二叉查找树</p></li><li>AVL树是最先发明的自平衡二叉查找树</li><li>B树</li><li>红黑树</li></ol>]]></content>
+      
+      
+      <categories>
+          
+          <category> 算法与数据结构 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> algorithm </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>数据链路层</title>
+      <link href="/2016/09/19/ji-suan-ji-wang-luo/shu-ju-lian-lu-ceng/"/>
+      <url>/2016/09/19/ji-suan-ji-wang-luo/shu-ju-lian-lu-ceng/</url>
+      
+        <content type="html"><![CDATA[<hr><p>个人笔记，无参考价值</p><hr><ol><li><p>使用点对点信道的数据链路层<br>1.1 数据链路层点对点信道各种协议的三个基本问题<br>封装成帧，透明传输，差错检验<br>1.2 封装成帧<br>把网络层传输下来的IP数据报加上帧首部和帧尾部构造成帧<br>1.3 透明传输<br> 传输过程中，采用“SOH”,”EOT”分别作为首部和尾部的标记<br> 对于文本文件，完全由可见的ascii码构成，不会出现“SOH”，“EOT”标记，所以不用做任何处理即可实现透明传输<br> 对于非文本文件，由于可能出现“SOH””EOT”字符，所以要对数据部分作一定的处理：<br> 字节填充法（字符填充法）：发送端数据中出现“SOH””EOT”字符时，在它前边加一个转义字符，若数据中本身含有转义字符，则在改转义字符前边再加一个转义字符“ESC”，接收端接收到数据时，删除对应“SOH””EOT””ESC”前面的转义字符<br><img src="/images/2016/10/1-3.png" alt="1.3"></p><p>1.4 差错检验  </p><ul><li>传输差错：比特差错，帧丢失，帧重复，帧失序<br><img src="/images/2016/10/1-40.png" alt="1.40"></li><li>比特差错：0–&gt;1 1–&gt;0  </li><li>误码率：传输错误地比特数占总比特数的比例</li><li>帧检验序列(FCS)：指为了检错而添加的冗余码</li><li>循环冗余校验（广泛使用的方法，但不是唯一的方法）：<br>发送端：<br>假定数据M有k位（比如101001，k = 7），我们要在这k位数据之后添加n位冗余码，这n位冗余码怎么得到呢，算法如下：<br>用原始的数据M乘以2^n （相当于在M后面添加了n个0）,得到一个k + n位的数2^n*M，用这个数模2除（模2除自行百度）以一个事先约定好的n + 1位的除数，那么能得到一个n位的余数，这个余数即就是我们想要的冗余码<br><img src="/images/2016/10/1-41.png" alt="1.41"><br>接收端：<br>把接收到的数据进行CRC校验，如果数据传输没有出错，那么用接收到的帧模2除以上面提到的事先约定好的n + 1位的除数，那么得到的余数必然为0，为什么呢？在于模2运算，请自行思考。<br>经过循环冗余校验之后，如果得出的余数为0，则判定这个帧没有差错，接受，否则判定该帧有差错，丢弃。<br>数据链路层实现了无比特差错的传输，但这还不是可靠传输，因为没有解决帧丢失，帧重复，帧失序的问题，可靠传输有TCP协议来实现（OSI模型倡导把数据链路层做成可靠的，但是现在实际并没有这么做）</li></ul></li><li><p>PPP协议<br>对于点对点的链路，目前采用最广泛的协议是PPP协议。用户与ISP通信时使用的就是PPP协议：<br><img src="/images/2016/10/2.0.png" alt><br>2.1 PPP协议的组成部分  </p><ul><li>一个将IP数据报封装到串行链路的方法</li><li>一个用来建立、配置和测试数据链路连接的链路控制协议LCP</li><li>一套网络控制协议NCP，用来支持不同的网络层协议  </li></ul><p>2.2 PPP协议的帧格式<br>   PPP帧分为三部分，即首部、数据和尾部<br>  首部分为四个字段，第一字段是标志字段F，规定为十六进制的0x7E（01111110），表示一个帧         的开始或结束，是PPP帧的界定符。<br>  首部的第二字段为1字节地址字段A，规定为0xFF；<br>   首部的第三字段为1字节控制字段C规定为0x03；<br>  首部的第三字段为2字节协议字段，规定了帧当中封装的协议。如0x0021为IP协议；<br>  数据部分的长度是可变的，但不超过1500字节；<br>  尾部第一字段为2字节的CRC校验序列FCS。第二字段为Ox7E（01111110）                                                   <img src="/images/2016/10/2.2.png" alt><br>2.3 异步传输功能的透明传输解决办法<br> 采用字节填充的方式解决透明传输的问题。<br> 当PPP使用异步传输时，它把转义符定义为0x7D，并使用字节填充，填充方法如下：<br>   （1）把数据字段出现的每一个0x7E字节转换为2字节序列（ 0x7D，0x5E ）；<br>   （2）若数据字段出现一个0x7D的字节，则把转变为2字节序列（ 0x7D，0x5D ）；<br>   （3）若数据字段中出现了ASCII的控制字符（数值小于0x20的字符），则在该字符前面要加入一个0x7D字节，同时改变该字符的编码。如0x03转变为0x7D，0x31 ；<br>由于在发送端进行了字节填充，因此在链路上传送的信息字节数超过了原来的信息字节数。在接收端进行相反的变化，正确恢复原来的信息。<br>2.4 同步传输功能的透明传输解决办法</p><ul><li>零比特填充<br>  PPP用在SONET/SDH链路时，使用的是同步传输，在这种情况下，PPP协议采用零比特填充的方法来实现透明传输。<br>（1）在发送端，先扫描整个数据字段，只要发现有5个连续1，则立即填入一个0；<br>（2）在接收端进行相反的操作。</li></ul></li><li><p>使用广播信道的数据链路层<br>局域网作为使用广播信道的典型，只介绍局域网。  </p><ul><li>适配器（网卡）<br>计算机与外界局域网的连接是通过适配器来实现的，适配器的作用是把计算机要发送到局域网的并行数据转换成串行数据发送到局域网，以及从局域网接收串行数据并将其转换为并行数据传送给计算机<br><img src="/images/2016/10/3.1.png" alt></li></ul></li><li><p>以太网<br>以太网是应用最广的局域网。<br>4.1 以太网的特点  </p><ul><li>以太网采用无连接的工作方式。</li><li>传统以太网采用动态随机接入媒体共享技术。</li><li>以太网采用曼彻斯特编码的信号。</li><li>传统以太网需要解决“冲突”问题。  </li></ul><p>4.2 CSMA/CD协议（载波监听，多点接入，碰撞检测）<br><img src="/images/2016/10/4.2.png" alt>  </p><ul><li>部分结论<br>发生碰撞的两个数据帧都不可用；<br>任何一个站在最多两倍的端到端的传播时延后就可以确定是否发生了碰撞；<br>在使用CSMA/CD协议时，一个站不可能同时进行发送和接收；<br>每个站在自己发送数据之后的一小段时间内，存在着发生碰撞的可能性；<br>如果发生了碰撞，发送数据的站必须推迟一段时间后重新发送。  </li><li>争用期<br>任何一个站在发送数据帧后最多2倍的端到端延时就可确定是否发生了碰撞，将此时间称为碰撞窗口，又称争用期；<br>以太网采用51.2us作为争用期，对于10Mbit/s的以太网在争用期内可以发送512bit的数据，既64字节。对于以太网，如果前64字节没有发生碰撞，则不会发生碰撞；以太网数据帧最小的长度为64字节。  </li></ul><ul><li>截断二进制指数类型的退避算法<br>a、将争用期作为基本退避时间t；<br>b、k=min[重传次数，10]；<br>c、从[0，1，……，(2k-1)]中随机取出一个数n，重传的等待时间T=t * n；<br>d、当重传次数达到16次时，丢掉该帧,向上层报告。  </li><li>传统以太网碰撞后的处理<br>在检测到碰装后，产生碰撞的站，可加入人为干扰信号，强化碰撞。将碰撞放大，使碰撞信号能    被更多的站点检测到；避免更多的碰撞产生  </li></ul><p>4.3 以太网的MAC层</p><ul><li>mac地址：<br>以太网的硬件为48位，六个字节，又称为MAC地址；<br>MAC地址存在网卡中；<br>IEEE规定第1字节的最低位为I/G位，为0时表示地址是一个单个站地址，为1时表示组地址，用来进行多播；<br>IEEE规定第1字节的最低第2位为G/L位，0时表示本地地址，1时为全球地址。  </li><li>mac帧<br><img src="/images/2016/10/4.3.2.png" alt><br>网卡收到的数据帧包括以下三种：单播、广播和多播，网卡检查收到帧中包含的目的MAC地址，如果是发往本站的接收，否则抛弃  </li><li>网桥（二层交换机）<br>实现物理分段的设备称之为网桥，网桥的作用是隔离碰撞域，但是不能隔离广播域<br>网桥的自学习算法：<br><img src="/images/2016/10/4.3.3.1.png" alt><br><img src="/images/2016/10/4.3.3.2.png" alt><br>二层交换机是网桥的升级版，增加了流量控制和差错检验的功能，并且支持多条数据交换通道，支持全双工模式，这时CSMA/CD协议失效，支持自协商（物理链路两端的设备自动通过交互信息，自动选择一种运行模式来运行）  </li><li>虚拟局域网<br>前面讲到的网桥可以细化广播域，但不能隔离广播域，那么通过何种技术来细化广播域呢？<br>答案是虚拟局域网，虚拟局域网是由一些局域网物理网段构成的与物理位置无关的逻辑组，而这些网段具有某些共同的需求。实现虚拟局域网的设备是路由器，细化广播域又叫逻辑分段。</li></ul></li><li><p>无线局域网<br>待补充</p></li></ol>]]></content>
+      
+      
+      <categories>
+          
+          <category> 计算机网络 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 计算机网络 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>07--pom的文件结构</title>
+      <link href="/2016/09/19/maven/07-pom-de-wen-jian-jie-gou/"/>
+      <url>/2016/09/19/maven/07-pom-de-wen-jian-jie-gou/</url>
+      
+        <content type="html"><![CDATA[<p>POM常用标签如下</p><pre><code class="xml">&lt;!--pom项目根标签，指定一些项目的约束--&gt;&lt;project&gt;      &lt;!--pom的版本，固定值4.0.0--&gt;    &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;      &lt;!--当前maven工程坐标--&gt;    &lt;!--组织名--&gt;    &lt;groupId&gt;com.nenu.test&lt;/groupId&gt;    &lt;!--模块名--&gt;    &lt;artifactId&gt;&lt;/artifactId&gt;    &lt;!--版本--&gt;    &lt;version&gt;&lt;/version&gt;    &lt;!--打包方式，可选值jar,war,pom等--&gt;    &lt;packaging&gt;&lt;/packaging&gt;    &lt;!--描述信息--&gt;    &lt;!--唯一标示--&gt;    &lt;id&gt;&lt;/id&gt;    &lt;!--工程名字描述--&gt;    &lt;name&gt;&lt;/name&gt;    &lt;!--工程简介--&gt;    &lt;description&gt;&lt;/description&gt;    &lt;!--依赖--&gt;    &lt;dependencies&gt;        &lt;dependency&gt;            &lt;!--这里首先是依赖的库的坐标--&gt;            &lt;!--作用域：可选值：compile，provided，test，system，runtime--&gt;            &lt;scope&gt;&lt;scope&gt;            &lt;!--排除依赖--&gt;            &lt;exclusions&gt;                &lt;exclusion&gt;                    &lt;!--坐标不需要版本号--&gt;                &lt;/exclusion&gt;            &lt;/exclusions&gt;        &lt;/dependency&gt;    &lt;/dependencies&gt;    &lt;!--只用于父类中--&gt;    &lt;dependencyManagement&gt;        &lt;dependencies&gt;            &lt;dependency&gt;                &lt;!--这里首先是依赖的库的坐标--&gt;                &lt;!--作用域：可选值：compile，provided，test，system，runtime，import--&gt;                &lt;scope&gt;&lt;scope&gt;            &lt;/dependency&gt;        &lt;/dependencies&gt;    &lt;/dependencyManagement&gt;    &lt;!--构建时候的一些配置--&gt;    &lt;build&gt;        &lt;!--插件--&gt;        &lt;plugins&gt;            &lt;plugin&gt;                &lt;!--也是需要一个坐标信息--&gt;                &lt;!--执行信息--&gt;                &lt;executions&gt;                    &lt;execution&gt;                        &lt;!--作用阶段--&gt;                        &lt;phase&gt;&lt;/phase&gt;                        &lt;!--目标--&gt;                        &lt;goals&gt;                                &lt;goal&gt;&lt;/goal&gt;                            &lt;/goals&gt;                    &lt;/execution&gt;                &lt;/executions&gt;            &lt;/plugin&gt;        &lt;/plugins&gt;    &lt;/build&gt;    &lt;!--父模块--&gt;    &lt;parent&gt;        &lt;!--坐标信息--&gt;    &lt;/parent&gt;    &lt;!--用于聚合某些模块--&gt;    &lt;modules&gt;        &lt;module&gt;            &lt;!--坐标信息--&gt;        &lt;/module&gt;    &lt;/modules&gt;&lt;/project&gt;</code></pre>]]></content>
+      
+      
+      <categories>
+          
+          <category> maven </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> maven </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>[转载]06--Maven里的仓库：远程仓库，镜像仓库，本地仓库</title>
+      <link href="/2016/09/19/maven/06-maven-li-de-cang-ku-yuan-cheng-cang-ku-jing-xiang-cang-ku-ben-di-cang-ku/"/>
+      <url>/2016/09/19/maven/06-maven-li-de-cang-ku-yuan-cheng-cang-ku-jing-xiang-cang-ku-ben-di-cang-ku/</url>
+      
+        <content type="html"><![CDATA[<hr><p>下面的内容是当时从网络上收藏到有道云笔记的，原作者已经不知道是谁，博客同时也是作为自己的笔记，无意侵权，如果您看到了这篇文章，并且您知道原出处，请您联系我，我将在博客中注明，或者如果您是原作者您介意我借用您的文章，请联系我，我将及时删除。</p><hr><p>介绍了maven中仓库的概念，以及远程仓库，镜像仓库，本地仓库三者的关系</p><p>简单点来说，repository就是个仓库。maven里有两种仓库，本地仓库和远程仓库。<br>远程仓库相当于公共的仓库，大家都能看到。本地仓库是你本地的一个山寨版，只有你看的到，主要起缓存作用。当你向仓库请求插件或依赖的时候，会先检查本地仓库里是否有。如果有则直接返回，否则会向远程仓库请求，并做缓存。你也可以把你做的东西上传到本地仓库给你本地自己用，或上传到远程仓库，供大家使用。<br>远程仓库可以在工程的pom.xml文件里指定。如果没指定，默认就会把下面这地方做远程仓库，即默认会到<a href="http://repo1.maven.org/maven2" target="_blank" rel="noopener">http://repo1.maven.org/maven2</a> 这个地方去请求插件和依赖包。</p><pre><code class="xml">&lt;repository&gt;    &lt;snapshots&gt;        &lt;enabled&gt;false&lt;/enabled&gt;    &lt;/snapshots&gt;    &lt;id&gt;central&lt;/id&gt;    &lt;name&gt;Maven Repository Switchboard&lt;/name&gt;    &lt;url&gt;http://repo1.maven.org/maven2&lt;/url&gt;&lt;/repository&gt;</code></pre><p>本地仓库默认在你本地的用户目录下的.m2/repository目录下。 </p><p>mirror就是镜像，主要提供一个方便地切换远程仓库地址的途径。比如，上班的时候在公司，用电信的网络，连的是电信的仓库。回到家后，是网通的网络，我想连网通的仓库，就可以通过mirror配置，统一把我工程里的仓库地址都改成联通的，而不用到具体工程配置文件里一个一个地改地址。<br>mirror的配置在.m2/settings.xml里。如： </p><pre><code class="xml">&lt;mirrors&gt;    &lt;mirror&gt;        &lt;id&gt;UK&lt;/id&gt;        &lt;name&gt;UK Central&lt;/name&gt;        &lt;url&gt;http://uk.maven.org/maven2&lt;/url&gt;        &lt;mirrorOf&gt;central&lt;/mirrorOf&gt;    &lt;/mirror&gt;&lt;/mirrors&gt;</code></pre><p>这样的话，就会给上面id为central的远程仓库做了个镜像。以后向central这个仓库发的请求都会发到<a href="http://uk.maven.org/maven2" target="_blank" rel="noopener">http://uk.maven.org/maven2</a> 而不是<a href="http://repo1.maven.org/maven2" target="_blank" rel="noopener">http://repo1.maven.org/maven2</a> 了。<br>central 里是要替代的仓库的id。如果填*，就会替代所有仓库。 </p><p>参考资料：<br><a href="http://maven.apache.org/guides/introduction/introduction-to-repositories.html" target="_blank" rel="noopener">http://maven.apache.org/guides/introduction/introduction-to-repositories.html</a><br><a href="http://maven.apache.org/guides/mini/guide-mirror-settings.html" target="_blank" rel="noopener">http://maven.apache.org/guides/mini/guide-mirror-settings.html</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> maven </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> maven </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>[转载]05--maven的生命周期以及插件</title>
+      <link href="/2016/09/19/maven/05-maven-de-sheng-ming-zhou-qi-yi-ji-cha-jian/"/>
+      <url>/2016/09/19/maven/05-maven-de-sheng-ming-zhou-qi-yi-ji-cha-jian/</url>
+      
+        <content type="html"><![CDATA[<hr><p>下面的内容是当时从网络上收藏到有道云笔记的，原作者已经不知道是谁，博客同时也是作为自己的笔记，无意侵权，如果您看到了这篇文章，并且您知道原出处，请您联系我，我将在博客中注明，或者如果您是原作者您介意我借用您的文章，请联系我，我将及时删除。</p><hr><p>maven中生命周期的概念以及插件的使用</p><h2 id="生命周期"><a href="#生命周期" class="headerlink" title="生命周期"></a>生命周期</h2><p>maven的生命周期分为三套，这三套生命周期是相互独立的，分别为：</p><ul><li>Clean Lifecycle 在进行真正的构建之前进行一些清理工作。</li><li>Default Lifecycle 构建的核心部分，编译，测试，打包，部署等等。</li><li>Site Lifecycle 生成项目报告，站点，发布站点。</li></ul><p>既然maven的生命周期是相互独立的，那么意味着你可以仅仅调用clean来清理工作目录，仅仅调用site来生成站点。当然你也可以运行 mvn clean install site 来运行所有这三套生命周期。</p><p>知道了每套生命周期的大概用途和相互关系以后，来逐个详细看一下每套生命周期，Clean和Site相对比较简单，先解释一下。</p><p>每套生命周期都由一组阶段(Phase)组成，我们平时在命令行输入的命令总会对应于一个特定的阶段。比如，运行mvn clean ，这个的clean是Clean生命周期的一个阶段。有点绕？要知道有Clean生命周期，也有clean阶段。Clean生命周期一共包含了三个阶段：  </p><ul><li>pre-clean  执行一些需要在clean之前完成的工作</li><li>clean  移除所有上一次构建生成的文件</li><li>post-clean  执行一些需要在clean之后立刻完成的工作<br>mvn clean 中的clean就是上面的clean，在一个生命周期中，运行某个阶段的时候，它之前的所有阶段都会被运行，也就是说，mvn clean 等同于 mvn pre-clean clean ，如果我们运行 mvn post-clean ，那么 pre-clean，clean 都会被运行。这是Maven很重要的一个规则，可以大大简化命令行的输入。</li></ul><p>下面看一下Site生命周期的各个阶段：  </p><ul><li>pre-site     执行一些需要在生成站点文档之前完成的工作</li><li>site    生成项目的站点文档</li><li>post-site     执行一些需要在生成站点文档之后完成的工作，并且为部署做准备</li><li>site-deploy     将生成的站点文档部署到特定的服务器上<br>经常用到的是site阶段和site-deploy阶段，用以生成和发布Maven站点</li></ul><p>最后是default生命周期，官方给的解释是：  </p><blockquote><p>validate - validate the project is correct and all necessary information is available<br>compile - compile the source code of the project<br>test - test the compiled source code using a suitable unit testing framework. These tests should not require the code be packaged or deployed<br>package - take the compiled code and package it in its distributable format, such as a JAR.<br>integration-test - process and deploy the package if necessary into an environment where integration tests can be run<br>verify - run any checks to verify the package is valid and meets quality criteria<br>install - install the package into the local repository, for use as a dependency in other projects locally<br>deploy - done in an integration or release environment, copies the final package to the remote repository for sharing with other developers and projects.</p></blockquote><p>实际用的多的是：compile，test，packaging，install这四个阶段</p><h2 id="插件机制"><a href="#插件机制" class="headerlink" title="插件机制"></a>插件机制</h2><p>maven的插件机制是完全依赖于maven的生命周期的，比如可以给一个maven构建的web工程添加一个jetty容器插件，通常一个插件的运行指定它在maven的某一个生命周期的阶段运行。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> maven </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> maven </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>04--在eclipse中使用maven</title>
+      <link href="/2016/09/19/maven/04-zai-eclipse-zhong-shi-yong-maven/"/>
+      <url>/2016/09/19/maven/04-zai-eclipse-zhong-shi-yong-maven/</url>
+      
+        <content type="html"><![CDATA[<p>毕竟没有人真的去纯手工开发一个项目，下面介绍一下怎么在IDE中使用maven，以eclipse为例</p><ol><li><p>创建一般的maven工程<br>1.1. 准备工作<br>分别指定installations和user settings为本地maven的安装位置和settings文件所在位置<br><img src="/images/2016/09/1.png" alt><br><img src="/images/2016/09/11.png" alt><br>1.2. 创建maven工程<br><img src="/images/2016/09/2.png" alt><br>遵照提示完成创建操作<br>1.3. 指定jdk的运行时参数<br>设定<code>-Dmaven.multiModuleProjectDirectory=$M3_HOME</code><br>1.4. 右击项目run as maven build就可以运行了<br>goals填入相应的参数<br><img src="/images/2016/09/4.png" alt></p></li><li><p>创建web工程<br>2.1. 跟前面的步骤相似，在这一步选择：webapp<br><img src="/images/2016/09/2.1.png" alt><br>2.2. 创建完成之后index.jsp会报错，因为缺少servlet对应的jar包，把相应的依赖添加进来<br>2.3. 添加缺失的目录结构并将工程转换为web工程<br><img src="/images/2016/09/2.3.1.png" alt><br><img src="/images/2016/09/2.3.2.png" alt><br>2.4. 添加tomcat插件作为项目运行的容器<br>在pom.xml中添加如下代码</p><pre><code class="xml">&lt;build&gt;&lt;plugins&gt; &lt;plugin&gt;&lt;groupId&gt;org.apache.tomcat&lt;/groupId&gt;&lt;artifactId&gt;tomcat-catalina&lt;/artifactId&gt;&lt;version&gt;7.0.65&lt;/version&gt;&lt;executions&gt;&lt;execution&gt;          &lt;phase&gt;package&lt;/phase&gt;          &lt;goals&gt;            &lt;goal&gt;run&lt;/goal&gt;          &lt;/goals&gt;       &lt;/execution&gt;&lt;/executions&gt; &lt;/plugin&gt;&lt;/plugins&gt;&lt;/build&gt;</code></pre><p>2.5. 右键运行为<code>maven build</code> 并填入相应的参数:<code>clean package</code> 就可以运行并在浏览器访问了</p></li></ol>]]></content>
+      
+      
+      <categories>
+          
+          <category> maven </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> maven </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>03--自动建立项目的骨架--archetype 插件的使用</title>
+      <link href="/2016/09/19/maven/03-zi-dong-jian-li-xiang-mu-de-gu-jia-archetype-cha-jian-de-shi-yong/"/>
+      <url>/2016/09/19/maven/03-zi-dong-jian-li-xiang-mu-de-gu-jia-archetype-cha-jian-de-shi-yong/</url>
+      
+        <content type="html"><![CDATA[<p>每次都要自己手动创建符合maven规范的站点目录比较麻烦，我们可以利用archetype插件来辅助生成maven项目的骨架<br>命令格式如下:  </p><ul><li><code>mvn archetype:generate</code>        根据提示一步一步进行操作  </li><li><code>mvn archetype:generate -DgroupId=公司域名的反转+项目名 -DartifactId=项目名-模块名 -Dverison=版本号 -Dpackage=包名</code> 一次性指定参数然后按照提示进行</li></ul>]]></content>
+      
+      
+      <categories>
+          
+          <category> maven </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> maven </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>02--maven基本概念以及常用构建命令</title>
+      <link href="/2016/09/19/maven/02-maven-ji-ben-gai-nian-yi-ji-chang-yong-gou-jian-ming-ling/"/>
+      <url>/2016/09/19/maven/02-maven-ji-ben-gai-nian-yi-ji-chang-yong-gou-jian-ming-ling/</url>
+      
+        <content type="html"><![CDATA[<p>maven必知必会的一些基本概念</p><ol><li><p>基本概念  </p><ul><li>maven的定义：maven是基于项目对象模型（POM），可以通过一小段描述信息来管理项目的构建，报告和文档的软件项目管理工具。</li><li>构件：一个jar包就是一个构件</li><li>坐标：每一个maven中的构件都有它自己的坐标，由groupId,artifactId,verison唯一确定</li><li><p>仓库：所有maven要用到的或者依赖的jar包的存放位置，包括本地仓库和中央仓库  </p><ul><li>本地仓库的位置由%M3_HOME%conf/settings.xml下的localRepository结点的值指定</li><li>中央仓库的位置为：<a href="http://repo1.maven.org/maven2/" target="_blank" rel="noopener">http://repo1.maven.org/maven2/</a>  </li><li>中央仓库的位置可以由settings文件中的repository和mirror两个节点来控制  </li><li>具体控制机制见：<a href="http://www.iteye.com/problems/60531" target="_blank" rel="noopener">http://www.iteye.com/problems/60531</a></li></ul></li><li><p>maven的目录结构：</p><pre><code> -- src      --main             --java                  --包路径              --resources(可选)      --test              --java                   --包路径              --resources(可选)--pom.xml（项目的管理和构建文件）</code></pre></li></ul></li><li><p>maven常用的构建命令  </p><ul><li>-v          查看maven版本号以及其他系统线相关信息</li><li>-clean    清除项目的构建信息</li><li>-compile    编译项目</li><li>-test    测试项目</li><li>-package    将项目进行打包</li><li>-install    安装项目到本地仓库</li></ul></li></ol>]]></content>
+      
+      
+      <categories>
+          
+          <category> maven </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> maven </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>01--搭建maven开发环境  </title>
+      <link href="/2016/09/19/maven/01-da-jian-maven-kai-fa-huan-jing/"/>
+      <url>/2016/09/19/maven/01-da-jian-maven-kai-fa-huan-jing/</url>
+      
+        <content type="html"><![CDATA[<p>maven环境的搭建</p><ol><li><p>下载maven的压缩包，解压<br> 得到目录结构如下：<br><img src="/images/2016/09/clipboard.png" alt></p><ul><li>bin目录：包含maven运行的脚本  </li><li>boot目录：存放maven类加载器框架，maven根据它来加载类  </li><li>conf目录：存放maven的配置文件  </li><li>lib目录：存放各种类  </li></ul></li><li><p>配置环境变量：  </p><ul><li>M3_HOME指向maven安装包根路径    </li><li>path = path;%M3_HOME%/bin</li></ul></li><li><p>dos下输入mvn -v可以查看到版本号,此时配置成功</p></li></ol>]]></content>
+      
+      
+      <categories>
+          
+          <category> maven </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> maven </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>DBUtils轻量框架</title>
+      <link href="/2016/09/19/web/dbutils-qing-liang-kuang-jia/"/>
+      <url>/2016/09/19/web/dbutils-qing-liang-kuang-jia/</url>
+      
+        <content type="html"><![CDATA[<p>在开发网站的时候，如果你疲惫于从0开始搭建并且你对MVC模式很熟悉，而且暂时还没有去学习诸如SSH之类的框架，那么Apache的DBUtils框架对你来说将是一个很好的选择。<br>待续···················</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> web </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 框架 </tag>
+            
+            <tag> Apache </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Ajax</title>
+      <link href="/2016/09/19/web/ajax/"/>
+      <url>/2016/09/19/web/ajax/</url>
+      
+        <content type="html"><![CDATA[<hr><p>Ajax是一门很叼的技术，它可以异步提交请求到服务端而不用刷新页面，这太有用了。设想一下，假如你在填写一个个人信息的页面，比如简历，各种信息填了好几十项，然后你上传了个头像，没有用异步上传的技术，头像上传完刷新回来，你填的其他信息全没了，那你是不是会摔电脑？现在你明白Ajax到底有多重要，但是它重要并不代表它难，笔者当时学习Ajax的时候是在慕课网学的，一个多小时的课程，让你明白什么是Ajax，如何用Ajax，精辟！</p><hr><p>下面是Ajax的一段示例代码  </p><pre><code class="js">&lt;Script&gt;  &lt;!-- Ajax 发送get异步请求 --&gt;  document.getElementById(&quot;search&quot;).onclick = function()  {    var request = new XMLHttpRequest();    request.open(&quot;GET&quot;,&quot;/staff1.do?staffNum=&quot;+document.getElementById(&quot;keyword&quot;).value);    request.send();    request.onreadystatechange = function()    {      if(request.readyState===4)      {        if(request.status===200)        {          document.getElementById(&quot;searchResult&quot;).innerHTML = request.responseText;        }        else          alert(&quot;发生错误&quot;+request.status);      }    }  }  &lt;!-- Ajax 发送post异步请求 --&gt;  document.getElementById(&quot;create&quot;).onclick = function()  {    var request = new XMLHttpRequest();    request.open(&quot;POST&quot;,&quot;/staff.do&quot;);    var data = &quot;staffNum=&quot;+document.getElementById(&quot;staffNum&quot;).value          +&quot;&amp;staffName=&quot;+document.getElementById(&quot;staffName&quot;).value+            &quot;&amp;staffSex=&quot;+document.getElementById(&quot;staffSex&quot;).value+            &quot;&amp;staffAge=&quot;+document.getElementById(&quot;staffAge&quot;).value;    request.setRequestHeader(&quot;Content-Type&quot;,&quot;application/x-www-form-urlencoded&quot;);    request.send(data);    request.onreadystatechange = function()    {      if(request.readyState===4)      {        if(request.status===200)        {          document.getElementById(&quot;createResult&quot;).innerHTML = request.responseText;        }        else          alert(&quot;发生错误&quot;+request.status);      }    }  }&lt;/Script&gt;</code></pre><p>从代码中可以看到，使用Ajax的步骤分为这么几步：  </p><ol><li>创建XMLHttpRequest对象  <pre><code class="js">var xmlhttp;if (window.XMLHttpRequest){// code for IE7+, Firefox, Chrome, Opera, Safarixmlhttp=new XMLHttpRequest();}else{// code for IE6, IE5xmlhttp=new ActiveXObject(&quot;Microsoft.XMLHTTP&quot;);}</code></pre></li><li>打开一个连接 open(method, url, asynch)<br>参数的含义如下：<br>method：请求类型<br>url：请求路径<br>asynch：是否要异步传输，默认值为true(异步)</li><li>发送数据 send(data)  <ul><li>对于get方式，data为空，因为get方式的请求参数都在url中传递  </li><li>对于post方式，data的格式需要设置为”<code>参数名=值&amp;参数名=值</code>“的形式，并且send(data)之前还要设置<code>requestHeader(&quot;Content-Type&quot;,&quot;application/x-www-form-urlencoded&quot;)</code></li></ul></li><li>编写回调函数处理服务器返回结果<br>当请求被发送到服务器时，我们需要执行一些基于响应的任务。<br>每当 readyState 改变时，就会触发 onreadystatechange 事件。所以我们通过监听readystate和status的值来判断请求是否得到正确的响应，从而决定后续的操作。<ul><li>onreadystatechange<br>存储函数（或函数名），每当 readyState 属性改变时，就会调用该函数。</li><li>readyState<br>存有 XMLHttpRequest 的状态。从 0 到 4 发生变化。<br>0: 请求未初始化<br>1: 服务器连接已建立<br>2: 请求已接收<br>3: 请求处理中<br>4: 请求已完成，且响应已就绪</li><li>status<br>服务器响应结果</li></ul></li></ol><p>原生的Ajax的使用不过就这么一点内容，据说JQuery的Ajax使用起来更加方便，等有时间学习了JQuery了再补上。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> web </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> ajax </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>JSP课程考试题</title>
+      <link href="/2016/09/19/web/jsp-ke-cheng-kao-shi-ti/"/>
+      <url>/2016/09/19/web/jsp-ke-cheng-kao-shi-ti/</url>
+      
+        <content type="html"><![CDATA[<p>笔者本科期间JSP课程考试自己整理的题</p><ol><li><p>JSP中动态include与静态include的语法和区别是什么？  </p><ul><li>语法：<br>动态include：<code>&lt;jsp:include page =””&gt;</code><br>静态include：<code>&lt;%@include file = “”%&gt;</code>  </li><li>区别：<br>静态包含是在JSP中包含一个静态的文件，同时解析这个文件中的JSP语句，相当于把该静态文件的内容复制到使用include指令的页面中，当被包含的文件发生变化时，使用include指令包含该文件的页面反应不出变化。<br>动态包含是将被包含文件编译后的结果包含入当前位置，它总是会检查所包含文件的变化，如果被包含资源有变化，那么该页面下一次被访问时将体现出变化后的内容。</li></ul></li><li><p>两种跳转方式是什么？有什么区别？  </p><ul><li>两种跳转方式分别为：<br>forward跳转：<code>&lt;jsp:forward page=&quot;跳转页面地址&quot; /&gt;</code><br>response跳转：<code>response.sendRedirect(&quot;跳转页面地址&quot;)</code>  </li><li>两种跳转的区别如下：<ul><li>forward跳转：<br>a.服务器端跳转，地址栏不改变；<br>b.执行到跳转语句后马上无条件跳转，之后的代码不再执行(跳转之前一定要释放全部资源)；<br>c.request设置的属性在跳转后的页面仍可以使用；<br>d.使用<code>&lt;jsp:param name=&quot;参数名&quot; value=&quot;参数值&quot; /&gt;</code>传递参数。  </li><li>response跳转：<br>a.客户端跳转,地址栏改变；<br>b.所有代码执行完毕后跳转；<br>c.跳转后的页面不能使用上一个页面的request属性；<br>d.使用地址重写传递参数(response.sendRedirect(“URL?参数名＝参数值”))。</li></ul></li></ul></li><li><p>Tomcat服务器的默认端口是什么？怎么修改其默认端口？<br>Tomcat的默认端口为：8080<br>修改默认端口：<br>进到conf目录下修改server.xml：找到第一个Connector，修改port的值即可</p></li><li><p>在JSP中如何使用注释？</p><ul><li>JSP注释<br>&lt;%–这是JSP注释–%&gt;  </li><li>JAVA注释<br><code>&lt;%/*JSP Scriplets代码片段中JAVA注释形式1*/int a = 1;   // JSP Scriplets代码片段中JAVA注释形式2%&gt;</code>  </li><li>HTML注释<br><code>&lt;!—这是HTML注释 --&gt;</code></li></ul></li><li><p>举例说明调用JavaBean的语法和各个属性的作用  </p><ul><li>语法：<br><code>&lt;jsp:useBean id =＂beanInstanceName＂ scope =＂page|request|session|application＂ class = ＂package.className＂/&gt;</code><br>或<br><code>&lt;jsp:useBean id =＂beanInstanceName＂ scope =＂page|request|session|application＂ class = ＂package.className＂&gt;&lt;/jsp:useBean&gt;</code>  </li><li>例子：   <pre><code>&lt;jsp:useBean id =＂bean1＂ scope =＂session＂ class = ＂com.nenu.haha.Bean1＂&gt;&lt;%=bean1.getName()%&gt;&lt;/jsp:useBean&gt;</code></pre></li><li>各属性的作用：<br>id: bean的实例名称，在后面的程序中使用该名称来区别不同的bean<br>scope: 指定bean的存在范围和变量名bean1的有效范围<br>class：bean的存放位置</li></ul></li><li><p>JSP收发邮件和上传文件的常用组件分别是什么？<br>上传文件：JspSmartUpload<br>收发邮件：JavaMail  </p></li><li><p>配置Tomcat虚拟目录时，需要修改哪个xml文件，在哪个位置加入什么语句？<br>修改Tomcat虚拟目录需要修改conf目录下的server.xml文件。<br>具体操作为：（假设工程根目录为：D:\myjsp）<br>找到<code>&lt;Host...&gt;</code>标签，下面增加一句：<br><code>&lt;Context path=＂/anyword＂ docBase=＂D:\myjsp＂reloadable=＂true＂/&gt;</code><br>path说明虚拟目录的名字，即访问路径为：localhost:8080/anyword<br>docBase为工程的物理路径</p></li><li><p>JSP的内置对象有哪些？作用分别是什么？  </p><ul><li>request:包含了客户端向服务器端请求的信息</li><li>response：包含了服务器端向客户端返回的相应内容</li><li>application：保存在application中的信息在整个应用中都有效，可存放全局变量</li><li>session：表示当前用户的会话信息，在session中保存的内容在当前用户所连接到的所有页面中都是可以访问到的</li><li>out:用于向客户端输出内容</li><li>page：指向当前jsp页面本身</li><li>exception：当JSP页面在执行页面过程中产生异常或是错误时，会自动产生一个exception对象</li><li>config：是一个Servlet初始化时，JSP引擎向它传递信息用的</li><li>pageContext：提供对JSP页面内所用对象及名字空间的访问</li></ul></li><li><p>创建了结果集RS后，输出结果集中的所有记录，写出语句  </p><pre><code class="JAVA">ResultSet rs = stmt.executeQuery();  //得到结果集While(rs.next()){ //循环输出所有记录 int id = rs.getInt(1); String name = rs.getString(2); out.println(＂id:＂+id+＂/t姓名:＂+name);}rs.close();  //关闭记录集</code></pre></li><li><p>在SQL Server数据库中要做哪些设置才能够保证JSP顺利访问  </p><ul><li>启动sql server</li><li>启用TCP/IP协议</li><li>配置端口</li><li>设置混合验证</li><li>sa授权登录</li><li>sa密码设置</li><li>重启sql server  </li></ul></li><li><p>关于中文乱码问题，有几种情况，如何解决？  </p><ul><li>JSP页面显示乱码<br>Page的第一行改成<code>&lt;%@page contentType=＂text/html;charset=utf-8＂%&gt;</code><br>Head里加<code>&lt;meta http-equiv=＂Content-Type＂ content=＂text/html;charset=utf-8＂&gt;</code><br>对包含文件作同样的修改  </li><li>获取表单乱码——post提交  <ul><li>方法一：在使用request.getParameter()之前设置编码：<br> request.setCharacterEncoding(＂utf-8＂);</li><li>方法二：设置过滤器  </li></ul></li><li>获取查询字符串乱码——get提交  <ul><li>方法一：  <pre><code class="JAVA">String pa = request.getParameter(＂haha＂);String pb = new String(pa.getBytes(＂iso-8859-1＂),＂gb2312＂);</code></pre></li><li>方法二：<br>打开tomcat安装路径conf下的web.xml文件，在第一个Connector加入属性URIEncoding=＂utf-8＂</li></ul></li></ul></li><li><p>Tomcat如何允许目录浏览，如何修改默认启动页面  </p><ul><li>修改默认启动页面，打开conf/web.xml，修改<code>&lt;welcome-file-list&gt;</code>的值  </li><li>允许目录浏览：设置<code>&lt;listings&gt;</code>的值为true</li></ul></li><li><p>rs产生后，如何计算总记录数rs_total  </p><pre><code class="JAVA">rs_last();rs_total = rs.getRow();</code></pre></li><li><p>详述JSP页面的执行过程，JSP页面第一次调用和第二次调用的区别  </p><ul><li>JSP页面执行过程：<br>当用户第一次请求JSP页面时，web容器将JSP页面转化成Servlet并通过Servlet引擎将其编译成class文件，将class文件加载入内存，执行完的结果通过HTML的形式返还给客户端  </li><li>第一次调用的过程：JSP-&gt;Servlet-&gt;class  </li><li>第二次调用，因为相应的class文件已经存在于JSP容器中，所以直接调用就行<br>所以第二次调用的速度要比第一次快</li></ul></li><li><p>两种表单数据提交方式及区别  </p><ul><li>get方式参数的值会显示在地址栏，post不会</li><li>post方式没有数据大小限制，get方式限制2k以内</li><li>Servlet对于get的处理调用doGet()方法，对于post用doPost()处理</li></ul></li></ol>]]></content>
+      
+      
+      <categories>
+          
+          <category> web </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> jsp </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>json</title>
+      <link href="/2016/09/19/web/zhuan-zai-json/"/>
+      <url>/2016/09/19/web/zhuan-zai-json/</url>
+      
+        <content type="html"><![CDATA[<hr><p>下面的内容是当时从网络上收藏到有道云笔记的，原作者已经不知道是谁，博客同时也是作为自己的笔记，无意侵权，如果您看到了这篇文章，并且您知道原出处，请您联系我，我将在博客中注明，或者如果您是原作者您介意我借用您的文章，请联系我，我将及时删除。</p><hr><p>对于json的学习，如果有自动机的基础，推荐上官网直接学习，官网的解释简单明了：<a href="http://www.json.org/" target="_blank" rel="noopener">http://www.json.org/</a>。本文不对json的格式进行讲解，只比较一下各个JSON技术的优劣。</p><ol><li><p><strong>json-lib</strong><br>json-lib最开始的也是应用最广泛的json解析工具，json-lib 不好的地方确实是依赖于很多第三方包，包括commons-beanutils.jar，commons-collections-3.2.jar，commons-lang-2.6.jar，commons-logging-1.1.1.jar，ezmorph-1.0.6.jar，对于复杂类型的转换，json-lib对于json转换成bean还有缺陷，比如一个类里面会出现另一个类的list或者map集合，json-lib从json到bean的转换就会出现问题。json-lib在功能和性能上面都不能满足现在互联网化的需求。</p></li><li><p><strong>开源的Jackson</strong><br>相比json-lib框架，Jackson所依赖的jar包较少，简单易用并且性能也要相对高些。而且Jackson社区相对比较活跃，更新速度也比较快。Jackson对于复杂类型的json转换bean会出现问题，一些集合Map，List的转换出现问题。Jackson对于复杂类型的bean转换Json，转换的json格式不是标准的Json格式。</p></li><li><p><strong>Google的Gson</strong><br>Gson是目前功能最全的Json解析神器，Gson由Google自行研发而来。Gson的应用主要为toJson与fromJson两个转换函数，依赖于gson.jar。而在使用这种对象转换之前需先创建好对象的类型以及其成员才能成功的将JSON字符串成功转换成相对应的对象。类里面只要有get和set方法，Gson完全可以将复杂类型的json到bean或bean到json的转换，是JSON解析的神器。Gson在功能上面无可挑剔，但是性能上面比FastJson有所差距。</p></li><li><p><strong>阿里巴巴的FastJson</strong><br>Fastjson是一个Java语言编写的高性能的JSON处理器,由阿里巴巴公司开发。<br>无依赖，不需要额外的jar，能够直接跑在JDK上。<br>FastJson在复杂类型的Bean转换Json上会出现一些问题，可能会出现引用的类型，导致Json转换出错，需要制定引用。<br>FastJson采用独创的算法，将parse的速度提升到极致，超过所有json库。</p></li></ol><p>综上4种Json技术的比较，在项目选型的时候可以使用Google的Gson和阿里巴巴的FastJson两种并行使用，<br>如果只是功能要求，没有性能要求，可以使用google的Gson，<br>如果有性能上面的要求可以使用Gson将bean转换json确保数据的正确，使用FastJson将Json转换Bean</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> web </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> json </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>ss翻墙</title>
+      <link href="/2016/09/18/git/an-zhuang-gitlab/"/>
+      <url>/2016/09/18/git/an-zhuang-gitlab/</url>
+      
+        <content type="html"><![CDATA[<h3 id="翻墙"><a href="#翻墙" class="headerlink" title="翻墙"></a>翻墙</h3><ol><li>下载shadowsocks  <pre><code class="shell">apt-get updateapt-get install python-pipapt-get install python-setuptools m2cryptopip install shadowsocks</code></pre></li><li>设置配置文件<pre><code class="json">{&quot;server&quot;:&quot;XX.XX.XX.XX&quot;,&quot;server_port&quot;:XX,&quot;local_port&quot;:1080,&quot;password&quot;:&quot;your password&quot;,&quot;timeout&quot;:600,&quot;method&quot;:&quot;aes-256-cfb&quot;}</code></pre></li><li>启动shadowsocks  <pre><code class="shell">sslocal -c /your/path/shadowsocks.json</code></pre></li><li>由于需要给终端翻墙，还需要安装并配置polipo<pre><code class="shell">apt-get install polipo</code></pre>修改配置  <pre><code class="shell">vim /etc/polipo/config</code></pre>添加三行<pre><code class="shell">socksParentProxy = &quot;localhost:1080&quot;socksProxyType = socks5logLevel=4</code></pre>关闭和启动polipo<pre><code class="shell">service polipo stopservice polipo start</code></pre></li><li>验证和使用<pre><code class="shell">http_proxy=http://localhost:8123 curl ip.gs</code></pre>语句得到的ip地址已经不是中国的了：“City / 城市: New York City New York<br>Country / 国家: United States<br>”，说明安装成功。<br>上面实验说明了想要为某个命令加上代理，就在前面使用：http_proxy=<a href="http://localhost:8123" target="_blank" rel="noopener">http://localhost:8123</a><br>ps：8123是polipo的默认端口，如有需要，可以修改成其他有效端口。</li></ol>]]></content>
+      
+      
+      <categories>
+          
+          <category> web </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> shadowsocks </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>语法：JAVA7新特性--数字之间下划线分隔</title>
+      <link href="/2016/09/18/java/yu-fa-java7-xin-te-xing-shu-zi-zhi-jian-xia-hua-xian-fen-ge/"/>
+      <url>/2016/09/18/java/yu-fa-java7-xin-te-xing-shu-zi-zhi-jian-xia-hua-xian-fen-ge/</url>
+      
+        <content type="html"><![CDATA[<p>在Oracle Java程序设计大赛模拟题中见到了这么一道题：</p><p><img src="/images/2016/09/oracle题.png" alt="oracle题"></p><p>当时就懵逼了，这不是全错了么，还有这么个用法？心中当然知道出题者的意图是考察对于数字数据类型的掌握程度，赶忙写了个demo测试了一下。</p><pre><code class="java">public class Test {    public static void main(String[] args) {        long n1 = 12_3_45___789;    //    long n2 = __123_45_678_9;    //    int n3 = 0xFc_aB_C3_353;        double n4 = 0b11001_001_0_0_11;    //    float n5 = 1.4_142_13;        float n6 = 0_1_2_3;        System.out.println(n1 + &quot; &quot; + n4 + &quot; &quot; + n6);    }}</code></pre><p>结果没啥好说的，请自行测试，百度了一下说法。然后就发现是自己孤陋寡闻了，Java7就支持了数字之间加下划线的特性。（希望不要被吐槽，google访问不上，如有高人求指点）度娘告知的答案如下：</p><p>JDK1.7的发布介绍了一些有用的特征，尽管大部分都是一些语法糖，但仍然极大地提高了代码的可读性和质量。其中的一个特征是介绍字面常量数字的下划线。</p><p>从Java7开始，你就可以在你的Java代码里把长整型数字，比如10000000000写成一个更具可读性的形式–10_000_000_000。在字面常量数字中加下划线的一个重要的原因是避免一些难以通过看代码来发现的细微的错误。对比10000000000 和1000000000，我们很难发现少了一个0或多了一个0，但对于10_000_000_000和1_000_000_000却不然。所以如果你在Java源码中要处理大数字，你可以在数字中加入下划线来提高可读性。</p><p>使用的时候要注意：在字面常量数字里加下划线是有一定规则的，以下是一些不能在数值型字面值上用下划线的地方：</p><ul><li>在数字的开始或结尾</li><li>浮点型数字的小数点附近</li><li>F或L下标的前面</li><li>该数值型字面值是字符串类型的时候</li></ul><p>这里有一些例子，来表现哪些地方加给数字加下划线有效，哪些地方给数字加下划线无效</p><pre><code class="java">float pi1 = 3_.1415F; // 无效的; 不能在小数点之前有下划线float pi2 = 3._1415F; // 无效的; 不能在小数点之后有下划线long socialSecurityNumber1 = 999_99_9999_L; //无效的，不能在L下标之前加下划线int a1 = _52; // 这是一个下划线开头的标识符，不是个数字int a2 = 5_2; // 有效int a3 = 52_; // 无效的，不能以下划线结尾int a4 = 5_______2; // 有效的int a5 = 0_x52; // 无效，不能在0x之间有下划线int a6 = 0x_52; // 无效的，不能在数字开头有下划线int a7 = 0x5_2; // 有效的 (16进制数字)int a8 = 0x52_; // 无效的，不能以下划线结尾int a9 = 0_52; // 有效的（8进制数）int a10 = 05_2; // 有效的（8进制数）int a11 = 052_; // 无效的，不能以下划线结尾</code></pre><p>下面是一些在数字中用下划线的其它示例：</p><pre><code class="java">long creditCardNumber = 6684_5678_9012_3456L; // 在编码的时候，最好永远不要这么做long socialSecurityNumber = 333_99_9999L; // 在编码的时候，最好永远不要这么做float pi = 3.14_15F;long hexBytes = 0xFF_EC_DE_5E;long hexWords = 0xCAFE_BABE;long maxLong = 0x7fff_ffff_ffff_ffffL;byte nybbles = 0b0010_0101;long bytes = 0b11010010_01101001_10010100_10010010;</code></pre><p>综上，数字型常量加下划线可以很好地提高代码可读性，可合理使用。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> JAVA </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> JAVA </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Git总结</title>
+      <link href="/2016/09/18/git/git-zong-jie/"/>
+      <url>/2016/09/18/git/git-zong-jie/</url>
+      
+        <content type="html"><![CDATA[<hr><p>git作为一种分布式的版本控制工具，相对svn的优势是很明显的，曾被阿里的面试官问到git与svn的区别，在这里对git做一个简要的介绍。</p><hr><h5 id="why-git"><a href="#why-git" class="headerlink" title="why git?"></a>why git?</h5><p>我本人用svn有三年的时间了，你要是不嫌弃的话其实svn也没有那么烂，我感觉会用的话还是挺好用的。当然笔者是受过它的苦的，曾经svn服务器挂过代码废了老大劲才找回来，这就凸显了svn最大的一个特点，svn是集中式的版本控制工具，它的版本库在svn服务器上构建，一旦服务器挂了，完了，版本历史就没了。而git是作为一个分布式的版本控制工具，它的版本库是构建在本地的，当然与别人协作的时候你也得推送到一个中间服务器上，但是那样每个人的本地都有一个完整的版本库，安全性孰强孰弱可想而知。</p><h5 id="how-to-git"><a href="#how-to-git" class="headerlink" title="how to git?"></a>how to git?</h5><p>github有一个开源项目，名为githug，推荐大家clone到本地来玩一下，通关之后，how to git这个问题我想自然也就解决了。</p><h5 id="常用git命令"><a href="#常用git命令" class="headerlink" title="常用git命令"></a>常用git命令</h5><p>git init：初始化一个仓库<br>git add <file> ：添加文件到暂存区<br>git commit -m “说明内容” ： 提交到版本库<br>git status：查看工作区的状态<br>git diff可以查看修改内容。<br>git log： 查看从最近到最远的提交日志，可以单行显示（加参数 –pretty=oneline ）<br>git reset –hard HEAD^ ：回退到上一个版本（ps：在Git中，用HEAD表示当前版本，也就是最新的提交，上一个版本就是HEAD^，<br>上上一个版本就是HEAD^^，当然往上100个版本写100个^比较容易数不过来，所以写成HEAD~100）<br>git reset –hard 版本号 ： 回退到指定版本<br>git reflog ：查看你的每一次命令<br>git checkout – file ： 丢弃工作区的修改<br>git reset HEAD file ： 将文件移出暂存区<br>git rm ：删除一个文件<br>git remote add origin git@server-name:path/repo-name.git ： 关联一个远程库<br>git push -u origin master ： 第一次推送master分支的所有内容到远端<br>git push origin master ： 推送最新修改到远端<br>git clone 仓库地址 ： clone仓库到本地<br>git branch ： 查看分支<br>git branch <name> ： 创建分支<br>git checkout <name> ：切换分支<br>git checkout -b <name> ： 创建+切换分支<br>git merge <name> ：合并某分支到当前分支<br>git branch -d <name> ：删除分支<br>git log –graph ：查看分支合并图  </name></name></name></name></name></file></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> git </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> git </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>问题集：2 + 2 = 5</title>
+      <link href="/2016/09/18/java/wen-ti-ji-2-2-5/"/>
+      <url>/2016/09/18/java/wen-ti-ji-2-2-5/</url>
+      
+        <content type="html"><![CDATA[<hr><p>一个有趣的实验：2 + 2 = 5</p><hr><p>相关代码如下：</p><pre><code class="java">import java.lang.reflect.*;public class Test {    public static void main(String[] args) throws NoSuchFieldException, IllegalAccessException {        Class cache = Integer.class.getDeclaredClasses()[0];        Field myCache = cache.getDeclaredField(&quot;cache&quot;);        myCache.setAccessible(true);        Integer[] newCache = (Integer[])myCache.get(cache);        newCache[132] = newCache[133];        int a = 2;        int b = a + a;        System.out.printf(&quot;%d + %d = %d&quot;, a, a, b);    }}</code></pre><p>运行结果如下：<br><img src="/images/2016/10/结果.png" alt="结果">  </p><p>很神奇，a为2，b赋值为a + a，很明显是4，控制台却偏偏输出了2 + 2 = 5。第一眼看到这个程序时，我的心情是这样的–借用同学的话，程序猿遇到的事鬼都没法解释。但是毕竟我们还是相信科学的。随着自己对于JAVA的理解的加深，我了解了反射，了解了自动拆包，解包，终于有一天我鼓足勇气，一点一点的查阅jdk的源码，找到了这个中的原因所在。<br>为了方便解释，我们执果索因，在最后输出语句之前加入一行调试语句，单独输出b的值，可以看到b的值还是4  </p><p><img src="/images/2016/10/调试.png" alt="调试">  </p><p>那么原因自然就出在了printf上，为何？查阅源码，源码中printf的代码段如下：</p><pre><code class="java">        public PrintStream printf(String format, Object ... args) {        return format(format, args);    }</code></pre><p>这能说明什么？说明我们传printf方法里边的参数是以Object对象的形式存在的，而不是简单的int类型，那自然就会用到JAVA里边的自动封包的机制，那照这么看来，难道是4在被封装成Integer类型时被封装成了5？我们验证一下，在最后的输出语句后加上：</p><pre><code class="java">System.out.printf(&quot;\n%d&quot;, 4);</code></pre><p>果不其然，我们得到了我们想要的结果：  </p><p><img src="/images/2016/10/Image 6.png" alt>  </p><p>那到底是为什么int的4会被封装成Integer的5呢？显然该是前面这段代码的原因了，还请随我细细来看</p><pre><code class="java">Class cache = Integer.class.getDeclaredClasses()[0];</code></pre><p>继续剖析代码，通过反射的基本知识我们知道这个语句的意思是获取Integer的第一个内部类，那么是什么呢，查阅源码，我们发现，这个class叫做IntegerCache，那我们来看看它的作用是什么</p><pre><code class="java">        private static class IntegerCache {        static final int low = -128;        static final int high;        static final Integer cache[];        static {            // high value may be configured by property            int h = 127;            String integerCacheHighPropValue =                sun.misc.VM.getSavedProperty(&quot;java.lang.Integer.IntegerCache.high&quot;);            if (integerCacheHighPropValue != null) {                try {                    int i = parseInt(integerCacheHighPropValue);                    i = Math.max(i, 127);                    // Maximum array size is Integer.MAX_VALUE                    h = Math.min(i, Integer.MAX_VALUE - (-low) -1);                } catch( NumberFormatException nfe) {                    // If the property cannot be parsed into an int, ignore it.                }            }            high = h;            cache = new Integer[(high - low) + 1];            int j = low;            for(int k = 0; k &lt; cache.length; k++)                cache[k] = new Integer(j++);            // range [-128, 127] must be interned (JLS7 5.1.7)            assert IntegerCache.high &gt;= 127;        }        private IntegerCache() {}    }</code></pre><p>这是官方的解释，它告诉我们这个类是在自动封包的时候作缓存用的，缓存的范围为-128~127，4在范围内</p><blockquote></blockquote><pre><code>    /** * Cache to support the object identity semantics of autoboxing for values between * -128 and 127 (inclusive) as required by JLS. * * The cache is initialized on first usage.  The size of the cache * may be controlled by the {@code -XX:AutoBoxCacheMax=&lt;size&gt;} option. * During VM initialization, java.lang.Integer.IntegerCache.high property * may be set and saved in the private system properties in the * sun.misc.VM class. */</code></pre><p>我们看看IntegerCache里边都做了些什么：</p><pre><code class="java">//声明下界上界和cache数组static final int low = -128;static final int high;static final Integer cache[];static {      //判断上界是否被显示设定，如果被设定，将上界赋值为显示值        // high value may be configured by property        int h = 127;        String integerCacheHighPropValue =                sun.misc.VM.getSavedProperty(&quot;java.lang.Integer.IntegerCache.high&quot;);        if (integerCacheHighPropValue != null) {                try {                        int i = parseInt(integerCacheHighPropValue);                        i = Math.max(i, 127);                        // Maximum array size is Integer.MAX_VALUE                        h = Math.min(i, Integer.MAX_VALUE - (-low) -1);                } catch( NumberFormatException nfe) {                        // If the property cannot be parsed into an int, ignore it.                }        }        high = h;        //定义数组并为数组循环赋值        cache = new Integer[(high - low) + 1];        int j = low;        for(int k = 0; k &lt; cache.length; k++)                cache[k] = new Integer(j++);</code></pre><p>到这，开始有点眉目了，IntegerCache里边放了一cache数组，cache[0] ~ cache[high - low]分别存着low ~ high对应的Integer值，那这自动封装就是取的int值对应到cache数组中的Integer元素，4的话应该是对应cache[132]，5对应cache[133]，那么再来看我们最初的代码</p><pre><code class="java">        //获取到cache字段        Field myCache = cache.getDeclaredField(&quot;cache&quot;);        //设置cache字段可以被访问        myCache.setAccessible(true);        //拿到cache字段并修改该字段的值        Integer[] newCache = (Integer[])myCache.get(cache);        //制造&quot;4是5&quot;的假象        newCache[132] = newCache[133];        int a = 2;        int b = a + a;        System.out.printf(&quot;%d + %d = %d&quot;, a, a, b);</code></pre><p>至此，真相大白，水落石出，2 + 2 = 5也就自然成立了，不过是原来int的4对应于Integer中的缓存是(Integer)4，而我们把这个缓存值改成了(Integer)5而已，是反射利用自动封包机制搞的鬼，笔者当时明晓答案之后只有一个感慨，反射这个东西真是挺牛逼的，比鬼厉害，哈哈。</p><p>后来哥大四找工作的时候，参加各大互联网公司的笔面试，各种被虐，但是好多次都见到这么一个题，哥笑了，题目如下，请大家自行解答：</p><pre><code class="java">int v1_1 = 127;int v1_2 = 127;int v2_1 = 128;int v2_2 = 128;System.out.println(v1_1 == v1_2);System.out.println(v2_1 == v2_2);//问输出的结果是什么？</code></pre>]]></content>
+      
+      
+      <categories>
+          
+          <category> JAVA </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> JAVA </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>问题集：同名变量问题</title>
+      <link href="/2016/09/18/java/wen-ti-ji-tong-ming-bian-liang-wen-ti/"/>
+      <url>/2016/09/18/java/wen-ti-ji-tong-ming-bian-liang-wen-ti/</url>
+      
+        <content type="html"><![CDATA[<hr><p>本文介绍什么情况下在同一个类中同名变量可以共存</p><hr><p>相关代码如下：</p><pre><code class="java">class Test{ static int x = 1; public static void main(String[] args){  int x=2;  System.out.println(x); }}class Test1 { public static void main(String[] args) {  int x = 2;  for(int i = 0; i &lt; 2; i++) {      int x = 3;      System.out.println(x);  } }}class Test2{ int x = 1; public static void main(String[] args){  int x=2;  System.out.println(x); }}</code></pre><p>运行结果分别如下：<br><img src="/images/2016/10/.png" alt="Test"><br><img src="/images/2016/10/Test1.png" alt="Test1"><br><img src="/images/2016/10/test2.png" alt="Test2"><br>可以看到，除开第二个编译失败之外，其余两个的运行结果都是2。为什么呢？这个问题在我的有道笔记中躺了一年的时间，从静态变量和实例变量的角度去考虑怎么也不能接受，直到后来我接触到了虚拟机，尼玛，这太应该了。<br>首先，对于Test程序，我们定义了一个静态变量x，这个x随着类的加载被分配到了内存的方法区模块，然后我们再定义了一个局部变量x，它随着方法一起被分配到了内存的运行时栈区，那自然这两个变量可以共存，打印结果为什么是2也就不足为奇了。那么怎么访问静态变量x呢？跟之前一样的访问规则：类名.变量名，读者可以自行尝试。<br>而对于Test1，在同一个方法体中，我们试图定义两个同名的变量x，如果可以，那意味着在栈中的该方法帧中存在两同名的变量x，显然这是不允许的，编译失败。<br>对于Test2，也很好接受了，实例变量被分配到了堆内存中，局部变量分配到了栈中，我们可以通过this.变量名来访问实例变量。<br>以前学长跟我说，学习JAVA做了一定的项目，看了一定的书籍之后你需要了解一下虚拟机的相关知识来进阶。嗯，我觉得很有必要了，路漫漫其修远兮，吾将上下而求索。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> JAVA </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> JAVA </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>问题集：两个String是否相等</title>
+      <link href="/2016/09/18/java/wen-ti-ji-liang-ge-string-shi-fou-xiang-deng/"/>
+      <url>/2016/09/18/java/wen-ti-ji-liang-ge-string-shi-fou-xiang-deng/</url>
+      
+        <content type="html"><![CDATA[<hr><p>我们知道String类私有的维护一个字符串池，在判断两个字符串对象是否==时，要考虑到这一点</p><hr><p>首先来看一段代码：  </p><pre><code class="java">class StringDemo { public static void main(String[] args) {  String s1 = &quot;Welcome&quot;;  String s2 = new String(&quot;Welcome&quot;);  String s3 = &quot;Welcome&quot;;  String s4 = new String(&quot;Welcome&quot;).intern();  //对相同字符串直接量使用同一个实例  System.out.println(s1 == s2);    //false  System.out.println(s1 == s3);    //true  System.out.println(s3 == s4);    //true  System.out.println(s2 == s4);    //false    }}</code></pre><p>简单解释如下：<br>s1 == s2 为false，原因是s1存在于字符串池中，而s2不是从字符串池中取的”Welcome”对象<br>s1 == s3 为true，因为s1和s3指向字符串池中的同一”Welcome”对象<br>s3 == s4 为true，s2 == s4 为false，官方API给出的解释如下：  </p><blockquote><p>返回字符串对象的规范化表示形式。<br>一个初始为空的字符串池，它由类 String 私有地维护。<br>当调用 intern 方法时，如果池已经包含一个等于此 String 对象的字符串（用 equals(Object) 方法确定），则返回池中的字符串。否则，将此 String 对象添加到池中，并返回此 String 对象的引用。<br>它遵循以下规则：对于任意两个字符串 s 和 t，当且仅当 s.equals(t) 为 true 时，s.intern() == t.intern() 才为 true。</p></blockquote><p>由于之前字符串池中已经存在”Welcome”对象，所以返回该对象的引用，故s3 == s4 为true，s2 == s4 为false。  </p><p>掌握原理则万变不离其中。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> JAVA </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> JAVA </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>问题集：nextInt后nextLine读取空值</title>
+      <link href="/2016/09/18/java/wen-ti-ji-nextint-hou-nextline-du-qu-kong-zhi/"/>
+      <url>/2016/09/18/java/wen-ti-ji-nextint-hou-nextline-du-qu-kong-zhi/</url>
+      
+        <content type="html"><![CDATA[<p>在学习Scanner类的时候遇到一个问题，在使用nextInt()获取到一个整数之后，如果接着调用nextLine()方法，nextLine()方法将获取不到值？</p><pre><code class="java">import java.util.*;public class Test {    public static void main(String[] args) {        Scanner sc = new Scanner(System.in);        int n = sc.nextInt();        String name = sc.nextLine();        String motto = sc.nextLine();        System.out.println(&quot;----------------------&quot;);        System.out.println(n);        System.out.println(name);        System.out.println(motto);        sc.close();    }}</code></pre><p>当输入1和abc时，程序结束，name和motto的值分别被赋为空串和abc</p><pre><code>NPP_EXEC: &quot;java&quot;java  -cp &quot;C:\Users\frank\Desktop&quot; &quot;Test&quot;Process started &gt;&gt;&gt;1abc----------------------------1abc&lt;&lt;&lt; Process finished. (Exit code 0)================ READY ================</code></pre><p>吓得我赶紧查了一下API,API对于nextLine()方法给出的解释是这样的：</p><blockquote><p>此扫描器执行当前行，并返回跳过的输入信息。 此方法返回当前行的其余部分，不包括结尾处的行分隔符。当前位置移至下一行的行首。<br>因为此方法会继续在输入信息中查找行分隔符，所以如果没有行分隔符，它可能会缓冲所有输入信息，并查找要跳过的行。</p></blockquote><p>我们可以发现，对于上面的代码，当输入1 abc和def，name和motto的值分别被赋为 abc,def</p><pre><code>NPP_EXEC: &quot;java&quot;java  -cp &quot;C:\Users\frank\Desktop&quot; &quot;Test&quot;Process started &gt;&gt;&gt;1 abcdef----------------------------1 abcdef&lt;&lt;&lt; Process finished. (Exit code 0)================ READY ================</code></pre><p>那么问题出在哪呢？</p><p>我们知道平常在使用nextInt()的时候总是习惯于在输入完一个整数之后敲回车来结束这一次整数输入，殊不知在这一个整数输入之后就开始算做下一次输入了，也就是说你的这一个换行符被当作了下一个输入，也就是你nextLine()的输入，而根据官方API，nextLine会查找换行符之前的内容，而不会记录换行符作为信息，那么自然出现了nextInt()之后不能调用nextLine()获取一行字符的假象。</p><p>问题原因找到了，如何解决呢？</p><p>野蛮的办法，连续调用两次nextLine()，第一次调用就让它光荣地牺牲吧~</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> JAVA </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> JAVA </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>问题集：自定义java.lang.Object类</title>
+      <link href="/2016/09/18/java/wen-ti-ji-zi-ding-yi-java.lang.object-lei/"/>
+      <url>/2016/09/18/java/wen-ti-ji-zi-ding-yi-java.lang.object-lei/</url>
+      
+        <content type="html"><![CDATA[<hr><p>同学去阿里面试的时候被问到的问题：可否自定义一个String类，放在一个名为java.lang的包中？与此问题有异曲同工之妙。</p><hr><p>相关代码如下：</p><pre><code class="java">package java.lang;public class Object {    public static void main(String[] args) {        System.out.println(&quot;Hello World!&quot;);    }}</code></pre><p>运行结果如下：<br><img src="/images/2016/10/vmresult.png" alt><br>为什么呢，明明我定义了main方法？它偏偏说找不到？<br>我们注意到这个类的特殊性，java.lang.Object，太特殊了，这不是万物的祖先嘛。<br>待续》》》因为虚拟机的类加载机制</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> JAVA </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> JAVA </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>语法：JAVA基本的程序设计结构</title>
+      <link href="/2016/09/18/java/java-ji-ben-de-cheng-xu-she-ji-jie-gou/"/>
+      <url>/2016/09/18/java/java-ji-ben-de-cheng-xu-she-ji-jie-gou/</url>
+      
+        <content type="html"><![CDATA[<hr><p>高级语言的基本程序设计结构都是大同小异的，笔者大学期间学习的第一门高级语言是C语言，在学习Java语言中不涉及到面向对象的部分时，都还是感觉非常得心应手的，毕竟高级语言的组成都比较相近，大体包括：<br>标识符，变量，常量，关键字，分隔符，表达式，语句，注释，数据类型，运算符，控制流程，数组，指针（引用），过程（函数，方法）等这么一些概念。</p><hr><p>本文不打算讲解所有的概念，只是简单的对某些概念做一下概括，或者是说提出一些需要注意的问题。</p><h2 id="注释"><a href="#注释" class="headerlink" title="注释"></a>注释</h2><p>Java中注释包括三种分别为：</p><ul><li>行注释    //</li><li>块注释    /<em>   </em>/</li><li>方法注释    /*<em>    </em>/</li></ul><h2 id="数据类型"><a href="#数据类型" class="headerlink" title="数据类型"></a>数据类型</h2><p>Java是强类型语言，包括8种基本数据类型和3种引用数据类型<br>其中基本数据类型包括四种整型（byte,short,int,long），2种浮点类型(float,double)，1种用于表示Unicode编码的字符单元的字符类型char和一种用于表示真值的boolean类型，3种引用数据类型包括数组，类和接口。<br>几种数据类型之间的转换：如图（虚线代表会丢失精度，实线代表不会丢失精度）:<br><img src="/images/2016/09/数据类型转换.png" alt="数据类型转换"></p><h2 id="变量"><a href="#变量" class="headerlink" title="变量"></a>变量</h2><ul><li>变量的定义和初始化<br>对于基本类型的变量而言，必须先初始化方能使用，对于引用类型，Java会默认将变量初始化为对应类型的“零值”，比如定义一个数组：<br><code>int[] arr = new int[6];</code><br>系统将初始化arr为[0,0,0,0,0,0]，数组类型的默认值为元素对应基本类型的零值的集合，类对象的“零值”为null。</li><li>常量<br>如果不希望一个变量被修改，那么我们可以用final修饰这个变量，习惯上我们习惯把它称之为常量，并把整个变量名大写，这种变量一经赋值，无法修改。<br>注意，对于引用变量而言，是指引用本身不能再被改变，而引用的对象的属性还能被改变。</li></ul><h2 id="运算符"><a href="#运算符" class="headerlink" title="运算符"></a>运算符</h2><ul><li>自增自减：++，–</li><li>关系运算符：==，！=，&gt;，&lt;，&gt;=，&lt;=</li><li>三元运算符：condition ? expression1 : expression2</li><li>位运算符：&amp;，|，^，~，&lt;&lt;，&gt;&gt;，&gt;&gt;&gt;</li><li>算术运算符：+，-，*，/，mod</li><li>条件运算符：&amp;&amp;，||（注意与&amp;，|的区别：&amp;和|可以用于位运算，而&amp;&amp;和||具有短路的功能）<br>谈及运算符，Math类中的一些函数和常量也非常常用，比如Math.PI，Math.abs(n)等，这些还需要我们在平常多积累。</li></ul><h2 id="字符串"><a href="#字符串" class="headerlink" title="字符串"></a>字符串</h2><p>Java中，字符串是存放在字符串池当中的，一经创建不能被改变，或许你可能不服了，怎么就不能被改变了？举个栗子：</p><pre><code class="Java">String a =&quot;haha&quot;;a =&quot;bb&quot;;</code></pre><p>这里字符串a不是改成”bb”了么？<br>请注意，字符串不是基本类型，它是引用类型，a不过是一个引用，它指向字符串池中的”haha”变量，现在我将它赋值为”bb”，不过是把它指向了”bb”这个字符串对象了而已，”haha”依然在那，没有任何改变。<br>如果想要创建可变的字符串，可以使用StringBuilder或StringBuffer这两个类，它们的功能完全一样，区别仅在于StringBuilder是线程安全的，而StringBuffer不是。<br>编程中，字符串API是使用最多的，我们需要熟练的掌握，具体请自行查阅API文档。</p><h2 id="大数值"><a href="#大数值" class="headerlink" title="大数值"></a>大数值</h2><p>做ACM的同学应该都知道，在Java里边有一个很厉害的东西，它可以实现任意精度的计算，不会溢出。这个神奇的东西就是BigInteger和BigDecimal类，它的神奇之处已经介绍了可以实现任意精度的计算。但是不支持+，-，*，/这些运算符号，所有的运算符号都被用函数来代替了。<br>具体的函数还是请查阅API，它的底层使用数组实现的，有兴趣的同学可以自行查阅它的源码，由于比较高能，本文不予讨论。</p><h2 id="数组"><a href="#数组" class="headerlink" title="数组"></a>数组</h2><ul><li>定义和初始化：<br>主要注意对象数组的定义和初始化方式：<pre><code class="JAVA">Person[] p =newPerson[5];for(int i =0; i &lt; p.length; i++){  p[i]=newPerson();}</code></pre></li><li>匿名数组：<br>在方法中时常要传递匿名数组 ：<pre><code>printArray(newint[]{1,2,3});</code></pre></li><li>foreach循环:<br>Java5中新增的循环书写方式，用于对数组或集合对象进行遍历，格式为：<br>foreach(var : collection)    statements   ,如：<pre><code class="JAVA">foreach(p :Person per){  per =newPerson();}</code></pre></li><li>多维数组:<br>Java中的多维数组实际是数组的数组，比如二位数组其实就是一维数组，不过它的每一个元素都是一个一维数组。</li></ul>]]></content>
+      
+      
+      <categories>
+          
+          <category> JAVA </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> JAVA </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>语法：环境变量</title>
+      <link href="/2016/09/18/java/huan-jing-bian-liang/"/>
+      <url>/2016/09/18/java/huan-jing-bian-liang/</url>
+      
+        <content type="html"><![CDATA[<h5 id="Java环境变量的配置"><a href="#Java环境变量的配置" class="headerlink" title="Java环境变量的配置"></a>Java环境变量的配置</h5><p><strong>java_home</strong>: 指向jdk根目录，被许多IDE和容器所需要<br><strong>path</strong>：指定java.exe和javac.exe等运行java程序必不可少的工具所在的目录<br>        值为：<em>%java_home%/bin</em><br><strong>classpath</strong>：指定类文件的目录<br>如果用户变量与系统变量同名，用户变量将覆盖系统变量</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> JAVA </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> JAVA </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>设计模式：模板设计模式</title>
+      <link href="/2016/09/18/java/she-ji-mo-shi-mo-ban-she-ji-mo-shi/"/>
+      <url>/2016/09/18/java/she-ji-mo-shi-mo-ban-she-ji-mo-shi/</url>
+      
+        <content type="html"><![CDATA[<hr><p>模板方法设计模式：在定义功能时，功能的一部分是确定的，而另一部分是不确定的，又确定的部分调用不确定的部分，<br>这时把不确定的部分封装起来，暴露出去，让它的子类去具体实现。<br>这也是抽象类的一种应用方式。</p><hr><p>通过一个小程序体现如下：</p><pre><code class="java">class TemplateDemo {    public static void main(String[] args) {        A a = new A();        a.getTime();    }}/* * 需求：获取一个程序的运行时间； *  * 实现方法：调用System类中的currentTimeMillis获取开始及结束时间 相减可得 * */abstract class GetTime {    public final void getTime() {        long startTime = System.currentTimeMillis();        runProgram();        long endTime = System.currentTimeMillis();        System.out.println(&quot;运行时间：&quot; + (endTime - startTime));    }    public abstract void runProgram();}class A extends GetTime {    public void runProgram() {        for (int i = 0; i &lt; 4000; i += 100)            System.out.print(i + &quot; &quot;);    }}</code></pre>]]></content>
+      
+      
+      <categories>
+          
+          <category> JAVA </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> JAVA </tag>
+            
+            <tag> 设计模式 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>设计模式：单例</title>
+      <link href="/2016/09/18/java/she-ji-mo-shi-dan-li/"/>
+      <url>/2016/09/18/java/she-ji-mo-shi-dan-li/</url>
+      
+        <content type="html"><![CDATA[<hr><p>单例设计模式是应用非常广泛的一种设计模式，分为饿汉式和懒汉式。本文将分别予以介绍。</p><hr><p>单例设计模式：对于一个特定的类只允许其建立唯一的一个对象</p><p>单例模式的三步曲：</p><ol><li>禁止在该类外建立该类的对象  </li><li>在该类内建立一个对象    </li><li>对外提供一个可以访问该类的方法  </li></ol><p>具体代码实现：</p><ul><li>饿汉式<br>所谓饿汉式，顾名思义，它很饥饿，于是它在类加载的时候就迫不及待的创建对象。  </li></ul><pre><code class="java">class Singleton {    // 私有化构造方法：    private Singleton() {    }    // 建立该方法的对象：    private static Singleton s = new Singleton();    // 提供外界访问该对象的方法：    public static Singleton getInstance() {        return s;    }    // 其余方法及属性的定义同普通类：    private static int age;    private static String name;    public void setAge(int age) {        this.age = age;    }    public int getAge() {        return age;    }    public void setName(String name) {        this.name = name;    }    public String getName() {        return name;    }}class SingletonDemo {    // 测试：    public static void main(String[] args) {        Singleton s1 = Singleton.getInstance();        Singleton s2 = Singleton.getInstance();        s1.setName(&quot; zhangsan!!!!!! &quot;);        System.out.println(s2.getName());    }}</code></pre><ul><li>懒汉式<br>所谓懒汉式，它很懒，不到迫不得已，它不创建对象，所以只有当使用时它才开始创建对象。  </li></ul><pre><code class="java">class Singleton {    // 私有化构造方法：    private Singleton() {    }    // 建立该方法的对象：    private static Singleton s = null;    // 提供外界访问该对象的方法：    public static Singleton getInstance() {        // 此处增加了对安全隐患的处理        if (s == null) {            synchronized (Singleton.class) {                if (s == null)                    s = new Singleton();            }        }        return s;    }    // 其余方法及属性的定义同普通类：    private static int age;    private static String name;    public void setAge(int age) {        this.age = age;    }    public int getAge() {        return age;    }    public void setName(String name) {        this.name = name;    }    public String getName() {        return name;    }}class SingletonDemo {    // 测试：    public static void main(String[] args) {        Singleton s1 = Singleton.getInstance();        Singleton s2 = Singleton.getInstance();        s1.setName(&quot; zhangsan!!!!!! &quot;);        System.out.println(s2.getName());    }}</code></pre><p>懒汉式设计的内容比较广，在面试中经常会被问及，但开发中一般使用饿汉式，简便快捷，无安全隐患</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> JAVA </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> JAVA </tag>
+            
+            <tag> 设计模式 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>语法：静态--static</title>
+      <link href="/2016/09/18/java/jing-tai-static/"/>
+      <url>/2016/09/18/java/jing-tai-static/</url>
+      
+        <content type="html"><![CDATA[<hr><p>Java中有一个特殊的关键字，叫static关键字，一个变量或方法是否被static修饰会导致它的性质和应用范围有很大的不同。本文主要讨论Java中静态与非静态的区别。  </p><hr><p>老毕的视频教程中讲到：  </p><blockquote><p>static是一个修饰符，用以修饰类成员（成员变量，成员函数）</p></blockquote><p>简明扼要的一句话，完美地诠释了static，静态与非静态的区别仅仅在于静态的属性或方法属于类，非静态的属性或方法属于某个具体的对象。</p><p><strong>概要</strong>  </p><ul><li><strong>静态的特点</strong>  </li><li><strong>实例变量（成员变量）与类变量（静态的成员变量）的区别</strong></li><li><strong>静态何时使用</strong>  </li><li><strong>静态使用注意事项</strong>  </li><li><strong>使用静态的利弊</strong>  </li><li><strong>运用实例</strong>  </li></ul><p><strong>静态的特点</strong></p><ol><li>随着类的加载而加载，随着类的消失而消失</li><li>优先于对象而存在</li><li>可以被类名直接调用</li><li>被所有对象所共享</li></ol><p><strong>实例变量（成员变量）与类变量（静态的成员变量）的区别</strong></p><ol><li>存放位置：<br> 实例变量：存放于堆内存中<br> 类变量：存放于方法区中  </li><li>生命周期：<br>实例变量：随着对象的建立而存在，随着对象的消失而消失<br>类变量：随着类的加载而存在，随着类的消失而消失</li></ol><p><strong>静态何时使用</strong>  </p><ul><li>静态属性：当所有的对象共享同一属性时，将该属性用static修饰</li><li>静态方法：当方法中不涉及访问具体对象的属性时用static修饰</li></ul><p><strong>静态使用注意事项</strong>  </p><ol><li>静态方法只能访问静态成员</li><li>静态方法中不能定义this，super等关键字</li></ol><p><strong>使用静态的利弊</strong>  </p><ul><li>利： 对对象的共有数据局进行单独的存储，节省空间；可以直接用类名调用，方便  </li><li>弊： 访问出现局限性；生命周期长</li></ul><p><strong>运用实例</strong><br>一般工具类多会封装一些静态的方法</p><pre><code class="java">//定义数组工具类ArrayToolclass ArrayTool { private ArrayTool(){}//将构造函数私有化，防止外界调用该类创建无意义的对象 //找寻数组元素中最大值 public static int getMax(int arr[]) {  int max=0;  for(int i=1;i&lt;arr.length;i++) {   if(arr[i]&gt;arr[max])    max=i;  }  return arr[max]; } //找寻数组中最小的元素 public static int getMin(int arr[]) {  int min=0;  for(int i=1;i&lt;arr.length;i++) {   if(arr[i]&lt;arr[min])    min=i;  }  return arr[min]; } //排序 public static void selectSort(int arr[]) {  for(int i=0;i&lt;arr.length-1;i++)   for(int j=i;j&lt;arr.length;j++) {    if(arr[i]&gt;arr[j]) {     int temp;     temp=arr[i];     arr[i]=arr[j];     arr[j]=temp;    }     //swap(arr[i],arr[j]);   } } //将数组输出 private static void swap(int a,int b) {  int temp;  temp=a;  a = b;  b=temp; } public static void showArray(int arr[]) {  for(int i=0;i&lt;arr.length;i++)   System.out.print(arr[i]+&quot; &quot;);  System.out.println(); }}class ArrayTest { public static void main(String[] args) {  int arr1[]={1,2,3,6,4,32};  int max=ArrayTool.getMax(arr1);  System.out.println(&quot;max=&quot;+max);  ArrayTool.showArray(arr1);  ArrayTool.selectSort(arr1);  ArrayTool.showArray(arr1); }}</code></pre>]]></content>
+      
+      
+      <categories>
+          
+          <category> JAVA </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> JAVA </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>HTTP协议</title>
+      <link href="/2016/09/18/web/http-xie-yi/"/>
+      <url>/2016/09/18/web/http-xie-yi/</url>
+      
+        <content type="html"><![CDATA[<p>HTTP（Hyper Text Transport Protocol）协议是我们生活中最常见的一种网络协议。它的全名叫做超文本传输协议。</p><ul><li>万维网工作原理（HTTP协议作用）</li><li>HTTP协议的分类</li><li>HTTP协议的内容</li></ul><ol><li><p><strong>万维网工作原理（HTTP协议作用）</strong><br>HTTP是面向事务的应用层的协议，它是万维网上能够可靠的交换文件的基础。万维网的工作过程如下图：<br><img src="http://i2.piimg.com/567571/0636f06a4d584f60.png" alt="image"><br>在这里有一个经典的面试题，这个题笔者在面试百度的时候曾经被问过，这个问题是“输入 <a href="http://www.baidu.com" target="_blank" rel="noopener">www.baidu.com</a> 回车之后发生了什么？”，这个问题简单的回答如下：</p><ol><li>浏览器向DNS请求解析<a href="http://www.baidu.com的IP地址。" target="_blank" rel="noopener">www.baidu.com的IP地址。</a></li><li>域名系统DNS解析出百度服务器的IP地址。</li><li>浏览器与服务器建立TCP连接。</li><li>浏览器发出取文件命令<br> GET /index.html</li><li>服务器给出响应，把文件index.html发送给浏览器。</li><li>TCP连接释放。</li><li>浏览器解析index.html，显示在页面中。</li></ol></li><li><p><strong>HTTP协议的分类</strong><br>目前HTTP协议只有两个版本：HTTP1.0 与 HTTP1.1。<br>自然1.1是比1.0高级的版本，那么1.1比1.0厉害在哪里呢？<br>其实它两者最大的差别如下：<br>HTTP1.0是无状态的，什么意思呢？这货在建立完TCP连接之后只为一次HTTP请求提供服务，也就是说可能某个页面有十张图片，需要向服务器发送十次HTTP请求，这个时候HTTP1.0的操作是重复地进行建立TCP连接，传送HTTP请求报文，传送HTTP响应报文，释放TCP连接 十次，很显然，这样做的效率是低下的。<br> HTTP1.1很好的改善了这一点，我们称它是持续连接的，它在发送完HTTP响应报文之后的一段时间内仍然会保持所建立的那条TCP连接，以便为下一次的HTTP请求服务。</p></li><li><p><strong>HTTP协议的内容</strong><br>HTTP的报文分为两种–请求报文与响应报文</p></li></ol><ul><li>请求报文<br>笔者用工具随手截取了一段HTTP请求报文如下：<br><code>`</code>HTML<br>GET /public/common/toolbar/css/index.css HTTP/1.1<br>Host: c.csdnimg.cn<br>Connection: keep-alive<br>Cache-Control: max-age=0<br>User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36<br>Accept: text/css,<em>/</em>;q=0.1<br>Referer: <a href="http://blog.csdn.net/forgotaboutgirl/article/details/6936982/" target="_blank" rel="noopener">http://blog.csdn.net/forgotaboutgirl/article/details/6936982/</a><br>Accept-Encoding: gzip, deflate, sdch<br>Accept-Language: zh-CN,zh;q=0.8<br>If-Modified-Since: Mon, 16 Nov 2015 10:38:49 GMT</li></ul><p>…</p><pre><code>对于它的解释如下：第一行叫做请求行：由请求的方法类型，请求的URL，协议版本和一个回车换行符构成。接下来的N行叫做首部行：包含一些参数，比如Host是请求的主机名，Accept是浏览器告诉服务器它所能接受解析的文档类型，Accept-Language是浏览器能解析的语言等。紧跟着是一个空行，标志着HTTP请求头已经结束，接下来的内容是请求体的内容。请求体的内容可以为空，也可以是表单的参数，形如：```HTMLusername=username&amp;password=pass</code></pre><ul><li>响应报文<br>同样截取一段响应报文如下：<br><code>`</code>HTML<br>HTTP/1.1 200 OK<br>Server: Apache-Coyote/1.1<br>Accept-Ranges: bytes<br>ETag: W/“105-1466676105602”<br>Last-Modified: Thu, 23 Jun 2016 10:01:45 GMT<br>Content-Type: text/html<br>Content-Length: 105<br>Date: Thu, 23 Jun 2016 10:04:32 GMT</li></ul><p>&lt;!DOCTYPE html&gt;</p><p><html lang="en"><br>    <head><meta name="generator" content="Hexo 3.8.0"><br>    </head></html></p><pre><code>&lt;body&gt;haha&lt;/body&gt;</code></pre><p><br><code>`</code><br>对于它的解释如下：<br>第一行叫做响应行：由HTTP版本号，响应码，响应码说明和一个回车换行符构成。<br>接下来的N行叫做首部行：包含一些参数，比如Server说明服务器类型。<br>紧跟着是一个空行，标志着HTTP请求头已经结束，接下来的内容是响应体的内容。<br>响应体的内容多为HTML代码，当然也可以是其他类型。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> web </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> HTTP </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>github pages + hexo 搭建个人博客</title>
+      <link href="/2016/09/18/web/github-pages-hexo-da-jian-ge-ren-bo-ke/"/>
+      <url>/2016/09/18/web/github-pages-hexo-da-jian-ge-ren-bo-ke/</url>
+      
+        <content type="html"><![CDATA[<hr><p>以前一直用有道云笔记记录学习的心得，最近准备面试人家都说要看个人博客，好吧，那就好好写博客吧。折腾了好几天，想用最好的方式搭建起自己的博客，今天为止，才算是找到了让自己满意的答案。最后决定采用markdown + hexo + github pages的模式。</p><hr><p>首先，本文面向有部分git基础的朋友。如果你是个小白，那么推荐你先学学git和github的基本操作，这两篇教程是笔者当时学习的教程，感觉非常不错，推荐给大家：<br>git教程：<a href="http://www.liaoxuefeng.com/wiki/0013739516305929606dd18361248578c67b8067c8c017b000" target="_blank" rel="noopener">廖雪峰的git教程</a><br>github教程：<a href="http://www.imooc.com/learn/390" target="_blank" rel="noopener">版本控制入门 – 搬进 Github</a></p><hr><p>好了，进入正题，下面请跟随我来开始个人博客站点的搭建：<br>分为这么几个步骤：</p><ol><li>创建github远端仓库</li><li>安装hexo</li><li>关联本地博客站点与远端仓库</li></ol><h5 id="1-创建github远端仓库"><a href="#1-创建github远端仓库" class="headerlink" title="1. 创建github远端仓库"></a>1. 创建github远端仓库</h5><p>登录到个人的github主页，添加一个仓库为：<br>username.github.io<br>注意这里的username是你的github同户名，仓库名必须为这种形式，这是github pages提供的形式，它只认这种形式（其实也可以是其他名字，但是得另外创建叫特定名字的分支）。如图:<br><img src="/images/2016/09/github-io.jpg" alt="github.io"></p><h5 id="2-安装hexo"><a href="#2-安装hexo" class="headerlink" title="2. 安装hexo"></a>2. 安装hexo</h5><p>在安装hexo之前，你本机先得有git和node.js环境，安装过程比较简单，请读者百度下载自行安装。<br>hexo的安装过程可以参照官网的教程：<a href="https://hexo.io/" target="_blank" rel="noopener">hexo官网</a><br><img src="/images/2016/09/hexo.jpg" alt="hexo"><br>首先，运行git bash，输入命令 <code>nmp install hexo-cli g</code> 即可安装hexo，选择一个本地文件夹用来存放你的静态博客站点，如D:\blog，在这个目录下面运行git bash，输入<code>hexo init</code>初始化当前路径为你的博客站点存放位置，运行<code>hexo server</code>命令就可以在本地查看你的博客站点了，访问地址为：localhost:4000，接下来如果你想新建一篇博客，只需运行<code>hexo new 文件名</code>即可，新创建的源文件默认是放到了你博客目录下面的source_posts文件夹下，hexo支持markdown，可以用atom等软件进行编写。</p><h5 id="3-关联本地博客与远端仓库"><a href="#3-关联本地博客与远端仓库" class="headerlink" title="3. 关联本地博客与远端仓库"></a>3. 关联本地博客与远端仓库</h5><p>现在，你已经在本地构建起你的个人站点了，但是你的更改，比如说添加一篇文章只能体现在你的本地机器上，别人看不到，现在，我们要做的是将更改实时同步到我们开始创建的github仓库。<br>要做到这一点，我们得对我们的hexo进行一定的配置，让它能找到我们的github仓库：打开_config.xml文件，找到：</p><pre><code># Deployment## Docs: https://hexo.io/docs/deployment.htmldeploy:</code></pre><p>更改为：</p><pre><code># Deployment## Docs: https://hexo.io/docs/deployment.htmldeploy:    type: git    repository: git@github.com:wangwei10061/wangwei10061.github.io.git    branch: master</code></pre><p>这里的wangwei10061需要改为你自己的用户名,出错可以参考这，<a href="http://www.v2ex.com/t/175940" target="_blank" rel="noopener">http://www.v2ex.com/t/175940</a>。好了，现在绑定完毕了，尝试着部署你的个人站点上github吧。<br>依次运行如下命令，当然首先你的git要能连到github远端仓库，本地和远端要有相应的SSH key，这一步如果存在问题，请回过头看本文前提：</p><pre><code>hexo generatehexo deploy</code></pre><p>现在，在浏览器中输入 username.github.io，同样username指你的github用户名，神奇的事情发生了有木有，你的博客被部署到这个独特的域名空间下了，尽情地写作吧~~</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> web </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> github-pages </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Servlet</title>
+      <link href="/2016/09/18/web/servlet/"/>
+      <url>/2016/09/18/web/servlet/</url>
+      
+        <content type="html"><![CDATA[<p>servlet是开发动态网站的一种技术，随后兴起的jsp等技术都是基于servlet的。<br>本文主要介绍servlet的生命周期，配置等知识，不对如何开发一个servlet作介绍。</p><ul><li><strong>servlet 创建方式</strong></li><li><strong>servlet 配置</strong></li><li><strong>servlet生命周期</strong></li><li><strong><a href="http://tomcat.apache.org/tomcat-5.5-doc/servletapi/" target="_blank" rel="noopener">servlet api</a></strong></li></ul><ol><li><p><strong>servlet创建方式</strong></p><ul><li>实现Servlet接口</li><li>继承GenericServlet类</li><li>继承HttpServlet类</li></ul></li><li><p><strong>servlet的配置</strong></p><ul><li><p>在servlet3.0版本之前，servlet的配置方式是在web.xml中进行配置：</p><pre><code class="xml">&lt;servlet&gt;  &lt;servlet-name&gt;servlet的名字&lt;/servlet-name&gt;  &lt;servlet-class&gt;servlet的全限定名&lt;/servlet-class&gt;&lt;/servlet&gt;&lt;servlet-mapping&gt;  &lt;servlet-name&gt;servlet的名字&lt;/servlet-name&gt;  &lt;url-pattern&gt;servlet的映射路径&lt;url-pattern&gt;&lt;/servlet-mapping&gt;</code></pre></li><li><p>从servlet3.0开始，增加了基于注解的配置方式，在Servlet定义的Java类的前边加上相应的注解即完成了相应的配置，如：</p><pre><code class="java">@WebServlet(name = &quot;TestServlet&quot;,urlPatterns = &quot;/*&quot;)public class TestServlet extends HttpServlet</code></pre></li></ul></li><li><p><strong>servlet生命周期</strong></p><ul><li>init方法<br>客户端第一次向服务器发送请求，服务器会通过反射从web.xml文件中获取到相应servlet的配置信息，创建相应的servlet对象并且调用其init方法进行初始化。</li><li>service方法<br>对应每一次客户端发来的请求，服务器都会调用一次service方法进行处理。</li><li>destroy方法<br>当服务器关闭或者应用程序从服务器中卸载时，servlet的destroy方法会被调用。</li></ul></li></ol><p><img src="/images/2016/09/Image 8.png" alt="生命周期图"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> web </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> servlet </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>语法：多线程</title>
+      <link href="/2016/09/18/java/duo-xian-cheng/"/>
+      <url>/2016/09/18/java/duo-xian-cheng/</url>
+      
+        <content type="html"><![CDATA[<hr><p>面试中被问的最多的问题之一就是Java的并发与多线程了，一直想花点时间好好总结一下，今天终于下笔。</p><hr><h5 id="一、几个概念："><a href="#一、几个概念：" class="headerlink" title="一、几个概念："></a>一、几个概念：</h5><p><strong>进程</strong>：简而言之就是进行中的程序<br><strong>线程</strong>：是“进程”中某个单一顺序的控制流，是程序中一条独立的执行路径<br><strong>单线程</strong>：整个进程中就只有一个单一的线程贯穿始终<br><strong>多线程</strong>：一个进程中含多个线程，cpu在不同的线程中快速地切换执行</p><h5 id="二、如何创建一个线程："><a href="#二、如何创建一个线程：" class="headerlink" title="二、如何创建一个线程："></a>二、如何创建一个线程：</h5><ol><li><p>继承Thread类<br>   具体步骤：<br>   a. 继承Thread类<br>   b. 复写run()方法<br>   c. 用该类的对象.start()方法来创建一个线程并调用run()方法<br><em>注意：不要直接调用run方法，如果直接调用该对象的run方法，跟普通的函数调用没有区别，不能达到开启多线程的目的</em></p></li><li><p>实现Runnable接口<br>具体步骤：<br>a. 实现Runnable接口<br>b. 复写run()方法<br>c. 以该类的对象为Thread类构造方法的参数建立一个Thread对象<br>d. 调用start()方法</p></li></ol><p>示例程序：</p><pre><code class="java">// MultiThreadingDemo .javapackage wintervacation.multithreading;/** * Created by wangw on 2016/3/2. * 演示创建多线程的两种方式： * a.继承Thread类 * b.实现Runnable接口 */public class MultiThreadingDemo {    public static void main(String[] args) {        MyThread0 thread0 = new MyThread0();        thread0.start();        /*        myThread1不能作为线程启动运行，必须包装在Thread对象thread1中        但是thread1启动运行的线程是myThread1，执行的线程体也是myThread1的         */        MyThread1 myThread1 = new MyThread1();        Thread thread1 = new Thread(myThread1);        thread1.start();        for(int i=0;i&lt;500;i++) {            System.out.println(Thread.currentThread().getName()+&quot; is running-------&quot;+i);        }        System.out.println(Thread.currentThread().getName()+&quot;is over&quot;);    }    //方式1：继承Thread类    static class MyThread0 extends Thread {        @Override        public void run() {        for(int i=0;i&lt;500;i++) {                System.out.println(Thread.currentThread().getName()+&quot; is running-------&quot;+i);            }            System.out.println(Thread.currentThread().getName()+&quot;is over&quot;);        }    }    //方式2:实现Runnable接口    static class MyThread1 implements Runnable {        @Override        public void run() {            for(int i=0;i&lt;500;i++) {                System.out.println(Thread.currentThread().getName()+&quot; is running-------&quot;+i);            }                System.out.println(Thread.currentThread().getName()+&quot;is over&quot;);        }    }}</code></pre><p>运行结果：<br><img src="/images/2016/10/c1.png" alt="c1"></p><p>二者的区别：  </p><ul><li>Java只允许单继承，第一种方式要求继承Thread类没有其他父类，所以第二种方式的使用范围更广  </li><li>对于多个具有相同程序代码的线程处理同一资源的情况，第二种方式对CPU(线程)、程序的代码和数据进行了有效的分离，较好的体现了面向对象的思想。<br>请看下面两个程序：  </li></ul><pre><code class="java">// SellTicketSystem0.java package wintervacation.multithreading;/** * Created by wangw on 2016/3/2. * 用继承Thread的方式模拟火车票售票系统，与实现Runnable接口的方式作比较 * 假设四个系统同时出售某一车次的100张车票 */public class SellTicketSystem0 {public static void main(String[] args) {        MyThread myThread0 = new MyThread();        myThread0.start();        MyThread myThread1 = new MyThread();        myThread1.start();        MyThread myThread2 = new MyThread();        myThread2.start();        MyThread myThread3 = new MyThread();        myThread3.start();    }}class MyThread extends Thread {    private int ticket = 100;    @Override    public void run() {      while(ticket&gt;0) {              System.out.println(this.getName()+&quot; sell out ticket&quot; + ticket--);      }    }}</code></pre><p>运行结果：<br><img src="/images/2016/10/c2.png" alt="c2"><br>可以看到每一张票被每个线程都卖了一遍，原因是每个线程都有它自己的100张票，显然不是我们想要的<br>再看另一种方式：  </p><pre><code class="java">// SellTicketSystem1.java package wintervacation.multithreading;/** * Created by wangw on 2016/3/2. * 用实现Runnable接口的方式模拟火车票售票系统，与继承Thread的方式作比较 * 假设四个系统同时出售某一车次的100张车票 */public class SellTicketSystem1 { public static void main(String[] args) {        MyThread thread = new MyThread();        Thread myThread0 = new Thread(thread);        myThread0.start();        Thread myThread1 = new Thread(thread);        myThread1.start();        Thread myThread2 = new Thread(thread);        myThread2.start();        Thread myThread3 = new Thread(thread);        myThread3.start();    } static class MyThread implements Runnable {    private int ticket = 100;    @Override    public void run() {      while(ticket&gt;0) {         System.out.println(Thread.currentThread().getName() + &quot; sell out ticket&quot; + ticket--);      }    }  }}</code></pre><p>运行结果：<br><img src="/images/2016/10/c3.png" alt="c3"><br>可以看到，所有的线程访问同一个变量，在不考虑同步的情况下很好的模拟了火车票售票系统。</p><h5 id="三、线程状态的转换"><a href="#三、线程状态的转换" class="headerlink" title="三、线程状态的转换"></a>三、线程状态的转换</h5><p>线程的生命周期图：<br><img src="/images/2016/10/threadstates.jpg" alt></p><p>Oracle官方给出的线程的状态分为四个：new, runnable, non-runnable 以及 terminated。<br>此处我们采用更容易接受的五状态生命周期图。说明如下：  </p><ul><li>New<br>新建状态，线程的实例已经被创建但是start方法尚未被调用  </li><li>Runnable<br>当该线程的start方法被调用，但是还没有被CPU调度选中时，线程处于Runnable状态  </li><li>Running<br>CPU调度选中，获得运行权  </li><li>Non-Runnable (Blocked)<br>线程阻塞状态，线程仍然存活，但是由于某些原因，导致它的运行受阻暂时不能运行  </li><li>Terminated<br>当线程的run方法退出时，线程进入Teminated状态  </li></ul><h5 id="四、线程的优先级和常用的方法"><a href="#四、线程的优先级和常用的方法" class="headerlink" title="四、线程的优先级和常用的方法"></a>四、线程的优先级和常用的方法</h5><ul><li>优先级<br>线程的优先级用1~10之间的一个整数表示，数值越大优先级越高，Thread类中定义了三个常量:<br>最高优先级:Thread.MAX_PRIORITY————10<br>最低优先级:Thread.MIN_PRIORITY————1<br>默认优先级:Thread.NORM_PRIORITY———–5  </li><li>常用方法<blockquote></blockquote>public void run(): is used to perform action for a thread.<br>public void start(): starts the execution of the thread.JVM calls the run() method on the thread.<br>public void sleep(long miliseconds): Causes the currently executing thread to sleep (temporarily cease execution) for the specified number of milliseconds.<br>public void join(): waits for a thread to die.<br>public void join(long miliseconds): waits for a thread to die for the specified miliseconds.<br>public int getPriority(): returns the priority of the thread.<br>public int setPriority(int priority): changes the priority of the thread.<br>public String getName(): returns the name of the thread.<br>public void setName(String name): changes the name of the thread.<br>public Thread currentThread(): returns the reference of currently executing thread.<br>public int getId(): returns the id of the thread.<br>public Thread.State getState(): returns the state of the thread.<br>public boolean isAlive(): tests if the thread is alive.<br>public void yield(): causes the currently executing thread object to temporarily pause and allow other threads to execute.<br>public void suspend(): is used to suspend the thread(depricated).<br>public void resume(): is used to resume the suspended thread(depricated).<br>public void stop(): is used to stop the thread(depricated).<br>public boolean isDaemon(): tests if the thread is a daemon thread.<br>public void setDaemon(boolean b): marks the thread as daemon or user thread.<br>public void interrupt(): interrupts the thread.<br>public boolean isInterrupted(): tests if the thread has been interrupted.<br>public static boolean interrupted(): tests if the current thread has been interrupted.  </li></ul><p>示例程序：  </p><pre><code class="java">// ThreadPriority.javapackage wintervacation.multithreading;/** * Created by wangw on 2016/3/2. 用于演示Thread的优先级，高优先级线程的执行优先于低优先级线程 */public class ThreadPriority {    public static void main(String[] args) throws InterruptedException {        System.out.println(&quot;最高优先级：&quot; + Thread.MAX_PRIORITY);        System.out.println(&quot;最低优先级：&quot; + Thread.MIN_PRIORITY);        System.out.println(&quot;默认优先级：&quot; + Thread.NORM_PRIORITY);        MyThread thread0 = new MyThread();        thread0.setPriority(Thread.MAX_PRIORITY);        thread0.start();        MyThread thread1 = new MyThread();        thread1.setPriority(Thread.MIN_PRIORITY);        thread1.start();        MyThread thread2 = new MyThread();        thread2.setPriority(Thread.NORM_PRIORITY);        thread2.start();        // join方法：当前线程执行某一线程的join方法之后，当前线程等到该线程执行结束之后才能执行        // thread1.join();        for (int i = 0; i &lt; 50; i++) {            System.out.println(Thread.currentThread().getName() + &quot; is running-------&quot; + i);        }        System.out.println(Thread.currentThread().getName() + &quot;is over&quot;);    }    static class MyThread extends Thread {        @Override        public void run() {            for (int i = 0; i &lt; 50; i++) {                System.out.println(Thread.currentThread().getName() + &quot; is running-------&quot; + i);            }            System.out.println(Thread.currentThread().getName() + &quot;is over&quot;);        }    }}</code></pre><h5 id="五、同步问题"><a href="#五、同步问题" class="headerlink" title="五、同步问题"></a>五、同步问题</h5><p>临界资源:同一时刻只允许一个线程访问的资源<br>临界区：处理临界资源的代码<br>涉及到临界资源的问题需要用到同步机制，否则可能会出现错误或会导致不安全，上面的卖票程序就存在这样的问题，为了使效果更加明显，我们在单个线程卖票之前让它睡眠100ms：  </p><pre><code class="java">static class MyThread implements Runnable {    private int ticket = 100;    @Override    public void run() {        while (ticket &gt; 0) {            try {                Thread.sleep(100);            } catch (InterruptedException e) {                e.printStackTrace();            }            System.out.println(Thread.currentThread().getName() + &quot; sell out ticket&quot; + ticket--);        }    }}</code></pre><p>运行结果：<br><img src="/images/2016/10/result.png" alt="result"><br>我们看到Thread-0,Thread-2和Thread-1分别卖出了代号为0,-1,-2的票,这显然是错误的<br>原因是线程3检测到ticket=1时，进入睡眠，此时线程0检测ticket仍然为1，也进入临界区，睡眠，同理，线程2,1依次进入临界区，睡眠。<br>100ms后，Thread-3恢复运行，卖出标号为1的票，ticket减一变为0，线程0,2,1依次恢复运行并执行卖票和ticket–的动作，便出现了图示的结果。<br>为了保护共享数据的完整性，JAVA语言引入了互斥锁的概念。<br>互斥锁：Java中的每一个对象都有且仅有一个互斥锁，对于加锁的临界区，只有拿到该锁的线程可以访问，Java使用synchronized关键字给对象家锁。<br>同步方法：使用synchronized修饰的方法，开发者不用指定加锁对象，JVM默认给this对象加锁<br>同步代码块：使用synchronized修饰的代码块，需要指定加锁对象<br>改进后的火车票售票系统：<br>&lt;方式1&gt;  </p><pre><code class="java">static class MyThread implements Runnable {    private int ticket = 100;    @Override    public void run() {        while (true) {            synchronized (&quot;haha&quot;) {                if (ticket &gt; 0) {                    try {                        Thread.sleep(100);                    } catch (InterruptedException e) {                        e.printStackTrace();                    }                    System.out.println(Thread.currentThread().getName() + &quot; sell out ticket&quot; + ticket--);                } else                    break;            }        }    }}</code></pre><p>&lt;方式2&gt;   </p><pre><code class="java">static class MyThread implements Runnable {    private int ticket = 100;    @Override    public void run() {        while (true) {            sell();            if (ticket &lt;= 0)                break;        }    }    public synchronized void sell() {        if (ticket &gt; 0) {            try {                Thread.sleep(100);            } catch (InterruptedException e) {                e.printStackTrace();            }            System.out.println(Thread.currentThread().getName() + &quot; sell out ticket&quot; + ticket--);        }    }}</code></pre><p>运行结果：<br><img src="/images/2016/10/result1.png" alt="result1">  </p><h5 id="六、死锁问题"><a href="#六、死锁问题" class="headerlink" title="六、死锁问题"></a>六、死锁问题</h5><p>死锁：并发运行的多个线程彼此等待对方占有的资源、都无法运行的状态<br>synchronized关键字要慎用，不然很容易出现死锁，下面是一个例子：  </p><pre><code class="java">// DeadLockDemo.javapackage wintervacation.multithreading;/** * Created by wangw on 2016/3/2. 死锁的例子 */public class DeadLockDemo {    public static void main(String[] args) throws InterruptedException {        StringBuffer sb = new StringBuffer(&quot;haha&quot;);        MyThread thread = new MyThread(sb);        thread.start();        synchronized (sb) {            thread.join();            System.out.println(Thread.currentThread().getName());        }    }    static class MyThread extends Thread {        private StringBuffer sb = new StringBuffer();        MyThread(StringBuffer sb) {            this.sb = sb;        }        @Override        public void run() {            synchronized (sb) {                System.out.println(this.getName());            }        }    }}</code></pre><p>主线程中调用了thread的join方法，等待thread线程执行完毕，而thread线程需要sb锁，sb锁被main线程占用，故也无法执行，发生死锁。<br>死锁没有好的解决方式，应该尽量避免。</p><h5 id="七、线程之间的通信"><a href="#七、线程之间的通信" class="headerlink" title="七、线程之间的通信"></a>七、线程之间的通信</h5><p>多线程程序之间如果没有通信，相互孤立，就失去了多线程的意义了。<br>通信问题的经典例子：<br>生产者消费者的同步问题（问题描述请自行上网搜索）<br>Java多线程实现：  </p><pre><code class="java">// ConsumerAndProductor.javapackage wintervacation.multithreading;/** * Created by wangw on 2016/3/2. 消费者和生产者的例子，用于说明线程之间的通信 把生产者和消费者作为两个线程 * 仓库作为一个类，有装入生产者生产的商品和向消费者提供商品两个方法 */public class ConsumerAndProductor {    public static void main(String[] args) {        Repo repo = new Repo();        ComsumerThread comsumerThread = new ComsumerThread(repo);        comsumerThread.start();        ProductorThread productorThread = new ProductorThread(repo);        productorThread.start();    }}class Repo {    // 仓库可以容纳6件商品    char[] data = new char[6];    int index = 0;    public synchronized void in(char c) {        if (index == 6) {            try {                this.wait();                System.out.println(&quot;-----&quot; + this);            } catch (InterruptedException e) {                e.printStackTrace();            }        }        data[index++] = c;        System.out.println(&quot;生产了产品&quot; + c);        this.notify();    }    public synchronized char out() {        if (index == 0) {            try {                this.wait();            } catch (InterruptedException e) {                e.printStackTrace();            }        }        index--;        System.out.println(&quot;消费了产品&quot; + data[index]);        this.notify();        return data[index];    }}class ComsumerThread extends Thread {    Repo repo;    ComsumerThread(Repo repo) {        this.repo = repo;    }    @Override    public void run() {        for (int i = 0; i &lt; 20; i++) {            char c = (char) (Math.random() * 26 + &#39;A&#39;);            repo.in(c);            try {                Thread.sleep((int) (Math.random() * 10));            } catch (InterruptedException e) {                e.printStackTrace();            }        }    }}class ProductorThread extends Thread {    Repo repo;    ProductorThread(Repo repo) {        this.repo = repo;    }    @Override    public void run() {        for (int i = 0; i &lt; 20; i++) {            repo.out();            try {                Thread.sleep((int) (Math.random() * 100));            } catch (InterruptedException e) {                e.printStackTrace();            }        }    }}</code></pre>]]></content>
+      
+      
+      <categories>
+          
+          <category> JAVA </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> JAVA </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+  
+  
+</search>

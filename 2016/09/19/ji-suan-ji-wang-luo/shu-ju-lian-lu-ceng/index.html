@@ -1,0 +1,884 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head><meta name="generator" content="Hexo 3.8.0">
+    <meta charset="utf-8">
+    <meta name="keywords" content="数据链路层, 顽逗">
+    <meta name="description" content="
+个人笔记，无参考价值
+
+
+使用点对点信道的数据链路层1.1 数据链路层点对点信道各种协议的三个基本问题封装成帧，透明传输，差错检验1.2 封装成帧把网络层传输下来的IP数据报加上帧首部和帧尾部构造成帧1.3 透明传输 传输过程中，采用“S">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>数据链路层 | 顽逗</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+    <style type="text/css">
+        
+    </style>
+
+    <script src="/libs/jquery/jquery-2.2.0.min.js"></script>
+</head>
+
+
+<body>
+
+<header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">顽逗</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fa fa-navicon"></i></a>
+<ul class="right">
+    
+    <li class="hide-on-med-and-down">
+        <a href="/" class="waves-effect waves-light">
+            
+            <i class="fa fa-home"></i>
+            
+            <span>首页</span>
+        </a>
+    </li>
+    
+    <li class="hide-on-med-and-down">
+        <a href="/tags" class="waves-effect waves-light">
+            
+            <i class="fa fa-tags"></i>
+            
+            <span>标签</span>
+        </a>
+    </li>
+    
+    <li class="hide-on-med-and-down">
+        <a href="/categories" class="waves-effect waves-light">
+            
+            <i class="fa fa-bookmark"></i>
+            
+            <span>分类</span>
+        </a>
+    </li>
+    
+    <li class="hide-on-med-and-down">
+        <a href="/archives" class="waves-effect waves-light">
+            
+            <i class="fa fa-archive"></i>
+            
+            <span>归档</span>
+        </a>
+    </li>
+    
+    <li class="hide-on-med-and-down">
+        <a href="/about" class="waves-effect waves-light">
+            
+            <i class="fa fa-user-circle-o"></i>
+            
+            <span>关于</span>
+        </a>
+    </li>
+    
+    <li class="hide-on-med-and-down">
+        <a href="/friends" class="waves-effect waves-light">
+            
+            <i class="fa fa-address-book"></i>
+            
+            <span>友情链接</span>
+        </a>
+    </li>
+    
+    <li>
+        <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+            <i id="searchIcon" class="fa fa-search" title="搜索"></i>
+        </a>
+    </li>
+</ul>
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">顽逗</div>
+        <div class="logo-desc">
+            
+            --wangwei10061
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li>
+            <a href="/" class="waves-effect waves-light">
+                
+                <i class="fa fa-fw fa-home"></i>
+                
+                首页
+            </a>
+        </li>
+        
+        <li>
+            <a href="/tags" class="waves-effect waves-light">
+                
+                <i class="fa fa-fw fa-tags"></i>
+                
+                标签
+            </a>
+        </li>
+        
+        <li>
+            <a href="/categories" class="waves-effect waves-light">
+                
+                <i class="fa fa-fw fa-bookmark"></i>
+                
+                分类
+            </a>
+        </li>
+        
+        <li>
+            <a href="/archives" class="waves-effect waves-light">
+                
+                <i class="fa fa-fw fa-archive"></i>
+                
+                归档
+            </a>
+        </li>
+        
+        <li>
+            <a href="/about" class="waves-effect waves-light">
+                
+                <i class="fa fa-fw fa-user-circle-o"></i>
+                
+                关于
+            </a>
+        </li>
+        
+        <li>
+            <a href="/friends" class="waves-effect waves-light">
+                
+                <i class="fa fa-fw fa-address-book"></i>
+                
+                友情链接
+            </a>
+        </li>
+        
+        
+    </ul>
+</div>
+
+        </div>
+
+        
+    </nav>
+
+</header>
+
+
+<script src="/libs/cryptojs/crypto-js.min.js"></script>
+<script>
+    (function() {
+        let pwd = 'bda2934344e2056525530add332bee338a5c572e2db410b0dfc06ffecbc160cb';
+        if (pwd && pwd.length > 0) {
+            if (pwd !== CryptoJS.SHA256(prompt('请输入访问本文章的密码')).toString(CryptoJS.enc.Hex)) {
+                alert('密码错误，将返回主页！');
+                location.href = '/';
+            }
+        }
+    })();
+</script>
+
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/21.jpg')">
+    <div class="container">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <div class="description center-align post-title">
+                        数据链路层
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        margin: 35px 0 15px 0;
+        padding-left: 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #toc-content .is-active-link::before {
+        background-color: #42b983;
+    }
+</style>
+<div class="row">
+    <div class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/计算机网络/" target="_blank">
+                                <span class="chip bg-color">计算机网络</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fa fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/计算机网络/" class="post-category" target="_blank">
+                                计算机网络
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                <div class="post-date info-break-policy">
+                    <i class="fa fa-calendar-minus-o fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2016-09-19
+                </div>
+
+                
+				
+				
+                    <div id="busuanzi_container_page_pv" class="info-break-policy">
+                        <i class="fa fa-eye fa-fw"></i>阅读次数:&nbsp;&nbsp;
+                        <span id="busuanzi_value_page_pv"></span>
+                    </div>
+				
+            </div>
+        </div>
+        <hr class="clearfix">
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <hr>
+<p>个人笔记，无参考价值</p>
+<hr>
+<ol>
+<li><p>使用点对点信道的数据链路层<br>1.1 数据链路层点对点信道各种协议的三个基本问题<br>封装成帧，透明传输，差错检验<br>1.2 封装成帧<br>把网络层传输下来的IP数据报加上帧首部和帧尾部构造成帧<br>1.3 透明传输<br> 传输过程中，采用“SOH”,”EOT”分别作为首部和尾部的标记<br> 对于文本文件，完全由可见的ascii码构成，不会出现“SOH”，“EOT”标记，所以不用做任何处理即可实现透明传输<br> 对于非文本文件，由于可能出现“SOH””EOT”字符，所以要对数据部分作一定的处理：<br> 字节填充法（字符填充法）：发送端数据中出现“SOH””EOT”字符时，在它前边加一个转义字符，若数据中本身含有转义字符，则在改转义字符前边再加一个转义字符“ESC”，接收端接收到数据时，删除对应“SOH””EOT””ESC”前面的转义字符<br><img src="/images/2016/10/1-3.png" alt="1.3"></p>
+<p>1.4 差错检验  </p>
+<ul>
+<li>传输差错：比特差错，帧丢失，帧重复，帧失序<br><img src="/images/2016/10/1-40.png" alt="1.40"></li>
+<li>比特差错：0–&gt;1 1–&gt;0  </li>
+<li>误码率：传输错误地比特数占总比特数的比例</li>
+<li>帧检验序列(FCS)：指为了检错而添加的冗余码</li>
+<li>循环冗余校验（广泛使用的方法，但不是唯一的方法）：<br>发送端：<br>假定数据M有k位（比如101001，k = 7），我们要在这k位数据之后添加n位冗余码，这n位冗余码怎么得到呢，算法如下：<br>用原始的数据M乘以2^n （相当于在M后面添加了n个0）,得到一个k + n位的数2^n*M，用这个数模2除（模2除自行百度）以一个事先约定好的n + 1位的除数，那么能得到一个n位的余数，这个余数即就是我们想要的冗余码<br><img src="/images/2016/10/1-41.png" alt="1.41"><br>接收端：<br>把接收到的数据进行CRC校验，如果数据传输没有出错，那么用接收到的帧模2除以上面提到的事先约定好的n + 1位的除数，那么得到的余数必然为0，为什么呢？在于模2运算，请自行思考。<br>经过循环冗余校验之后，如果得出的余数为0，则判定这个帧没有差错，接受，否则判定该帧有差错，丢弃。<br>数据链路层实现了无比特差错的传输，但这还不是可靠传输，因为没有解决帧丢失，帧重复，帧失序的问题，可靠传输有TCP协议来实现（OSI模型倡导把数据链路层做成可靠的，但是现在实际并没有这么做）</li>
+</ul>
+</li>
+<li><p>PPP协议<br>对于点对点的链路，目前采用最广泛的协议是PPP协议。用户与ISP通信时使用的就是PPP协议：<br><img src="/images/2016/10/2.0.png" alt><br>2.1 PPP协议的组成部分  </p>
+<ul>
+<li>一个将IP数据报封装到串行链路的方法</li>
+<li>一个用来建立、配置和测试数据链路连接的链路控制协议LCP</li>
+<li>一套网络控制协议NCP，用来支持不同的网络层协议  </li>
+</ul>
+<p>2.2 PPP协议的帧格式<br>   PPP帧分为三部分，即首部、数据和尾部<br>  首部分为四个字段，第一字段是标志字段F，规定为十六进制的0x7E（01111110），表示一个帧         的开始或结束，是PPP帧的界定符。<br>  首部的第二字段为1字节地址字段A，规定为0xFF；<br>   首部的第三字段为1字节控制字段C规定为0x03；<br>  首部的第三字段为2字节协议字段，规定了帧当中封装的协议。如0x0021为IP协议；<br>  数据部分的长度是可变的，但不超过1500字节；<br>  尾部第一字段为2字节的CRC校验序列FCS。第二字段为Ox7E（01111110）                                                   <img src="/images/2016/10/2.2.png" alt><br>2.3 异步传输功能的透明传输解决办法<br> 采用字节填充的方式解决透明传输的问题。<br> 当PPP使用异步传输时，它把转义符定义为0x7D，并使用字节填充，填充方法如下：<br>   （1）把数据字段出现的每一个0x7E字节转换为2字节序列（ 0x7D，0x5E ）；<br>   （2）若数据字段出现一个0x7D的字节，则把转变为2字节序列（ 0x7D，0x5D ）；<br>   （3）若数据字段中出现了ASCII的控制字符（数值小于0x20的字符），则在该字符前面要加入一个0x7D字节，同时改变该字符的编码。如0x03转变为0x7D，0x31 ；<br>由于在发送端进行了字节填充，因此在链路上传送的信息字节数超过了原来的信息字节数。在接收端进行相反的变化，正确恢复原来的信息。<br>2.4 同步传输功能的透明传输解决办法</p>
+<ul>
+<li>零比特填充<br>  PPP用在SONET/SDH链路时，使用的是同步传输，在这种情况下，PPP协议采用零比特填充的方法来实现透明传输。<br>（1）在发送端，先扫描整个数据字段，只要发现有5个连续1，则立即填入一个0；<br>（2）在接收端进行相反的操作。</li>
+</ul>
+</li>
+<li><p>使用广播信道的数据链路层<br>局域网作为使用广播信道的典型，只介绍局域网。  </p>
+<ul>
+<li>适配器（网卡）<br>计算机与外界局域网的连接是通过适配器来实现的，适配器的作用是把计算机要发送到局域网的并行数据转换成串行数据发送到局域网，以及从局域网接收串行数据并将其转换为并行数据传送给计算机<br><img src="/images/2016/10/3.1.png" alt></li>
+</ul>
+</li>
+<li><p>以太网<br>以太网是应用最广的局域网。<br>4.1 以太网的特点  </p>
+<ul>
+<li>以太网采用无连接的工作方式。</li>
+<li>传统以太网采用动态随机接入媒体共享技术。</li>
+<li>以太网采用曼彻斯特编码的信号。</li>
+<li>传统以太网需要解决“冲突”问题。  </li>
+</ul>
+<p>4.2 CSMA/CD协议（载波监听，多点接入，碰撞检测）<br><img src="/images/2016/10/4.2.png" alt>  </p>
+<ul>
+<li>部分结论<br>发生碰撞的两个数据帧都不可用；<br>任何一个站在最多两倍的端到端的传播时延后就可以确定是否发生了碰撞；<br>在使用CSMA/CD协议时，一个站不可能同时进行发送和接收；<br>每个站在自己发送数据之后的一小段时间内，存在着发生碰撞的可能性；<br>如果发生了碰撞，发送数据的站必须推迟一段时间后重新发送。  </li>
+<li>争用期<br>任何一个站在发送数据帧后最多2倍的端到端延时就可确定是否发生了碰撞，将此时间称为碰撞窗口，又称争用期；<br>以太网采用51.2us作为争用期，对于10Mbit/s的以太网在争用期内可以发送512bit的数据，既64字节。对于以太网，如果前64字节没有发生碰撞，则不会发生碰撞；以太网数据帧最小的长度为64字节。  </li>
+</ul>
+<ul>
+<li>截断二进制指数类型的退避算法<br>a、将争用期作为基本退避时间t；<br>b、k=min[重传次数，10]；<br>c、从[0，1，……，(2k-1)]中随机取出一个数n，重传的等待时间T=t * n；<br>d、当重传次数达到16次时，丢掉该帧,向上层报告。  </li>
+<li>传统以太网碰撞后的处理<br>在检测到碰装后，产生碰撞的站，可加入人为干扰信号，强化碰撞。将碰撞放大，使碰撞信号能    被更多的站点检测到；避免更多的碰撞产生  </li>
+</ul>
+<p>4.3 以太网的MAC层</p>
+<ul>
+<li>mac地址：<br>以太网的硬件为48位，六个字节，又称为MAC地址；<br>MAC地址存在网卡中；<br>IEEE规定第1字节的最低位为I/G位，为0时表示地址是一个单个站地址，为1时表示组地址，用来进行多播；<br>IEEE规定第1字节的最低第2位为G/L位，0时表示本地地址，1时为全球地址。  </li>
+<li>mac帧<br><img src="/images/2016/10/4.3.2.png" alt><br>网卡收到的数据帧包括以下三种：单播、广播和多播，网卡检查收到帧中包含的目的MAC地址，如果是发往本站的接收，否则抛弃  </li>
+<li>网桥（二层交换机）<br>实现物理分段的设备称之为网桥，网桥的作用是隔离碰撞域，但是不能隔离广播域<br>网桥的自学习算法：<br><img src="/images/2016/10/4.3.3.1.png" alt><br><img src="/images/2016/10/4.3.3.2.png" alt><br>二层交换机是网桥的升级版，增加了流量控制和差错检验的功能，并且支持多条数据交换通道，支持全双工模式，这时CSMA/CD协议失效，支持自协商（物理链路两端的设备自动通过交互信息，自动选择一种运行模式来运行）  </li>
+<li>虚拟局域网<br>前面讲到的网桥可以细化广播域，但不能隔离广播域，那么通过何种技术来细化广播域呢？<br>答案是虚拟局域网，虚拟局域网是由一些局域网物理网段构成的与物理位置无关的逻辑组，而这些网段具有某些共同的需求。实现虚拟局域网的设备是路由器，细化广播域又叫逻辑分段。</li>
+</ul>
+</li>
+<li><p>无线局域网<br>待补充</p>
+</li>
+</ol>
+
+            </div>
+            <hr>
+
+            
+            <style>
+    #reward {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    #reward .reward-link {
+        font-size: 1.88rem;
+    }
+
+    #reward .btn-floating:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #rewardModal {
+        width: 320px;
+        height: 350px;
+    }
+
+    #rewardModal .reward-title {
+        margin: 15px auto;
+        padding-bottom: 5px;
+    }
+
+    #rewardModal .modal-content {
+        padding: 10px;
+    }
+
+    #rewardModal .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.3rem;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    #rewardModal .close:hover {
+        color: #ef5350;
+        transform: scale(1.3);
+        -moz-transform:scale(1.3);
+        -webkit-transform:scale(1.3);
+        -o-transform:scale(1.3);
+    }
+
+    #rewardModal .reward-tabs {
+        margin: 0 auto;
+        width: 210px;
+    }
+
+    .reward-tabs .tabs {
+        height: 38px;
+        margin: 10px auto;
+        padding-left: 0;
+    }
+
+    .reward-content ul {
+        padding-left: 0 !important;
+    }
+
+    .reward-tabs .tabs .tab {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .reward-tabs .tab a {
+        color: #fff;
+        background-color: #ccc;
+    }
+
+    .reward-tabs .tab a:hover {
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .reward-tabs .wechat-tab .active {
+        color: #fff !important;
+        background-color: #22AB38 !important;
+    }
+
+    .reward-tabs .alipay-tab .active {
+        color: #fff !important;
+        background-color: #019FE8 !important;
+    }
+
+    .reward-tabs .reward-img {
+        width: 210px;
+        height: 210px;
+    }
+</style>
+
+<div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-large waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fa fa-close"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/images/alipay.png" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/images/wechat.png" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+            
+
+            <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+
+<!-- <div id="article-share">
+    
+    <div class="social-share" data-disabled="qzone" data-wechat-qrcode-helper="<p>微信里点“发现”->“扫一扫”二维码便可查看分享。</p>"></div>
+    
+</div> -->
+
+<script src="/libs/share/js/social-share.min.js"></script>
+
+
+            <div class="reprint">
+                <p>
+                    <span class="reprint-tip">
+                        <i class="fa fa-exclamation-circle"></i>&nbsp;&nbsp;转载请注明:
+                    </span>
+                    <a href="wangwei10061.github.io" class="b-link-green">顽逗</a>
+                    <i class="fa fa-angle-right fa-lg fa-fw text-color"></i>
+                    <a href="/2016/09/19/ji-suan-ji-wang-luo/shu-ju-lian-lu-ceng/" class="b-link-green">数据链路层</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    
+        <link rel="stylesheet" href="/libs/gitalk/gitalk.css">
+<link rel="stylesheet" href="/css/my-gitalk.css">
+
+<div class="card gitalk-card" data-aos="fade-up">
+    <div id="gitalk-container" class="card-content"></div>
+</div>
+
+<script src="/libs/gitalk/gitalk.min.js"></script>
+<script>
+    let gitalk = new Gitalk({
+        clientID: '4f5459a7ef09d284b76f',
+        clientSecret: '2ae198a7284cc09092870816a2db9e9c715642a1',
+        repo: 'wangwei10061.github.io',
+        owner: 'wangwei10061',
+        admin: ["wangwei10061"],
+        id: '2016-09-19T19-55-00',
+        distractionFreeMode: false  // Facebook-like distraction free mode
+    });
+
+    gitalk.render('gitalk-container');
+</script>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fa fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/2016/09/19/suan-fa-yu-shu-ju-jie-gou/shu/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/1.jpg" class="responsive-img" alt="树">
+                        
+                        <span class="card-title">树</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary">
+个人笔记，无参考价值
+
+
+树的一些概念，定义
+二叉树的定义
+二叉树的性质： a. i层最大结点数：2^(i - 1) b. k层满二叉树结点总数：2^k - 1 c. n0 = n2 + 1 d. 完全二叉树的深度：[log n] + 1</div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="fa fa-clock-o fa-fw icon-date"></i>2016-09-19
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fa fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/算法与数据结构/" class="post-category" target="_blank">
+                                    算法与数据结构
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/algorithm/" target="_blank">
+                        <span class="chip bg-color">algorithm</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fa fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2016/09/19/maven/07-pom-de-wen-jian-jie-gou/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/21.jpg" class="responsive-img" alt="07--pom的文件结构">
+                        
+                        <span class="card-title">07--pom的文件结构</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary">POM常用标签如下
+&lt;!--pom项目根标签，指定一些项目的约束--&gt;
+&lt;project&gt;  
+    &lt;!--pom的版本，固定值4.0.0--&gt;
+    &lt;modelVersion&gt;4.0</div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="fa fa-clock-o fa-fw icon-date"></i>2016-09-19
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fa fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/maven/" class="post-category" target="_blank">
+                                    maven
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/maven/" target="_blank">
+                        <span class="chip bg-color">maven</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+</div>
+
+
+<script>
+    $('#articleContent').on('copy', function (e) {
+        // IE8 or earlier browser is 'undefined'
+        if (typeof window.getSelection === 'undefined') return;
+
+        var selection = window.getSelection();
+        // if the selection is short let's not annoy our users.
+        if (('' + selection).length < Number.parseInt('120')) {
+            return;
+        }
+
+        // create a div outside of the visible area and fill it with the selected text.
+        var bodyElement = document.getElementsByTagName('body')[0];
+        var newdiv = document.createElement('div');
+        newdiv.style.position = 'absolute';
+        newdiv.style.left = '-99999px';
+        bodyElement.appendChild(newdiv);
+        newdiv.appendChild(selection.getRangeAt(0).cloneContents());
+
+        // we need a <pre> tag workaround.
+        // otherwise the text inside "pre" loses all the line breaks!
+        if (selection.getRangeAt(0).commonAncestorContainer.nodeName === 'PRE') {
+            newdiv.innerHTML = "<pre>" + newdiv.innerHTML + "</pre>";
+        }
+
+        var url = document.location.href;
+        newdiv.innerHTML += '<br />'
+            + '来源: 顽逗<br />'
+            + '作者: 威少<br />'
+            + '链接: <a href="' + url + '">' + url + '</a><br />'
+            + '本文章著作权归作者所有，任何形式的转载都请注明出处。';
+
+        selection.selectAllChildren(newdiv);
+        window.setTimeout(function () {bodyElement.removeChild(newdiv);}, 200);
+    });
+</script>
+
+    </div>
+    <div class="col l3 hide-on-med-and-down">
+        <div class="toc-widget">
+            <div class="toc-title"><i class="fa fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            // headingsOffset: -205,
+            headingSelector: 'h1, h2, h3, h4, h5, h6'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h1, h2, h3, h4, h5, h6').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+    });
+</script>
+    
+
+</main>
+
+
+<footer class="page-footer bg-color">
+    <div class="container row center-align">
+        <div class="col s12 m8 l8 copy-right">
+            本站&copy;基于
+            <a href="https://hexo.io/" target="_blank">Hexo</a>的 
+            <a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">hexo-theme-matery</a>主题搭建.
+
+            
+
+            
+			
+                <br>
+                
+                <span id="busuanzi_container_site_pv">
+                    <i class="fa fa-heart-o"></i>
+                    本站总访问量 <span id="busuanzi_value_site_pv" class="white-color"></span>
+                </span>
+                
+                
+                <span id="busuanzi_container_site_uv">
+                    <i class="fa fa-users"></i>
+                    次,&nbsp;访客数 <span id="busuanzi_value_site_uv" class="white-color"></span> 人.
+                </span>
+                
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/wangwei10061" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fa fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:153692771@qq.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fa fa-envelope-open"></i>
+    </a>
+
+
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+<!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fa fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字" class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script src="/js/search.js"></script>
+<script type="text/javascript">
+$(function () {
+    searchFunc("/" + "search.xml", 'searchInput', 'searchResult');
+});
+</script>
+<!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fa fa-angle-up"></i>
+    </a>
+</div>
+
+
+<script src="/libs/materialize/materialize.min.js"></script>
+<script src="/libs/masonry/masonry.pkgd.min.js"></script>
+<script src="/libs/aos/aos.js"></script>
+<script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+<script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+<script src="/js/matery.js"></script>
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+
+    <script src="/libs/others/clicklove.js"></script>
+
+
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+
+
+</body>
+</html>
