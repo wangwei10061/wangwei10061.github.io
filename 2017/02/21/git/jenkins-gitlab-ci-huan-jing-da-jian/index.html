@@ -360,7 +360,7 @@ wget -q -O - https://pkg.jenkins.io/debian/j">
 <blockquote>
 <p>sudo apt-get update<br>sudo apt-get install curl openssh-server ca-certificates postfix<br>sudo apt-get install gitlab-ce</p>
 </blockquote>
-<p>安装完之后默认是只能本机通过localhost访问的，修改</p>
+<p>安装完之后默认是只能本机通过localhost访问的，修改/etc/gitlab/gitlab.rb  </p>
 <blockquote>
 <p>external_url ‘<a href="http://your" target="_blank" rel="noopener">http://your</a> ip:8080’<br>nginx[‘listen_addresses’] = [‘your ip’]<br>nginx[‘listen_port’] = 8080  </p>
 </blockquote>
