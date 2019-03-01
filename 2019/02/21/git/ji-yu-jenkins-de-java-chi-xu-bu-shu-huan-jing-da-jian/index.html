@@ -338,8 +338,8 @@ Jenkins实现Java项目的自动部署，基于Jenkins + Gitlab CI环境搭建
 <hr>
 <h5 id="1-介绍"><a href="#1-介绍" class="headerlink" title="1. 介绍"></a>1. 介绍</h5><p>需求：<br>有Maven管理的Java项目<a href="https://github.com/wangwei10061/JenkinsTest.git" target="_blank" rel="noopener">JenkinsTest</a>，要求对JenkinsTest的每一次版本提交触发Jenkins的一次自动构建，并自动部署war包到服务器。</p>
 <p>测试环境如下：<br>VMWare虚拟机1（192.168.249.129），1C2G，部署Jenkins服务，通过<a href="https://blog.csdn.net/huhuhuemail/article/details/53283539" target="_blank" rel="noopener">Tomcat运行Jenkins.war</a>的方式<br>VMWare虚拟机2（192.168.249.130），1C2G，部署Gitlab服务，同时作为Tomcat应用服务器（后续工程war包部署的服务器）</p>
-<h5 id="2-安装Jenkins插件"><a href="#2-安装Jenkins插件" class="headerlink" title="2. 安装Jenkins插件"></a>2. 安装Jenkins插件</h5><p>为Jenkins安装Maven Integration plugin（提供maven支持）及Publish Over SSH(因为Jenkins服务器与应用服务器不是同一服务器，需要传送war包到应用服务器)插件。<br>安装完成之后在Global Tool Configuration中对Maven插件配置如下：<br><img src="../../../images/2019/03/Maven.jpg" alt><br>而Publish Over SSH的配置需要在Configure System中进行，参照<a href="https://blog.51cto.com/faded/1761770" target="_blank" rel="noopener">https://blog.51cto.com/faded/1761770</a></p>
-<h5 id="3-创建Jenkins-Job"><a href="#3-创建Jenkins-Job" class="headerlink" title="3. 创建Jenkins Job"></a>3. 创建Jenkins Job</h5><p>创建Jenkins Maven Project，绑定仓库地址：<br><img src="../../../images/2019/03/Source Code Management.jpg" alt="Source Code Management"><br>勾选push触发条件：<br><img src="../../../images/2019/03/Build Triggers.jpg" alt="Build Triggers"><br>设置maven goal，此处为war:war<br><img src="../../../images/2019/03/Build.jpg" alt="Build"><br>在打包完成之后，需要将war包传送到应用服务器，并部署到tomcat webapps目录，重启tomcat，作配置如下：<br><img src="../../../images/2019/03/Post-build Actions.jpg" alt="Post-build Actions"><br>具体每一项参数的意思可以参见输入框后的说明，其中deploy.sh的内容如下：</p>
+<h5 id="2-安装Jenkins插件"><a href="#2-安装Jenkins插件" class="headerlink" title="2. 安装Jenkins插件"></a>2. 安装Jenkins插件</h5><p>为Jenkins安装Maven Integration plugin（提供maven支持）及Publish Over SSH(因为Jenkins服务器与应用服务器不是同一服务器，需要传送war包到应用服务器)插件。<br>安装完成之后在Global Tool Configuration中对Maven插件配置如下：<br><img src="/images/2019/03/Maven.jpg" alt><br>而Publish Over SSH的配置需要在Configure System中进行，参照<a href="https://blog.51cto.com/faded/1761770" target="_blank" rel="noopener">https://blog.51cto.com/faded/1761770</a></p>
+<h5 id="3-创建Jenkins-Job"><a href="#3-创建Jenkins-Job" class="headerlink" title="3. 创建Jenkins Job"></a>3. 创建Jenkins Job</h5><p>创建Jenkins Maven Project，绑定仓库地址：<br><img src="/images/2019/03/Source Code Management.jpg" alt="Source Code Management"><br>勾选push触发条件：<br><img src="/images/2019/03/Build Triggers.jpg" alt="Build Triggers"><br>设置maven goal，此处为war:war<br><img src="/images/2019/03/Build.jpg" alt="Build"><br>在打包完成之后，需要将war包传送到应用服务器，并部署到tomcat webapps目录，重启tomcat，作配置如下：<br><img src="/images/2019/03/Post-build Actions.jpg" alt="Post-build Actions"><br>具体每一项参数的意思可以参见输入框后的说明，其中deploy.sh的内容如下：</p>
 <pre class=" language-shell"><code class="language-shell">#默认变量值
 TOMCAT_HOME="/root/apache-tomcat-8.5.38"
 TOMCAT_PORT=48081
@@ -381,8 +381,7 @@ cp $HOME/war/$PROJECT.war $TOMCAT_HOME/webapps/$PROJECT.war
 $TOMCAT_HOME/bin/startup.sh
 echo "tomcat is starting,please try to access $PROJECT conslone url"
 </projectname></projectname></code></pre>
-<h5 id="4-测试"><a href="#4-测试" class="headerlink" title="4. 测试"></a>4. 测试</h5><p>修改代码，push至Gitlab，访问应用服务器，看到如下界面：</p>
-<p>说明自动部署成功。</p>
+<h5 id="4-测试"><a href="#4-测试" class="headerlink" title="4. 测试"></a>4. 测试</h5><p>修改代码，push至Gitlab，访问应用服务器，看到如下界面：<br><img src="/images/2019/03/Xnip2019-03-01_23-22-59.jpg" alt><br>说明自动部署成功。</p>
 <p>本文仅供参考，文中细节未做详尽说明，遇到问题应参照错误信息具体调试。</p>
 
             </div>
