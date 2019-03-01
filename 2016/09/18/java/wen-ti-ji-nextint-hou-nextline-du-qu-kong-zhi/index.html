@@ -580,24 +580,25 @@ def
             <div class="article-badge left-badge text-color">
                 <i class="fa fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2016/09/18/java/wen-ti-ji-2-2-5/">
+                <a href="/2016/09/18/java/wen-ti-ji-tong-ming-bian-liang-wen-ti/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/11.jpg" class="responsive-img" alt="问题集：2 + 2 = 5">
+                        <img src="/medias/featureimages/0.jpg" class="responsive-img" alt="问题集：同名变量问题">
                         
-                        <span class="card-title">问题集：2 + 2 = 5</span>
+                        <span class="card-title">问题集：同名变量问题</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary">
-一个有趣的实验：2 + 2 = 5
+本文介绍什么情况下在同一个类中同名变量可以共存
 
 相关代码如下：
-import java.lang.reflect.*;
-
-public class Test {
-    public static void main(String[] args) </div>
+class Test{
+ static int x = 1;
+ public static void main(String[] args){
+  int x=2;
+  S</div>
                     <div class="publish-info">
                         <span class="publish-date">
                             <i class="fa fa-clock-o fa-fw icon-date"></i>2016-09-18

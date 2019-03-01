@@ -564,22 +564,24 @@ class Test{
             <div class="article-badge left-badge text-color">
                 <i class="fa fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2016/09/18/java/wen-ti-ji-liang-ge-string-shi-fou-xiang-deng/">
+                <a href="/2016/09/18/java/wen-ti-ji-2-2-5/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/21.jpg" class="responsive-img" alt="问题集：两个String是否相等">
+                        <img src="/medias/featureimages/11.jpg" class="responsive-img" alt="问题集：2 + 2 = 5">
                         
-                        <span class="card-title">问题集：两个String是否相等</span>
+                        <span class="card-title">问题集：2 + 2 = 5</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary">
-我们知道String类私有的维护一个字符串池，在判断两个字符串对象是否==时，要考虑到这一点
+一个有趣的实验：2 + 2 = 5
 
-首先来看一段代码：  
-class StringDemo {
- public static void main(String[] args) </div>
+相关代码如下：
+import java.lang.reflect.*;
+
+public class Test {
+    public static void main(String[] args) </div>
                     <div class="publish-info">
                         <span class="publish-date">
                             <i class="fa fa-clock-o fa-fw icon-date"></i>2016-09-18
@@ -614,24 +616,20 @@ class StringDemo {
                 下一篇&nbsp;<i class="fa fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2016/09/18/java/wen-ti-ji-zi-ding-yi-java.lang.object-lei/">
+                <a href="/2016/09/18/java/wen-ti-ji-nextint-hou-nextline-du-qu-kong-zhi/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/21.jpg" class="responsive-img" alt="问题集：自定义java.lang.Object类">
+                        <img src="/medias/featureimages/20.jpg" class="responsive-img" alt="问题集：nextInt后nextLine读取空值">
                         
-                        <span class="card-title">问题集：自定义java.lang.Object类</span>
+                        <span class="card-title">问题集：nextInt后nextLine读取空值</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
-                    <div class="summary">
-同学去阿里面试的时候被问到的问题：可否自定义一个String类，放在一个名为java.lang的包中？与此问题有异曲同工之妙。
+                    <div class="summary">在学习Scanner类的时候遇到一个问题，在使用nextInt()获取到一个整数之后，如果接着调用nextLine()方法，nextLine()方法将获取不到值？
+import java.util.*;
 
-相关代码如下：
-package java.lang;
-
-public class Object {
-    </div>
+public class Test</div>
                     <div class="publish-info">
                             <span class="publish-date">
                                 <i class="fa fa-clock-o fa-fw icon-date"></i>2016-09-18
