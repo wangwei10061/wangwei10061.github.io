@@ -295,8 +295,8 @@ wget -q -O - https://pkg.jenkins.io/debian/j">
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/git/" target="_blank">
-                                <span class="chip bg-color">git</span>
+                            <a href="/tags/git-jenkins/" target="_blank">
+                                <span class="chip bg-color">git, jenkins</span>
                             </a>
                         
                     </div>
@@ -346,7 +346,7 @@ wget -q -O - https://pkg.jenkins.io/debian/j">
 <blockquote>
 <p>sudo /etc/init.d/jenkins start<br>sudo /etc/init.d/jenkins stop  </p>
 </blockquote>
-<p>Jenkins安装完毕后，可以通过浏览器，例如192.168.16.183:8080，此处IP地址为Jenkins所在机器的IP地址。 这时候可能会卡在Setup<br>Wizard这个页面，原因是它要测试是否能与Google连通来判断网络是否连通，翻一下墙就好了。<br>按照提示一步一步走到dashboard界面。  </p>
+<p>Jenkins安装完毕后，可以通过浏览器，例如192.168.16.183:8080，此处IP地址为Jenkins所在机器的IP地址。 这时候可能会卡在Setup<br>Wizard这个页面，原因是它要测试是否能与Google连通来判断网络是否连通，<a href="/2016/09/18/git/an-zhuang-gitlab">翻一下墙</a>就好了。<br>按照提示一步一步走到dashboard界面。  </p>
 <p>Jenkins安装好之后，需要为其安装gitlab插件:<br>在主面板上点击Manage Jenkins -&gt; Manage Plugins，选择安装Gitlab Plugin和Gitlab Hook Plugin。</p>
 <h5 id="2-搭建gitlab源码服务器"><a href="#2-搭建gitlab源码服务器" class="headerlink" title="2. 搭建gitlab源码服务器"></a>2. 搭建gitlab源码服务器</h5><p>直接从官网下载gitlab的deb包已经下载不下来了，阿里云和网易的源也没有gitlab的源，现在我所找到的源只有<a href="https://mirror.tuna.tsinghua.edu.cn/help/gitlab-ce/" target="_blank" rel="noopener">清华</a>的镜像<br>首先信任 GitLab 的 GPG 公钥:  </p>
 <blockquote>
@@ -388,7 +388,7 @@ wget -q -O - https://pkg.jenkins.io/debian/j">
 <li><p>配置GitLab connections<br>连接到gitlab拉取代码使用，配置证书，使用gitlab api token。<br>token从gitlab中获取，在个人设置中有Access Token一栏，<br>创建一个token，填入jenkins的系统管理 -&gt; 系统设置 -&gt; gitlab配置中。<br><img src="/images/2017/02/token.png" alt="token"><br><img src="/images/2017/02/jenkins-gitlab.png" alt="jenkins gitlab"><br>Test Connection，显示success则表示配置成功。  </p>
 </li>
 </ol>
-<h5 id="4-测试集成环境"><a href="#4-测试集成环境" class="headerlink" title="4. 测试集成环境"></a>4. 测试集成环境</h5><p>新建一个项目，源码管理选git，填入对应的仓库URL，配置    Credentials，<br>这里可以选择用ssh username with private key（其他的我也没试成功过。。），输入用户名和对应的私钥即可<br><img src="/images/2017/02/源码管理.png" alt="源码管理"><br>接下来构建触发器选择Build when a change is pushed to GitLab. GitLab CI Service URL: …<br><img src="/images/2017/02/构建触发器.png" alt="构建触发器"><br>注意： 由于我们的jenkins任务由webhook事件来通知，所以需要将上面的CI<br>service URL添加到gitlab对应项目的Integrations配置中。<br><img src="/images/2017/02/integrations配置.png" alt="Integrations配置"><br>配置完之后apply，保存。jenkins任务就新建完成了<br>此时我们在本地push代码到gitlab服务器，可以看到：<br>成功地触发一次jenkins构建，效果如下：<br><img src="/images/2017/02/jenkins-build.png" alt="jenkins build">  </p>
+<h5 id="4-测试集成环境"><a href="#4-测试集成环境" class="headerlink" title="4. 测试集成环境"></a>4. 测试集成环境</h5><p>新建一个项目，源码管理选git，填入对应的仓库URL，配置    Credentials，<br>这里可以选择用ssh username with private key（其他的我也没试成功过。。），输入用户名和对应的私钥即可<br><img src="/images/2017/02/源码管理.png" alt="源码管理"><br>接下来构建触发器选择Build when a change is pushed to GitLab. GitLab CI Service URL: …<br><img src="/images/2017/02/构建触发器.png" alt="构建触发器"><br>注意： 由于我们的jenkins任务由webhook事件来通知，所以需要将上面的CI<br>service URL添加到gitlab对应项目的Integrations配置中(这里如果是内网IP会被Gitlab拒绝，可使用内网穿透工具穿透内网)。<br><img src="/images/2017/02/integrations配置.png" alt="Integrations配置"><br>配置完之后apply，保存。jenkins任务就新建完成了<br>此时我们在本地push代码到gitlab服务器，可以看到：<br>成功地触发一次jenkins构建，效果如下：<br><img src="/images/2017/02/jenkins-build.png" alt="jenkins build">  </p>
 <p>至此jenkins+gitlab持续集成环境搭建完成！</p>
 
             </div>
