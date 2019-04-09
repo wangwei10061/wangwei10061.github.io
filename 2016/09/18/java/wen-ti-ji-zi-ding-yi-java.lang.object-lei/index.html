@@ -545,22 +545,25 @@ public class Object {
             <div class="article-badge left-badge text-color">
                 <i class="fa fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2016/09/18/java/wen-ti-ji-liang-ge-string-shi-fou-xiang-deng/">
+                <a href="/2016/09/18/java/wen-ti-ji-tong-ming-bian-liang-wen-ti/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/21.jpg" class="responsive-img" alt="问题集：两个String是否相等">
+                        <img src="/medias/featureimages/0.jpg" class="responsive-img" alt="问题集：同名变量问题">
                         
-                        <span class="card-title">问题集：两个String是否相等</span>
+                        <span class="card-title">问题集：同名变量问题</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary">
-我们知道String类私有的维护一个字符串池，在判断两个字符串对象是否==时，要考虑到这一点
+本文介绍什么情况下在同一个类中同名变量可以共存
 
-首先来看一段代码：  
-class StringDemo {
- public static void main(String[] args) </div>
+相关代码如下：
+class Test{
+ static int x = 1;
+ public static void main(String[] args){
+  int x=2;
+  S</div>
                     <div class="publish-info">
                         <span class="publish-date">
                             <i class="fa fa-clock-o fa-fw icon-date"></i>2016-09-18
@@ -595,25 +598,18 @@ class StringDemo {
                 下一篇&nbsp;<i class="fa fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2016/09/18/java/wen-ti-ji-tong-ming-bian-liang-wen-ti/">
+                <a href="/2016/09/18/java/java-ji-ben-de-cheng-xu-she-ji-jie-gou/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/0.jpg" class="responsive-img" alt="问题集：同名变量问题">
+                        <img src="/medias/featureimages/10.jpg" class="responsive-img" alt="语法：JAVA基本的程序设计结构">
                         
-                        <span class="card-title">问题集：同名变量问题</span>
+                        <span class="card-title">语法：JAVA基本的程序设计结构</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary">
-本文介绍什么情况下在同一个类中同名变量可以共存
-
-相关代码如下：
-class Test{
- static int x = 1;
- public static void main(String[] args){
-  int x=2;
-  S</div>
+高级语言的基本程序设计结构都是大同小异的，笔者大学期间学习的第一门高级语言是C语言，在学习Java语言中不涉及到面向对象的部分时，都还是感觉非常得心应手的，毕竟高级语言的组成都比较相近，大体包括：标识符，变量，常量，关键字，分隔符，表达式</div>
                     <div class="publish-info">
                             <span class="publish-date">
                                 <i class="fa fa-clock-o fa-fw icon-date"></i>2016-09-18
